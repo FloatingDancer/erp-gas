@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Delivery;
+use App\Models\Order;
+use App\Models\Driver;
+use App\Models\ActivityLog;
+use Illuminate\Http\Request;
+
+class DeliveryController extends Controller
+{
+    public function index()
+    {
+        $user = auth()->user();
+        if ($user && $user->isDriver()) {
+            $deliveries = Delivery::with(['order', 'driver'])
+                ->where('driver_id', $user->driver_id)
+                ->get();
+        } else {
+            $deliveries = Delivery::with(['order', 'driver'])->get();
+        }
+        return view('deliveries.index', compact('deliveries'));
+    }
+
+    public function create()
+    {
+        // Tampilkan order yang belum memiliki data pengiriman (delivery)
+        $orders = Order::whereDoesntHave('delivery')->get();
+        $drivers = Driver::where('status', 'Active')->get();
+        return view('deliveries.create', compact('orders', 'drivers'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'driver_id' => 'required|exists:drivers,id',
+            'delivery_date' => 'required|date',
+            'status' => 'required',
+        ]);
+
+        $driver = Driver::find($request->driver_id);
+        $data = $request->all();
+        $data['driver_name'] = $driver->name;
+
+        $delivery = Delivery::create($data);
+
+        // Jika status delivery adalah 'Delivered', otomatis set status order menjadi 'Completed'
+        if ($delivery->status === 'Delivered') {
+            $delivery->order->update(['status' => 'Completed']);
+        }
+
+        ActivityLog::log('Create', 'Menjadwalkan pengiriman untuk Order #' . $request->order_id . ' dengan driver ' . $driver->name);
+
+        return redirect()->route('deliveries.index')
+            ->with('success', 'Delivery berhasil ditambahkan!');
+    }
+
+    public function edit(Delivery $delivery)
+    {
+        // Tampilkan order yang belum memiliki data pengiriman, atau yang sedang digunakan oleh pengiriman ini sendiri
+        $orders = Order::whereDoesntHave('delivery')
+            ->orWhere('id', $delivery->order_id)
+            ->get();
+        $drivers = Driver::all();
+        return view('deliveries.edit', compact('delivery', 'orders', 'drivers'));
+    }
+
+    public function update(Request $request, Delivery $delivery)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'driver_id' => 'required|exists:drivers,id',
+            'delivery_date' => 'required|date',
+            'status' => 'required',
+        ]);
+
+        $driver = Driver::find($request->driver_id);
+        $data = $request->all();
+        $data['driver_name'] = $driver->name;
+
+        $delivery->update($data);
+
+        // Jika status delivery adalah 'Delivered', otomatis set status order menjadi 'Completed'
+        if ($delivery->status === 'Delivered') {
+            if ($delivery->order) {
+                $delivery->order->update(['status' => 'Completed']);
+            }
+        } else {
+            // Jika status pengiriman diubah dari Delivered ke status lain (misal kembali ke Scheduled/On Delivery), 
+            // kembalikan status order menjadi 'Pending'
+            if ($delivery->order && $delivery->order->status === 'Completed') {
+                $delivery->order->update(['status' => 'Pending']);
+            }
+        }
+
+        ActivityLog::log('Update', 'Memperbarui pengiriman #' . $delivery->id . ' status: ' . $delivery->status);
+
+        return redirect()->route('deliveries.index')
+            ->with('success', 'Delivery berhasil diperbarui!');
+    }
+
+    public function destroy(Delivery $delivery)
+    {
+        $id = $delivery->id;
+        $delivery->delete();
+
+        ActivityLog::log('Delete', 'Menghapus pengiriman #' . $id);
+
+        return redirect()->route('deliveries.index')
+            ->with('success', 'Delivery berhasil dihapus!');
+    }
+
+    public function confirmArrival(Delivery $delivery)
+    {
+        $delivery->update(['status' => 'Delivered']);
+        
+        if ($delivery->order) {
+            $delivery->order->update(['status' => 'Completed']);
+        }
+
+        ActivityLog::log('Update', 'Mengonfirmasi pengiriman #' . $delivery->id . ' telah sampai di tempat pelanggan.');
+
+        return redirect()->back()->with('success', 'Pengiriman berhasil dikonfirmasi sampai!');
+    }
+}
