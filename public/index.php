@@ -1,5 +1,24 @@
 <?php
 
+if (isset($_GET['debug_db'])) {
+    header('Content-Type: text/plain');
+    try {
+        $pdo = new PDO("mysql:host=bbxep7rxv8hul594p6jc-mysql.services.clever-cloud.com;port=3306;dbname=bbxep7rxv8hul594p6jc", "unpxbjtqthzw7cfe", "MMhhmU8R6zpxyhytFH7h");
+        echo "Database connection to Clever Cloud successful!\n";
+    } catch (\Throwable $e) {
+        echo "Database connection failed: " . $e->getMessage() . "\n";
+    }
+    exit;
+}
+
+if (isset($_GET['debug_env'])) {
+    header('Content-Type: text/plain');
+    $env = $_ENV;
+    if (isset($env['DB_PASSWORD'])) $env['DB_PASSWORD'] = '******';
+    print_r($env);
+    exit;
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
