@@ -37,6 +37,10 @@ try {
     /** @var Application $app */
     $app = require_once __DIR__.'/../bootstrap/app.php';
 
+    // Force bootstrapping here to catch early boot exceptions!
+    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+    $kernel->bootstrap();
+
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
     header('Content-Type: text/plain', true, 500);
