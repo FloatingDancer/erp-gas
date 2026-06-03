@@ -10,7 +10,7 @@ class DriverUserSeeder extends Seeder
 {
     public function run()
     {
-        User::where('email', 'driver@example.com')->delete();
+        User::where('email', 'driver@gmail.com')->delete();
 
         $driver = Driver::create([
             'name' => 'Budi Santoso',
@@ -21,8 +21,8 @@ class DriverUserSeeder extends Seeder
 
         User::create([
             'name' => 'Budi Santoso',
-            'email' => 'driver@example.com',
-            'password' => bcrypt('password'),
+            'email' => 'driver@gmail.com',
+            'password' => bcrypt('12345678'),
             'role' => 'driver',
             'driver_id' => $driver->id
         ]);
