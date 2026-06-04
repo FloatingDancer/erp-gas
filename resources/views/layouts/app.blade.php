@@ -863,7 +863,8 @@
         const sidebarOverlay  = document.getElementById('sidebarOverlay');
 
         if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
+            sidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
                 sidebar.classList.add('open');
                 sidebarOverlay.classList.add('show');
             });
@@ -875,6 +876,16 @@
                 sidebarOverlay.classList.remove('show');
             });
         }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 992 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
+                }
+            }
+        });
     </script>
     
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
