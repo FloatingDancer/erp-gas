@@ -281,6 +281,17 @@
             background: #f1f5f9;
             border-color: #cbd5e1;
         }
+        @media (max-width: 576px) {
+            .topbar-profile-trigger {
+                padding: 0;
+                border: none;
+                background: transparent;
+            }
+            .topbar-profile-trigger:hover {
+                background: transparent;
+                border-color: transparent;
+            }
+        }
 
         /* Avatar circle */
         .topbar-profile-avatar {
@@ -716,11 +727,11 @@
             {{-- Profile Trigger --}}
             <div class="topbar-profile-trigger" id="profileTrigger" style="position:relative;">
                 <div class="topbar-profile-avatar">{{ $initials }}</div>
-                <div class="topbar-profile-info">
+                <div class="topbar-profile-info d-none d-sm-block">
                     <div class="topbar-profile-name">{{ auth()->user()->name }}</div>
                     <div class="topbar-profile-role d-none d-sm-block">{{ auth()->user()->isDriver() ? 'Driver' : 'Administrator' }}</div>
                 </div>
-                <span class="topbar-profile-chevron" id="profileChevron">▼</span>
+                <span class="topbar-profile-chevron d-none d-sm-inline" id="profileChevron">▼</span>
 
                 {{-- Dropdown Menu --}}
                 <div class="topbar-profile-dropdown-menu" id="profileDropdown">
