@@ -1,4 +1,59 @@
 <x-guest-layout>
+    <style>
+        .quick-login-divider {
+            text-align: center;
+            margin: 24px 0 16px;
+            position: relative;
+        }
+        .divider-line {
+            border: 0;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.08);
+            margin: 0;
+        }
+        .divider-text {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #141b2a;
+            padding: 0 12px;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+        }
+        .quick-login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn-demo-login {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-demo-login:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #e2e8f0;
+        }
+        .btn-demo-login:active {
+            transform: scale(0.98);
+        }
+    </style>
+
     {{-- Session Status --}}
     @if (session('status'))
         <div class="session-status">{{ session('status') }}</div>
@@ -59,6 +114,22 @@
 
         {{-- Submit --}}
         <button type="submit" class="btn-login">Masuk →</button>
+
+        {{-- Quick Login Divider --}}
+        <div class="quick-login-divider">
+            <hr class="divider-line">
+            <span class="divider-text">Atau Quick Login</span>
+        </div>
+
+        {{-- Quick Login Buttons --}}
+        <div class="quick-login-grid">
+            <button type="button" class="btn-demo-login" onclick="quickLogin('admin@gmail.com', '12345678')">
+                🔑 Admin
+            </button>
+            <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
+                🚚 Driver
+            </button>
+        </div>
     </form>
 
     <script>
@@ -72,5 +143,19 @@
             this.innerHTML = '👁';
         }
     });
+
+    function quickLogin(email, password) {
+        document.getElementById('email').value = email;
+        document.getElementById('password').value = password;
+        
+        const form = document.querySelector('form');
+        const submitBtn = form.querySelector('.btn-login');
+        submitBtn.innerHTML = 'Memproses masuk... ⏳';
+        submitBtn.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            form.submit();
+        }, 150);
+    }
     </script>
 </x-guest-layout>
