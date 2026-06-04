@@ -484,6 +484,27 @@
             box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
         }
         /* Notifications Styling */
+        .notification-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            background: white;
+            width: 340px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            z-index: 2000;
+            display: none;
+            text-align: left;
+            cursor: default;
+        }
+        @media (max-width: 576px) {
+            .notification-dropdown-menu {
+                width: 280px;
+                right: -120px;
+            }
+        }
         .bell-badge {
             position: absolute;
             top: 2px;
@@ -681,7 +702,7 @@
                 <span class="bell-badge" id="notificationBadge" style="display:none;">0</span>
                 
                 {{-- Dropdown Menu --}}
-                <div class="notification-dropdown-menu" id="notificationDropdown" style="position:absolute; right:0; top:calc(100% + 8px); background:white; width:340px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.12); border:1px solid #e2e8f0; padding:12px; z-index:2000; display:none; text-align:left; cursor:default;" onclick="event.stopPropagation();">
+                <div class="notification-dropdown-menu" id="notificationDropdown" onclick="event.stopPropagation();">
                     <div class="notification-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:8px; margin-bottom:8px;">
                         <span class="notification-header-title" style="font-size:13.5px; font-weight:700; color:#0f172a;">🔔 Notifikasi Sistem</span>
                         <span id="notificationCountText" style="font-size:11.5px; color:#64748b;">0 baru</span>
