@@ -127,20 +127,22 @@
         {{-- Submit --}}
         <button type="submit" class="btn-login">Masuk →</button>
 
-        {{-- Quick Login Divider --}}
-        <div class="quick-login-divider">
-            <span class="divider-text">Atau Quick Login</span>
-        </div>
+        @if(config('app.demo'))
+            {{-- Quick Login Divider --}}
+            <div class="quick-login-divider">
+                <span class="divider-text">Atau Quick Login</span>
+            </div>
 
-        {{-- Quick Login Buttons --}}
-        <div class="quick-login-grid">
-            <button type="button" class="btn-demo-login" onclick="quickLogin('admin@gmail.com', '12345678')">
-                🔑 Admin
-            </button>
-            <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
-                🚚 Driver
-            </button>
-        </div>
+            {{-- Quick Login Buttons --}}
+            <div class="quick-login-grid">
+                <button type="button" class="btn-demo-login" onclick="quickLogin('admin@gmail.com', '12345678')">
+                    🔑 Admin
+                </button>
+                <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
+                    🚚 Driver
+                </button>
+            </div>
+        @endif
     </form>
 
     <script>
