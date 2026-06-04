@@ -1,27 +1,13 @@
 <x-guest-layout>
     <style>
-        .quick-login-divider {
+        .quick-login-title {
             text-align: center;
-            margin: 24px 0 16px;
-            position: relative;
-        }
-        .divider-line {
-            border: 0;
-            border-top: 1.5px solid rgba(255, 255, 255, 0.08);
-            margin: 0;
-        }
-        .divider-text {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #141b2a;
-            padding: 0 12px;
-            font-size: 11px;
+            margin: 22px 0 12px;
+            font-size: 11.5px;
             color: #64748b;
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
         }
         .quick-login-grid {
             display: grid;
@@ -51,6 +37,32 @@
         }
         .btn-demo-login:active {
             transform: scale(0.98);
+        }
+        .quick-login-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0 16px;
+        }
+        .quick-login-divider::before,
+        .quick-login-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+        }
+        .quick-login-divider::before {
+            margin-right: 12px;
+        }
+        .quick-login-divider::after {
+            margin-left: 12px;
+        }
+        .divider-text {
+            font-size: 11.5px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
         }
     </style>
 
@@ -117,7 +129,6 @@
 
         {{-- Quick Login Divider --}}
         <div class="quick-login-divider">
-            <hr class="divider-line">
             <span class="divider-text">Atau Quick Login</span>
         </div>
 

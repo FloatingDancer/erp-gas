@@ -223,6 +223,14 @@
         .topbar-greeting {
             font-size: 13.5px;
             color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @media (max-width: 576px) {
+            .topbar-greeting {
+                max-width: 140px;
+            }
         }
 
         .topbar-greeting span {
@@ -298,6 +306,14 @@
             font-weight: 600;
             color: #1e293b;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+        @media (max-width: 576px) {
+            .topbar-profile-name {
+                max-width: 80px;
+            }
         }
 
         .topbar-profile-role {
@@ -650,7 +666,7 @@
                 ☰
             </button>
             <div class="topbar-greeting">
-                Selamat datang, <span>{{ auth()->user()->name }}</span> 👋
+                <span class="d-none d-sm-inline">Selamat datang, </span><span>{{ auth()->user()->name }}</span> 👋
             </div>
         </div>
 
@@ -679,7 +695,7 @@
                 <div class="topbar-profile-avatar">{{ $initials }}</div>
                 <div class="topbar-profile-info">
                     <div class="topbar-profile-name">{{ auth()->user()->name }}</div>
-                    <div class="topbar-profile-role">{{ auth()->user()->isDriver() ? 'Driver' : 'Administrator' }}</div>
+                    <div class="topbar-profile-role d-none d-sm-block">{{ auth()->user()->isDriver() ? 'Driver' : 'Administrator' }}</div>
                 </div>
                 <span class="topbar-profile-chevron" id="profileChevron">▼</span>
 

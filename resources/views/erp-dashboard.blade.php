@@ -89,18 +89,89 @@
         color: #6b7280;
         margin-bottom: 14px;
     }
+
+    /* ===== RESPONSIVE PAGE HEADER ===== */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        gap: 16px;
+    }
+    .dashboard-title {
+        font-size: 26px;
+        font-weight: 700;
+        margin: 0;
+        color: #111827;
+    }
+    .dashboard-subtitle {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+    .dashboard-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .export-form {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        background: white;
+        padding: 6px 12px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .action-btn-group {
+        display: flex;
+        gap: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+        }
+        .dashboard-actions {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+            gap: 12px;
+        }
+        .export-form {
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 14px;
+        }
+        .action-btn-group {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .action-btn-group .action-btn {
+            text-align: center;
+            width: 100%;
+            padding: 12px;
+        }
+    }
 </style>
 
 {{-- Page Header --}}
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+<div class="dashboard-header">
     <div>
-        <h1 style="font-size:26px; font-weight:700; margin:0; color:#111827;">ERP Dashboard</h1>
-        <p style="margin:4px 0 0; color:#6b7280; font-size:14px;">
+        <h1 class="dashboard-title">ERP Dashboard</h1>
+        <p class="dashboard-subtitle">
             {{ now()->format('l, d F Y') }}
         </p>
     </div>
-    <div style="display:flex; gap:10px; align-items: center; flex-wrap: wrap;">
-        <form action="{{ route('reports.export-csv') }}" method="GET" style="display:flex; gap:6px; align-items:center; background:white; padding:6px 12px; border-radius:10px; border:1px solid #e2e8f0; font-size:13px; font-weight:600;">
+    <div class="dashboard-actions">
+        <form action="{{ route('reports.export-csv') }}" method="GET" class="export-form">
             <span style="color:#6b7280;">Ekspor Laporan:</span>
             <select name="month" style="border:none; outline:none; font-weight:600; color:#374151; background:transparent;">
                 @for ($m=1; $m<=12; $m++)
@@ -114,8 +185,10 @@
             </select>
             <button type="submit" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:15px; padding:0 4px;" title="Unduh CSV">📥</button>
         </form>
-        <a href="/orders/create" class="action-btn" style="background:#2563eb; color:white;">+ New Order</a>
-        <a href="/customers/create" class="action-btn" style="background:#d97706; color:white;">+ New Customer</a>
+        <div class="action-btn-group">
+            <a href="/orders/create" class="action-btn" style="background:#2563eb; color:white;">+ New Order</a>
+            <a href="/customers/create" class="action-btn" style="background:#d97706; color:white;">+ New Customer</a>
+        </div>
     </div>
 </div>
 
@@ -169,7 +242,7 @@
                     <thead>
                         <tr class="table-light">
                             <th style="padding: 12px 24px; font-weight: 600; color:#475569; font-size:11px; text-transform:uppercase;">Pelanggan</th>
-                            <th style="padding: 12px 12px; font-weight: 600; color:#475569; font-size:11px; text-transform:uppercase;">Produk Terakhir</th>
+                            <th class="d-none d-md-table-cell" style="padding: 12px 12px; font-weight: 600; color:#475569; font-size:11px; text-transform:uppercase;">Produk Terakhir</th>
                             <th style="padding: 12px 12px; font-weight: 600; color:#475569; font-size:11px; text-transform:uppercase; text-align:center;">Sisa Hari</th>
                             <th style="padding: 12px 24px; font-weight: 600; color:#475569; font-size:11px; text-transform:uppercase; text-align:right;">Aksi</th>
                         </tr>
@@ -208,8 +281,11 @@
                                 <td style="padding: 12px 24px;">
                                     <div style="font-weight: 600; color: #1e293b;">{{ $pred['customer_name'] }}</div>
                                     <div style="font-size: 11px; color: #94a3b8;">Terakhir: {{ $pred['last_purchase'] }}</div>
+                                    <div class="d-md-none" style="font-size: 11px; color: #475569; margin-top: 3px; font-weight: 500;">
+                                        📦 {{ $pred['last_product'] }}
+                                    </div>
                                 </td>
-                                <td style="padding: 12px 12px; color: #475569;">{{ $pred['last_product'] }}</td>
+                                <td class="d-none d-md-table-cell" style="padding: 12px 12px; color: #475569;">{{ $pred['last_product'] }}</td>
                                 <td style="padding: 12px 12px; text-align: center;">
                                     <span style="display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10.5px; font-weight: 700; {!! $badgeColor !!}">
                                         {{ $badgeText }}
