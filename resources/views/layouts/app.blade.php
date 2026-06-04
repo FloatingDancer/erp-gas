@@ -435,6 +435,8 @@
             margin-top: 62px;
             padding: 28px;
             min-height: calc(100vh - 62px);
+            display: flex;
+            flex-direction: column;
         }
 
         /* Global: center all form-card (create/edit pages) */
@@ -741,7 +743,12 @@
 
     <!-- =================== CONTENT =================== -->
     <main class="main-content">
-        @yield('content')
+        <div style="flex: 1; width: 100%;">
+            @yield('content')
+        </div>
+        <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #94a3b8; letter-spacing: 0.3px;">
+            &copy; {{ now()->year }} NAGA SAKTI JAYA. All rights reserved.
+        </footer>
     </main>
 
 
