@@ -14,19 +14,7 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 require __DIR__.'/../vendor/autoload.php';
 
 // Bootstrap Laravel and handle the request...
-try {
-    /** @var Application $app */
-    $app = require_once __DIR__.'/../bootstrap/app.php';
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-    // Force bootstrapping here to catch early boot exceptions!
-    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-    $kernel->bootstrap();
-
-    $app->handleRequest(Request::capture());
-} catch (\Throwable $e) {
-    header('Content-Type: text/plain', true, 500);
-    echo "PRIMARY BOOTSTRAP ERROR: " . $e->getMessage() . "\n\n";
-    echo "File: " . $e->getFile() . " (Line: " . $e->getLine() . ")\n\n";
-    echo "Trace:\n" . $e->getTraceAsString();
-    exit(1);
-}
+$app->handleRequest(Request::capture());
