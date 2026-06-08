@@ -4,6 +4,22 @@
     {
       "src": "public/index.php",
       "use": "vercel-php@0.7.2"
+    },
+    {
+      "src": "public/google47f5cb4b9e60644b.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/robots.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/favicon.ico",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/build/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -12,11 +28,15 @@
       "dest": "/public/$1"
     },
     {
+      "src": "/(favicon.ico|robots.txt)",
+      "dest": "/public/$1"
+    },
+    {
       "src": "/build/(.*)",
       "dest": "/public/build/$1"
     },
     {
-      "src": "/(css|js|images|favicon.ico|robots.txt)/(.*)",
+      "src": "/(css|js|images)/(.*)",
       "dest": "/public/$1/$2"
     },
     {
