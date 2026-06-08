@@ -218,8 +218,8 @@
 
         {{-- Card --}}
         <div class="auth-card">
-            <h2>Selamat Datang 👋</h2>
-            <p class="subtitle">Masuk ke akun Anda untuk melanjutkan</p>
+            <h2>{{ $title ?? 'Selamat Datang 👋' }}</h2>
+            <p class="subtitle">{{ $subtitle ?? 'Masuk ke akun Anda untuk melanjutkan' }}</p>
 
             {{ $slot }}
         </div>
