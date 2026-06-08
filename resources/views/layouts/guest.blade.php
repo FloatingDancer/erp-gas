@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Sistem Informasi ERP Naga Sakti Jaya - Kelola pelanggan, produk, pengiriman, transaksi, dan pelaporan secara efisien dan real-time.">
+    <meta name="keywords" content="Naga Sakti Jaya, ERP Naga Sakti Jaya, erp-nagasaktijaya, Manajemen Gas, Vercel ERP">
     <title>NAGA SAKTI JAYA — {{ config('app.name', 'Login') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
