@@ -144,42 +144,35 @@
             <div class="profile-role-badge">{{ $user->isDriver() ? 'Driver' : 'Administrator' }}</div>
         </div>
 
-        @if(session('status') === 'profile-updated')
-            <div class="alert-success">✅ Profile berhasil diperbarui!</div>
+        @if(session('status') === 'profile-updated' || session('success'))
+            <div class="alert-success">✅ {{ session('success') ?? 'Profile berhasil diperbarui!' }}</div>
         @endif
 
-        {{-- Edit Profile Form --}}
+        {{-- Profile Detail Card --}}
         <div class="form-card">
-            <div class="form-card-title">✏️ Edit Profile</div>
+            <div class="form-card-title">👤 Detail Profil</div>
 
-            <form action="{{ route('profile.update') }}" method="POST">
-                @csrf
-                @method('PATCH')
+            <div class="form-group">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" class="form-input" value="{{ $user->name }}" readonly>
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label">Nama Lengkap</label>
-                    <input type="text" name="name" class="form-input"
-                           value="{{ old('name', $user->name) }}" required>
-                    @error('name') <p style="font-size:12px;color:#ef4444;margin-top:4px;">{{ $message }}</p> @enderror
-                </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" value="{{ $user->email }}" readonly>
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-input"
-                           value="{{ old('email', $user->email) }}" required>
-                    @error('email') <p style="font-size:12px;color:#ef4444;margin-top:4px;">{{ $message }}</p> @enderror
-                </div>
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <input type="text" class="form-input" value="{{ $user->isDriver() ? 'Driver' : 'Administrator' }}" readonly>
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label">Role</label>
-                    <input type="text" class="form-input" value="{{ $user->isDriver() ? 'Driver' : 'Administrator' }}" readonly>
-                </div>
-
-                <div style="display:flex;gap:10px;margin-top:8px;">
-                    <button type="submit" class="btn-save">💾 Simpan Perubahan</button>
-                    <a href="{{ route('dashboard') }}" class="btn-back">← Dashboard</a>
-                </div>
-            </form>
+            <div style="display:flex;gap:10px;margin-top:8px;">
+                <a href="{{ route('profile.edit') }}" class="btn-save" style="text-decoration:none;">
+                    ⚙️ Account Settings
+                </a>
+                <a href="{{ route('dashboard') }}" class="btn-back">← Dashboard</a>
+            </div>
         </div>
 
         {{-- Account Info (read-only) --}}
@@ -208,9 +201,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@if(session('status') === 'profile-updated')
+@if(session('status') === 'profile-updated' || session('success'))
 <script>
-Swal.fire({icon:'success',title:'Berhasil!',text:'Profile berhasil diperbarui.',timer:2000,showConfirmButton:false});
+Swal.fire({icon:'success',title:'Berhasil!',text:'{{ session('success') ?? 'Profile berhasil diperbarui.' }}',timer:2000,showConfirmButton:false});
 </script>
 @endif
 @endsection
