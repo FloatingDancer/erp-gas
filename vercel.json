@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/(google47f5cb4b9e60644b\\.html)",
+      "dest": "/public/$1"
+    },
+    {
       "src": "/build/(.*)",
       "dest": "/public/build/$1"
     },
