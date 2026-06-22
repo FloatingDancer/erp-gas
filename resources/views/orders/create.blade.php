@@ -42,33 +42,41 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 .select2-container--default .select2-selection--single {
     border: 1.5px solid #e2e8f0 !important;
     border-radius: 10px !important;
-    height: 43px !important;
+    height: 41px !important;
     background-color: #fff !important;
     transition: border-color 0.15s, box-shadow 0.15s;
     outline: none !important;
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #1e293b !important;
     padding-left: 14px !important;
     padding-right: 30px !important;
-    font-size: 14px;
+    font-size: 14px !important;
+    line-height: 38px !important;
+    margin: 0 !important;
+    width: 100% !important;
 }
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
     color: #64748b !important;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 40px !important;
-    right: 12px !important;
+    height: 38px !important;
+    right: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow b {
+    position: static !important;
+    margin: 0 !important;
     border-color: #64748b transparent transparent transparent !important;
-    border-width: 6px 5px 0 5px !important;
+    border-width: 5px 4px 0 4px !important;
 }
 .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
     border-color: transparent transparent #64748b transparent !important;
-    border-width: 0 5px 6px 5px !important;
+    border-width: 0 4px 5px 4px !important;
 }
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
