@@ -124,7 +124,7 @@
 
         <div class="header">
             <div>
-                <h2>⛽ NAGA SAKTI JAYA</h2>
+                <h2>TK. NAGA SAKTI JAYA</h2>
                 <p style="margin: 0; color: #475569; font-size: 12px; max-width: 400px; line-height: 1.4;">
                     Perumahan Mutiara Sampurna Blok R4/19, Jayasampurna, Kec. Serang Baru, Kabupaten Bekasi, Jawa Barat 17330
                 </p>
