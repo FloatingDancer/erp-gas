@@ -192,7 +192,7 @@
         <div class="footer">
             <div class="signature-block">
                 <p>Penerima,</p>
-                <div class="signature-line">Pelanggan</div>
+                <div class="signature-line">{{ $invoice->order->customer->customer_name ?? 'Pelanggan' }}</div>
             </div>
             <div class="signature-block">
                 <p>Hormat Kami,</p>
