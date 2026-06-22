@@ -125,7 +125,10 @@
         <div class="header">
             <div>
                 <h2>⛽ NAGA SAKTI JAYA</h2>
-                <p style="margin: 0; color: #64748b;">Sistem Informasi Management Gas</p>
+                <p style="margin: 0 0 5px 0; color: #475569; font-size: 12px; max-width: 400px; line-height: 1.4;">
+                    Perumahan Mutiara Sampurna Blok R4/19, Jayasampurna, Kec. Serang Baru, Kabupaten Bekasi, Jawa Barat 17330
+                </p>
+                <p style="margin: 0; color: #94a3b8; font-size: 11px;">Sistem Informasi Management Gas</p>
             </div>
             <div class="company-info">
                 <h3 style="margin: 0; color: #0f172a;">FAKTUR PENJUALAN</h3>
@@ -194,7 +197,7 @@
             </div>
             <div class="signature-block">
                 <p>Hormat Kami,</p>
-                <div class="signature-line">Petugas NAGA SAKTI JAYA</div>
+                <div class="signature-line">TK. Naga Sakti Jaya</div>
             </div>
         </div>
     </div>
