@@ -90,7 +90,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
     
     @if($logs->hasPages())
         <div class="pagination-wrap">
-            {{ $logs->links() }}
+            {{ $logs->links('pagination::bootstrap-5') }}
         </div>
     @endif
 </div>
