@@ -23,6 +23,7 @@ Route::get('/db-debug-check-123', function() {
         'host' => config('database.connections.mysql.host'),
         'database' => config('database.connections.mysql.database'),
         'username' => config('database.connections.mysql.username'),
+        'password' => config('database.connections.mysql.password'),
         'customers_count' => Illuminate\Support\Facades\DB::table('customers')->count(),
     ];
 });
