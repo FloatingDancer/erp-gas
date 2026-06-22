@@ -92,4 +92,10 @@ class InvoiceController extends Controller
         $invoice->load(['order.customer', 'order.product']);
         return view('invoices.print', compact('invoice'));
     }
+
+    public function printPublic(Invoice $invoice)
+    {
+        $invoice->load(['order.customer', 'order.product']);
+        return view('invoices.print', compact('invoice'));
+    }
 }

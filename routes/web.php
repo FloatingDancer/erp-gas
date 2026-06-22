@@ -21,6 +21,8 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+Route::get('/public/invoices/{invoice}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
+
 /*
 |--------------------------------------------------------------------------
 | Protected ERP Routes
