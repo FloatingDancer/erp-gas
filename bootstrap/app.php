@@ -15,5 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->report(function (\Throwable $e) {
+            try {
+                \App\Models\ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'System Error',
+                    'description' => substr('Msg: ' . $e->getMessage() . "\nFile: " . $e->getFile() . ':' . $e->getLine() . "\nTrace: " . $e->getTraceAsString(), 0, 1000),
+                ]);
+            } catch (\Throwable $ex) {
+                // Ignore database write failure
+            }
+        });
     })->create();
