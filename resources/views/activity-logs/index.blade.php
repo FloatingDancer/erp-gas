@@ -60,7 +60,15 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                             <span class="badge-pill badge-blue">🔵 {{ $log->action }}</span>
                         @endif
                     </td>
-                    <td style="font-weight:500; color:#374151;">{{ $log->description }}</td>
+                    <td style="font-weight:500; color:#374151; max-width: 500px; word-break: break-word;">
+                        @if(strlen($log->description) > 150)
+                            <span id="desc-short-{{ $log->id }}">{{ Str::limit($log->description, 150, '...') }}</span>
+                            <span id="desc-full-{{ $log->id }}" style="display: none;">{{ $log->description }}</span>
+                            <button type="button" onclick="toggleDesc({{ $log->id }})" id="btn-toggle-{{ $log->id }}" style="background: none; border: none; color: #2563eb; font-size: 11.5px; font-weight: 600; padding: 0 4px; cursor: pointer; display: inline-block;">See More</button>
+                        @else
+                            {{ $log->description }}
+                        @endif
+                    </td>
                     <td style="color:#64748b;">
                         <span style="font-weight:600; color:#0f172a;">{{ $log->user->name ?? 'System' }}</span>
                         <div style="font-size:11px; color:#94a3b8;">{{ $log->user->email ?? '' }}</div>
@@ -86,4 +94,22 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
         </div>
     @endif
 </div>
+
+<script>
+    function toggleDesc(id) {
+        const shortSpan = document.getElementById('desc-short-' + id);
+        const fullSpan = document.getElementById('desc-full-' + id);
+        const btn = document.getElementById('btn-toggle-' + id);
+        
+        if (fullSpan.style.display === 'none') {
+            fullSpan.style.display = 'inline';
+            shortSpan.style.display = 'none';
+            btn.innerText = 'Show Less';
+        } else {
+            fullSpan.style.display = 'none';
+            shortSpan.style.display = 'inline';
+            btn.innerText = 'See More';
+        }
+    }
+</script>
 @endsection
