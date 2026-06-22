@@ -34,7 +34,87 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 .alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:12px 16px;border-radius:10px;margin-bottom:20px;}
 .empty-state{text-align:center;padding:60px 20px;color:#94a3b8;}
 .empty-state .empty-icon{font-size:48px;margin-bottom:12px;}
+
+/* Select2 Custom Styles */
+.select2-container {
+    width: 100% !important;
+}
+.select2-container--default .select2-selection--single {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    height: 43px !important;
+    background-color: #fff !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none !important;
+    display: flex;
+    align-items: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #1e293b !important;
+    padding-left: 14px !important;
+    padding-right: 30px !important;
+    font-size: 14px;
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #64748b !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+    right: 12px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #64748b transparent transparent transparent !important;
+    border-width: 6px 5px 0 5px !important;
+}
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #64748b transparent !important;
+    border-width: 0 5px 6px 5px !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+.select2-dropdown {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    overflow: hidden;
+    z-index: 9999;
+}
+.select2-container--default .select2-search--dropdown {
+    padding: 8px 10px !important;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    font-size: 13.5px;
+    outline: none !important;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #3b82f6 !important;
+}
+.select2-container--default .select2-results > .select2-results__options {
+    max-height: 180px !important;
+    overflow-y: auto !important;
+}
+.select2-container--default .select2-results__option {
+    padding: 8px 14px !important;
+    font-size: 13.5px;
+    color: #374151;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #2563eb !important;
+    color: #fff !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
 </style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <div class="page-header">
   <div>
@@ -65,7 +145,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
     <div class="form-group">
       <label class="form-label">Customer</label>
-      <select name="customer_id" class="form-input" required>
+      <select name="customer_id" class="form-input select2-enable" required>
         <option value="" disabled selected>-- Pilih Customer --</option>
         @foreach($customers as $c)
           <option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>
@@ -106,4 +186,13 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     </div>
   </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.select2-enable').select2({
+        width: '100%'
+    });
+});
+</script>
 @endsection
