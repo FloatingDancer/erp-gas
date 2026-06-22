@@ -64,24 +64,35 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 38px !important;
     right: 14px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    width: 16px !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 16px !important;
+    transition: transform 0.15s ease;
+}
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow {
+    transform: rotate(180deg) !important;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow b {
-    position: static !important;
-    margin: 0 !important;
-    border-color: #64748b transparent transparent transparent !important;
-    border-width: 5px 4px 0 4px !important;
-}
-.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
-    border-color: transparent transparent #64748b transparent !important;
-    border-width: 0 4px 5px 4px !important;
+    display: none !important;
 }
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Custom styling for standard select fields */
+select.form-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 16px !important;
+    padding-right: 40px !important;
 }
 .select2-dropdown {
     border: 1.5px solid #e2e8f0 !important;
