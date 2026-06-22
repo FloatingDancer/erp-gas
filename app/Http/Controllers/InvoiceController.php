@@ -93,9 +93,14 @@ class InvoiceController extends Controller
         return view('invoices.print', compact('invoice'));
     }
 
-    public function printPublic(Invoice $invoice)
+    public function printPublic($id)
     {
-        $invoice->load(['order.customer', 'order.product']);
-        return view('invoices.print', compact('invoice'));
+        try {
+            $invoice = Invoice::with(['order.customer', 'order.product'])->findOrFail($id);
+            return view('invoices.print', compact('invoice'));
+        } catch (\Throwable $e) {
+            return response("Error: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)
+                ->header('Content-Type', 'text/plain');
+        }
     }
 }
