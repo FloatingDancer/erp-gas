@@ -17,6 +17,16 @@ use App\Http\Controllers\DriverController;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/db-debug-check-123', function() {
+    return [
+        'connection' => config('database.default'),
+        'host' => config('database.connections.mysql.host'),
+        'database' => config('database.connections.mysql.database'),
+        'username' => config('database.connections.mysql.username'),
+        'customers_count' => Illuminate\Support\Facades\DB::table('customers')->count(),
+    ];
+});
+
 Route::get('/', function () {
     return redirect('/login');
 });
