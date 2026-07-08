@@ -56,7 +56,7 @@ class OrderController extends Controller
         $product->decrement('stock', $request->quantity);
 
         // Otomatis buat Invoice
-        Invoice::create([
+        $invoice = Invoice::create([
             'order_id'     => $order->id,
             'total_amount' => $order->total_amount,
             'status'       => 'Unpaid',
@@ -65,7 +65,9 @@ class OrderController extends Controller
         ActivityLog::log('Create', 'Membuat order baru #' . $order->id . ' untuk ' . $order->customer->customer_name . ' (Qty: ' . $order->quantity . ')');
 
         return redirect()->route('orders.index')
-            ->with('success', 'Order berhasil dibuat!');
+            ->with('success', 'Order berhasil dibuat!')
+            ->with('show_navigation_popup', true)
+            ->with('invoice_id', $invoice->id);
     }
 
     public function edit(Order $order)

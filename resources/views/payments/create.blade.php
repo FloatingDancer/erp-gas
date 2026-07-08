@@ -81,7 +81,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                         <option
                             value="{{ $invoice->id }}"
                             data-amount="{{ $invoice->total_amount }}"
-                            {{ old('invoice_id') == $invoice->id ? 'selected' : '' }}
+                            {{ (old('invoice_id') ?? request('invoice_id')) == $invoice->id ? 'selected' : '' }}
                         >
                             INV-{{ str_pad($invoice->id, 4, '0', STR_PAD_LEFT) }}
                             — Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}

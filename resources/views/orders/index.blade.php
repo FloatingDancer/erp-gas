@@ -114,13 +114,35 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 @if(session('success'))
 <script>
-  Swal.fire({
-    icon: 'success',
-    title: 'Berhasil!',
-    text: '{{ session('success') }}',
-    timer: 2000,
-    showConfirmButton: false
-  });
+  @if(session('show_navigation_popup'))
+    Swal.fire({
+      icon: 'success',
+      title: 'Order Berhasil Dibuat! 🎉',
+      text: 'Pilih modul tujuan Anda selanjutnya:',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: '🔍 Cek Invoice',
+      denyButtonText: '💳 Buat Pembayaran',
+      cancelButtonText: 'Batal / Tetap di Sini',
+      confirmButtonColor: '#2563eb',
+      denyButtonColor: '#10b981',
+      cancelButtonColor: '#64748b',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "{{ route('invoices.edit', session('invoice_id')) }}";
+      } else if (result.isDenied) {
+        window.location.href = "{{ route('payments.create') }}?invoice_id={{ session('invoice_id') }}";
+      }
+    });
+  @else
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil!',
+      text: '{{ session('success') }}',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  @endif
 </script>
 @endif
 
