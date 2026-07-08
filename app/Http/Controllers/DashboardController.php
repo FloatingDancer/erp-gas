@@ -468,22 +468,6 @@ class DashboardController extends Controller
             ];
         }
 
-        // 5. Cek notifikasi pengiriman email (sukses/gagal) dalam 12 jam terakhir
-        $emailLogs = ActivityLog::whereIn('action', ['Email Sent', 'Email Failed'])
-            ->where('created_at', '>=', now()->subHours(12))
-            ->orderBy('id', 'desc')
-            ->get();
-            
-        foreach ($emailLogs as $log) {
-            $isSuccess = $log->action === 'Email Sent';
-            $notifications[] = [
-                'type' => $isSuccess ? 'success' : 'danger',
-                'title' => $isSuccess ? 'Email Terkirim' : 'Gagal Kirim Email',
-                'message' => $log->description,
-                'time' => $log->created_at->diffForHumans()
-            ];
-        }
-
         return response()->json($notifications);
     }
 }
