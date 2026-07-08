@@ -840,40 +840,93 @@
         const notificationTrigger = document.getElementById('notificationTrigger');
         const notificationDropdown = document.getElementById('notificationDropdown');
 
+        function getNotifHash(item) {
+            const str = item.title + '|' + item.message;
+            let hash = 5381;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            }
+            return hash.toString(36);
+        }
+
+        let currentNotifications = [];
+
+        function markNotificationsAsRead() {
+            if (currentNotifications.length === 0) return;
+            
+            let readHashes = JSON.parse(localStorage.getItem('read_notifications') || '[]');
+            currentNotifications.forEach(item => {
+                const h = getNotifHash(item);
+                if (!readHashes.includes(h)) {
+                    readHashes.push(h);
+                }
+            });
+            
+            localStorage.setItem('read_notifications', JSON.stringify(readHashes));
+            $('#notificationBadge').hide();
+            $('#notificationCountText').text('0 baru');
+            
+            renderNotificationItems(currentNotifications, readHashes);
+        }
+
+        function renderNotificationItems(data, readHashes) {
+            const list = $('#notificationList');
+            let html = '';
+            data.forEach(item => {
+                let iconName = 'bell';
+                let iconClass = 'info';
+                if (item.type === 'warning') { iconName = 'alert-triangle'; iconClass = 'warning'; }
+                if (item.type === 'danger') { iconName = 'alert-circle'; iconClass = 'danger'; }
+                if (item.type === 'success') { iconName = 'truck'; iconClass = 'success'; }
+                
+                const isUnread = !readHashes.includes(getNotifHash(item));
+                const unreadStyle = isUnread ? 'background-color: #f8fafc; border-left: 3px solid #2563eb; padding-left: 12px;' : 'padding-left: 15px;';
+                
+                html += `
+                    <div class="notification-item" style="${unreadStyle} transition: background-color 0.2s;">
+                        <div class="notification-item-icon ${iconClass}"><i data-lucide="${iconName}" style="width:14px;height:14px;"></i></div>
+                        <div class="notification-item-content">
+                            <div style="font-weight:${isUnread ? '700' : '600'}; color:#0f172a; font-size:12px;">${item.title}</div>
+                            <div style="color:${isUnread ? '#1e293b' : '#64748b'}; font-size:11.5px; margin-top:2px;">${item.message}</div>
+                            <div class="notification-item-time">${item.time}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            list.html(html);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
         function loadNotifications() {
             $.ajax({
                 url: '/notifications',
                 method: 'GET',
                 success: function (data) {
                     const badge = $('#notificationBadge');
-                    const list = $('#notificationList');
                     const countText = $('#notificationCountText');
+                    const list = $('#notificationList');
+                    
+                    currentNotifications = data || [];
                     
                     if (data && data.length > 0) {
-                        badge.text(data.length).show();
-                        countText.text(data.length + ' baru');
+                        let readHashes = JSON.parse(localStorage.getItem('read_notifications') || '[]');
+                        const activeHashes = data.map(item => getNotifHash(item));
                         
-                        let html = '';
-                        data.forEach(item => {
-                            let iconName = 'bell';
-                            let iconClass = 'info';
-                            if (item.type === 'warning') { iconName = 'alert-triangle'; iconClass = 'warning'; }
-                            if (item.type === 'danger') { iconName = 'alert-circle'; iconClass = 'danger'; }
-                            if (item.type === 'success') { iconName = 'truck'; iconClass = 'success'; }
-                            
-                            html += `
-                                <div class="notification-item">
-                                    <div class="notification-item-icon ${iconClass}"><i data-lucide="${iconName}" style="width:14px;height:14px;"></i></div>
-                                    <div class="notification-item-content">
-                                        <div style="font-weight:600; color:#0f172a; font-size:12px;">${item.title}</div>
-                                        <div style="color:#475569; font-size:11.5px; margin-top:2px;">${item.message}</div>
-                                        <div class="notification-item-time">${item.time}</div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        list.html(html);
-                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        // Prune readHashes that are no longer in the active list
+                        readHashes = readHashes.filter(h => activeHashes.includes(h));
+                        localStorage.setItem('read_notifications', JSON.stringify(readHashes));
+                        
+                        const unreadCount = data.filter(item => !readHashes.includes(getNotifHash(item))).length;
+                        
+                        if (unreadCount > 0) {
+                            badge.text(unreadCount).show();
+                            countText.text(unreadCount + ' baru');
+                        } else {
+                            badge.hide();
+                            countText.text('0 baru');
+                        }
+                        
+                        renderNotificationItems(data, readHashes);
                     } else {
                         badge.hide();
                         countText.text('0 baru');
@@ -900,6 +953,11 @@
             // Tutup dropdown profil jika dropdown notifikasi dibuka
             profileDropdown.classList.remove('open');
             profileChevron.style.transform = '';
+
+            // Mark as read when opening the panel
+            if (!isDropdownOpen) {
+                markNotificationsAsRead();
+            }
         });
 
         // Mobile Sidebar Toggle
