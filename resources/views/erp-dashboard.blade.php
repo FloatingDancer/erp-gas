@@ -198,7 +198,8 @@
 
     {{-- Left Column: Demand Forecasting Card --}}
     <div class="col-12 col-md-5">
-        <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-betwe            <div>
+        <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
                 <h5 style="margin-bottom: 8px;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Peramalan Permintaan (Next Month)</h5>
                 <p style="font-size:12.5px; color:#64748b; margin: 0 0 20px;">Estimasi penjualan dan pendapatan bulan depan menggunakan algoritma <strong>Simple Moving Average (SMA)</strong> 3 bulan terakhir.</p>
                 
@@ -216,7 +217,7 @@
                         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Pendapatan (Revenue)</div>
                         <div style="font-size: 20px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">Rp {{ number_format($forecastRevenue, 0, ',', '.') }}</div>
                     </div>
-                </div>         </div>
+                </div>
             </div>
 
             <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
