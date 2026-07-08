@@ -931,6 +931,33 @@
         });
     </script>
     
+    @if(session('wa_url'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const waUrl = "{!! session('wa_url') !!}";
+                const newWindow = window.open(waUrl, '_blank');
+                
+                // If blocked by browser pop-up blocker, show SweetAlert fallback
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    Swal.fire({
+                        title: 'Kirim WhatsApp 💬',
+                        text: 'Silakan klik tombol di bawah ini untuk mengirim update status ke WhatsApp pelanggan.',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Kirim Sekarang',
+                        cancelButtonText: 'Tutup',
+                        confirmButtonColor: '#25d366',
+                        cancelButtonColor: '#64748b'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.open(waUrl, '_blank');
+                        }
+                    });
+                }
+            });
+        </script>
+    @endif
+    
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 </body>
 </html>

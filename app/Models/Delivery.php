@@ -31,7 +31,7 @@ class Delivery extends Model
             if ($delivery->wasChanged('status') || $delivery->wasRecentlyCreated) {
                 if (in_array($delivery->status, ['On Delivery', 'Delivered'])) {
                     self::sendStatusEmail($delivery);
-                    self::sendStatusWhatsApp($delivery);
+                    self::flashWhatsAppUrl($delivery);
                 }
             }
         });
@@ -127,26 +127,13 @@ class Delivery extends Model
         ";
     }
 
-    public static function sendStatusWhatsApp($delivery)
+    public static function flashWhatsAppUrl($delivery)
     {
-        $wahaUrl = env('WAHA_URL');
-        $wahaSession = env('WAHA_SESSION', 'default');
-        $wahaApiKey = env('WAHA_API_KEY');
-        
-        if (empty($wahaUrl)) {
-            return;
-        }
-
         try {
             $delivery->load(['order.customer', 'order.product']);
             $customer = $delivery->order->customer ?? null;
             
             if (!$customer || !$customer->phone) {
-                \App\Models\ActivityLog::create([
-                    'user_id' => auth()->id(),
-                    'action' => 'WA Failed',
-                    'description' => 'Gagal mengirim WA untuk Order #' . $delivery->order_id . ': No. telepon customer kosong.'
-                ]);
                 return;
             }
             
@@ -175,47 +162,12 @@ class Delivery extends Model
                      . "Terima kasih telah mempercayai kami untuk kebutuhan gas Anda.\n"
                      . "*TK. NAGA SAKTI JAYA*";
             
-            $url = rtrim($wahaUrl, '/') . '/api/sendText';
+            $waUrl = "https://api.whatsapp.com/send?phone=" . $phone . "&text=" . rawurlencode($message);
             
-            $payload = [
-                'chatId' => $phone . '@c.us',
-                'text' => $message,
-                'session' => $wahaSession
-            ];
-            
-            $headers = [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ];
-            
-            if (!empty($wahaApiKey)) {
-                $headers['Authorization'] = 'Bearer ' . $wahaApiKey;
-            }
-            
-            $response = \Illuminate\Support\Facades\Http::withHeaders($headers)
-                ->timeout(10)
-                ->post($url, $payload);
-                
-            if ($response->successful()) {
-                \App\Models\ActivityLog::create([
-                    'user_id' => auth()->id(),
-                    'action' => 'WA Sent',
-                    'description' => 'Berhasil mengirim WhatsApp status pengiriman (' . ($delivery->status === 'On Delivery' ? 'Sedang Dikirim' : 'Telah Sampai') . ') untuk Order #' . $delivery->order_id . ' ke ' . $phone
-                ]);
-            } else {
-                \App\Models\ActivityLog::create([
-                    'user_id' => auth()->id(),
-                    'action' => 'WA Failed',
-                    'description' => 'Gagal mengirim WhatsApp untuk Order #' . $delivery->order_id . '. Response: ' . $response->status() . ' - ' . substr($response->body(), 0, 150)
-                ]);
-            }
+            session()->flash('wa_url', $waUrl);
             
         } catch (\Throwable $e) {
-            \App\Models\ActivityLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'WA Failed',
-                'description' => 'Gagal mengirim WhatsApp untuk Order #' . $delivery->order_id . '. Error: ' . substr($e->getMessage(), 0, 200)
-            ]);
+            // Ignore error
         }
     }
 }
