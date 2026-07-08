@@ -33,14 +33,14 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">💳 Payments</h1>
+        <h1 class="page-title"><i data-lucide="credit-card" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Payments</h1>
         <p class="page-subtitle">Kelola data pembayaran</p>
     </div>
-    <a href="{{ route('payments.create') }}" class="btn-primary-custom">+ Add Payment</a>
+    <a href="{{ route('payments.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Payment</a>
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -70,11 +70,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td style="font-weight:700;color:#0f172a;">Rp {{ number_format($pay->amount, 0, ',', '.') }}</td>
                     <td>
                         @if($pay->method === 'Cash')
-                            <span class="badge-pill badge-green">💵 Cash</span>
+                            <span class="badge-pill badge-green"><i data-lucide="banknote" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Cash</span>
                         @elseif($pay->method === 'Transfer')
-                            <span class="badge-pill badge-blue">🏦 Transfer</span>
+                            <span class="badge-pill badge-blue"><i data-lucide="landmark" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Transfer</span>
                         @elseif($pay->method === 'E-Wallet')
-                            <span class="badge-pill badge-purple">📱 E-Wallet</span>
+                            <span class="badge-pill badge-purple"><i data-lucide="smartphone" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> E-Wallet</span>
                         @else
                             <span class="badge-pill badge-gray">{{ $pay->method }}</span>
                         @endif
@@ -82,10 +82,10 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td style="color:#64748b;">{{ \Carbon\Carbon::parse($pay->created_at)->format('d M Y') }}</td>
                     <td>
                         <div style="display:flex;gap:6px;">
-                            <a href="{{ route('payments.edit', $pay->id) }}" class="action-edit">✏️ Edit</a>
+                            <a href="{{ route('payments.edit', $pay->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                             <form action="{{ route('payments.destroy', $pay->id) }}" method="POST" id="del-{{ $pay->id }}" style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="button" class="action-delete" onclick="confirmDelete({{ $pay->id }})">🗑 Delete</button>
+                                <button type="button" class="action-delete" onclick="confirmDelete({{ $pay->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                             </form>
                         </div>
                     </td>
@@ -94,7 +94,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 <tr>
                     <td colspan="7">
                         <div class="empty-state">
-                            <div class="empty-icon">💳</div>
+                            <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="credit-card" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                             <p>Belum ada data pembayaran</p>
                         </div>
                     </td>

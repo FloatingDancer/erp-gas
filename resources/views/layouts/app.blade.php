@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Scripts loaded early so they are available for inline views -->
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
@@ -641,18 +642,18 @@
     @php
         $currentPath = request()->path();
         $navItems = [
-            ['path' => 'dashboard',  'label' => 'Dashboard',  'icon' => '⊞'],
-            ['path' => 'customers',  'label' => 'Customers',  'icon' => '👤'],
-            ['path' => 'products',   'label' => 'Products',   'icon' => '📦'],
-            ['path' => 'orders',     'label' => 'Orders',     'icon' => '🛒'],
-            ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => '🚚'],
-            ['path' => 'drivers',    'label' => 'Drivers',    'icon' => '👷'],
-            ['path' => 'invoices',   'label' => 'Invoices',   'icon' => '🧾'],
-            ['path' => 'payments',   'label' => 'Payments',   'icon' => '💳'],
+            ['path' => 'dashboard',  'label' => 'Dashboard',  'icon' => 'layout-dashboard'],
+            ['path' => 'customers',  'label' => 'Customers',  'icon' => 'users'],
+            ['path' => 'products',   'label' => 'Products',   'icon' => 'package'],
+            ['path' => 'orders',     'label' => 'Orders',     'icon' => 'shopping-cart'],
+            ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
+            ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
+            ['path' => 'invoices',   'label' => 'Invoices',   'icon' => 'file-text'],
+            ['path' => 'payments',   'label' => 'Payments',   'icon' => 'credit-card'],
         ];
         if (auth()->user()->isDriver()) {
             $navItems = [
-                ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => '🚚'],
+                ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
             ];
         }
         $initials = strtoupper(substr(auth()->user()->name, 0, 1));
@@ -683,7 +684,7 @@
                 @endphp
                 <a href="/{{ $item['path'] }}"
                    class="nav-item {{ $isActive ? 'active' : '' }}">
-                    <span class="nav-icon">{{ $item['icon'] }}</span>
+                    <span class="nav-icon"><i data-lucide="{{ $item['icon'] }}" style="width:16px;height:16px;"></i></span>
                     {{ $item['label'] }}
                 </a>
             @endforeach
@@ -707,11 +708,11 @@
 
         {{-- Left: Greeting --}}
         <div class="topbar-left">
-            <button class="btn-sidebar-toggle" id="sidebarToggle" style="display:none; background:transparent; border:none; font-size:20px; color:#374151; cursor:pointer; padding:4px 8px; margin-right:8px;">
-                ☰
+            <button class="btn-sidebar-toggle" id="sidebarToggle" style="display:none; background:transparent; border:none; color:#374151; cursor:pointer; padding:4px 8px; margin-right:8px; display:inline-flex; align-items:center; justify-content:center;">
+                <i data-lucide="menu" style="width:20px;height:20px;"></i>
             </button>
             <div class="topbar-greeting">
-                <span class="d-none d-sm-inline">Selamat datang, </span><span>{{ auth()->user()->name }}</span> 👋
+                <span class="d-none d-sm-inline">Selamat datang, </span><span>{{ auth()->user()->name }}</span>
             </div>
         </div>
 
@@ -720,13 +721,13 @@
 
             {{-- Notification Bell --}}
             <div class="topbar-bell" id="notificationTrigger" title="Notifikasi" style="position:relative; cursor:pointer;">
-                🔔
+                <i data-lucide="bell" style="width:18px;height:18px;"></i>
                 <span class="bell-badge" id="notificationBadge" style="display:none;">0</span>
                 
                 {{-- Dropdown Menu --}}
                 <div class="notification-dropdown-menu" id="notificationDropdown" onclick="event.stopPropagation();">
                     <div class="notification-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:8px; margin-bottom:8px;">
-                        <span class="notification-header-title" style="font-size:13.5px; font-weight:700; color:#0f172a;">🔔 Notifikasi Sistem</span>
+                        <span class="notification-header-title" style="font-size:13.5px; font-weight:700; color:#0f172a; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="bell" style="width:14px;height:14px;"></i> Notifikasi Sistem</span>
                         <span id="notificationCountText" style="font-size:11.5px; color:#64748b;">0 baru</span>
                     </div>
                     <div class="notification-list" id="notificationList" style="max-height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:4px;">
@@ -742,7 +743,7 @@
                     <div class="topbar-profile-name">{{ auth()->user()->name }}</div>
                     <div class="topbar-profile-role d-none d-sm-block">{{ auth()->user()->isDriver() ? 'Driver' : 'Administrator' }}</div>
                 </div>
-                <span class="topbar-profile-chevron d-none d-sm-inline" id="profileChevron">▼</span>
+                <span class="topbar-profile-chevron d-none d-sm-inline" id="profileChevron" style="display:inline-flex; align-items:center;"><i data-lucide="chevron-down" style="width:12px;height:12px;"></i></span>
 
                 {{-- Dropdown Menu --}}
                 <div class="topbar-profile-dropdown-menu" id="profileDropdown">
@@ -760,11 +761,11 @@
 
                     {{-- Items --}}
                     <a href="{{ route('profile.index') }}" class="dd-item">
-                        <span class="dd-item-icon">👤</span>
+                        <span class="dd-item-icon"><i data-lucide="user" style="width:14px;height:14px;"></i></span>
                         My Profile
                     </a>
                     <a href="{{ route('profile.edit') }}" class="dd-item">
-                        <span class="dd-item-icon">⚙️</span>
+                        <span class="dd-item-icon"><i data-lucide="settings" style="width:14px;height:14px;"></i></span>
                         Account Settings
                     </a>
 
@@ -773,7 +774,7 @@
                     <form id="logout-form" action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="button" id="logout-btn" class="dd-item danger">
-                            <span class="dd-item-icon">🚪</span>
+                            <span class="dd-item-icon"><i data-lucide="log-out" style="width:14px;height:14px;"></i></span>
                             Logout
                         </button>
                     </form>
@@ -854,15 +855,15 @@
                         
                         let html = '';
                         data.forEach(item => {
-                            let iconEmoji = '📢';
+                            let iconName = 'bell';
                             let iconClass = 'info';
-                            if (item.type === 'warning') { iconEmoji = '⚠️'; iconClass = 'warning'; }
-                            if (item.type === 'danger') { iconEmoji = '🚨'; iconClass = 'danger'; }
-                            if (item.type === 'success') { iconEmoji = '🚚'; iconClass = 'success'; }
+                            if (item.type === 'warning') { iconName = 'alert-triangle'; iconClass = 'warning'; }
+                            if (item.type === 'danger') { iconName = 'alert-circle'; iconClass = 'danger'; }
+                            if (item.type === 'success') { iconName = 'truck'; iconClass = 'success'; }
                             
                             html += `
                                 <div class="notification-item">
-                                    <div class="notification-item-icon ${iconClass}">${iconEmoji}</div>
+                                    <div class="notification-item-icon ${iconClass}"><i data-lucide="${iconName}" style="width:14px;height:14px;"></i></div>
                                     <div class="notification-item-content">
                                         <div style="font-weight:600; color:#0f172a; font-size:12px;">${item.title}</div>
                                         <div style="color:#475569; font-size:11.5px; margin-top:2px;">${item.message}</div>
@@ -872,6 +873,7 @@
                             `;
                         });
                         list.html(html);
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
                     } else {
                         badge.hide();
                         countText.text('0 baru');
@@ -929,6 +931,9 @@
                 }
             }
         });
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
     </script>
     
     @if(session('wa_url'))
@@ -940,7 +945,7 @@
                 // If blocked by browser pop-up blocker, show SweetAlert fallback
                 if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
                     Swal.fire({
-                        title: 'Kirim WhatsApp 💬',
+                        title: 'Kirim WhatsApp',
                         text: 'Silakan klik tombol di bawah ini untuk mengirim update status ke WhatsApp pelanggan.',
                         icon: 'info',
                         showCancelButton: true,

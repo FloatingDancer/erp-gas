@@ -145,12 +145,12 @@
         </div>
 
         @if(session('status') === 'profile-updated' || session('success'))
-            <div class="alert-success">✅ {{ session('success') ?? 'Profile berhasil diperbarui!' }}</div>
+            <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') ?? 'Profile berhasil diperbarui!' }}</div>
         @endif
 
         {{-- Profile Detail Card --}}
         <div class="form-card">
-            <div class="form-card-title">👤 Detail Profil</div>
+            <div class="form-card-title"><i data-lucide="user" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Detail Profil</div>
 
             <div class="form-group">
                 <label class="form-label">Nama Lengkap</label>
@@ -169,15 +169,15 @@
 
             <div style="display:flex;gap:10px;margin-top:8px;">
                 <a href="{{ route('profile.edit') }}" class="btn-save" style="text-decoration:none;">
-                    ⚙️ Account Settings
+                    <i data-lucide="settings" style="width:14px;height:14px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Account Settings
                 </a>
-                <a href="{{ route('dashboard') }}" class="btn-back">← Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="btn-back"><i data-lucide="arrow-left" style="width:14px;height:14px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Dashboard</a>
             </div>
         </div>
 
         {{-- Account Info (read-only) --}}
         <div class="form-card">
-            <div class="form-card-title">ℹ️ Informasi Akun</div>
+            <div class="form-card-title"><i data-lucide="info" style="width:18px;height:18px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Informasi Akun</div>
             <div class="info-row">
                 <span class="info-label">Bergabung</span>
                 <span class="info-value">{{ \Carbon\Carbon::parse($user->created_at)->format('d F Y') }}</span>

@@ -23,8 +23,8 @@
         right: 20px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 52px;
         opacity: 0.2;
+        color: white;
     }
     .stat-card .stat-label {
         font-size: 13px;
@@ -183,45 +183,44 @@
                     <option value="{{ $y }}" {{ now()->year == $y ? 'selected' : '' }}>{{ $y }}</option>
                 @endfor
             </select>
-            <button type="submit" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:15px; padding:0 4px;" title="Unduh CSV">📥</button>
+            <button type="submit" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:15px; padding:0 4px; display:inline-flex; align-items:center; justify-content:center;" title="Unduh CSV"><i data-lucide="download" style="width:16px;height:16px;"></i></button>
         </form>
         <div class="action-btn-group">
-            <a href="/orders/create" class="action-btn" style="background:#2563eb; color:white;">+ New Order</a>
-            <a href="/customers/create" class="action-btn" style="background:#d97706; color:white;">+ New Customer</a>
+            <a href="/orders/create" class="action-btn" style="background:#2563eb; color:white;"><i data-lucide="plus" style="width:14px;height:14px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> New Order</a>
+            <a href="/customers/create" class="action-btn" style="background:#d97706; color:white;"><i data-lucide="user-plus" style="width:14px;height:14px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> New Customer</a>
         </div>
     </div>
 </div>
 
 {{-- ===== PREDICTIVE ANALYTICS SECTION ===== --}}
-<p class="section-title">🔮 Predictive Analytics</p>
+<p class="section-title"><i data-lucide="sparkles" style="width:14px;height:14px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Predictive Analytics</p>
 <div class="row g-3 mb-4">
 
     {{-- Left Column: Demand Forecasting Card --}}
     <div class="col-12 col-md-5">
-        <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <h5 style="margin-bottom: 8px;">📊 Peramalan Permintaan (Next Month)</h5>
+        <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-betwe            <div>
+                <h5 style="margin-bottom: 8px;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Peramalan Permintaan (Next Month)</h5>
                 <p style="font-size:12.5px; color:#64748b; margin: 0 0 20px;">Estimasi penjualan dan pendapatan bulan depan menggunakan algoritma <strong>Simple Moving Average (SMA)</strong> 3 bulan terakhir.</p>
                 
                 <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-                    <div style="font-size: 32px; background: #dbeafe; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">📦</div>
+                    <div style="background: #dbeafe; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i data-lucide="shopping-bag" style="width:24px;height:24px;color:#2563eb;"></i></div>
                     <div>
                         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Jumlah Order</div>
                         <div style="font-size: 24px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">{{ $forecastOrders }} <span style="font-size: 14px; font-weight: 500; color:#64748b;">Order</span></div>
                     </div>
                 </div>
-
+ 
                 <div style="background: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-                    <div style="font-size: 32px; background: #dcfce7; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">💵</div>
+                    <div style="background: #dcfce7; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i data-lucide="dollar-sign" style="width:24px;height:24px;color:#059669;"></i></div>
                     <div>
                         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Pendapatan (Revenue)</div>
                         <div style="font-size: 20px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">Rp {{ number_format($forecastRevenue, 0, ',', '.') }}</div>
                     </div>
-                </div>
+                </div>         </div>
             </div>
 
             <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
-                <span>ℹ️</span> 
+                <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;"></i>
                 @if($hasEnoughData)
                     <span>Data riwayat transaksi cukup. Akurasi peramalan sedang (berdasarkan 3 bulan penjualan).</span>
                 @else
@@ -234,7 +233,7 @@
     {{-- Right Column: Customer Gas Run-out Predictions Table --}}
     <div class="col-12 col-md-7">
         <div class="chart-card" style="height: 100%;">
-            <h5 style="margin-bottom: 8px;">🔥 Prediksi Tabung Gas Pelanggan Habis</h5>
+            <h5 style="margin-bottom: 8px;"><i data-lucide="flame" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Prediksi Tabung Gas Pelanggan Habis</h5>
             <p style="font-size:12.5px; color:#64748b; margin: 0 0 20px;">Daftar pelanggan yang diprediksi akan kehabisan tabung gas berdasarkan rata-rata interval pembelian sebelumnya.</p>
             
             <div class="table-responsive" style="margin: 0 -24px -24px; border-top: 1px solid #f1f5f9;">
@@ -282,7 +281,7 @@
                                     <div style="font-weight: 600; color: #1e293b;">{{ $pred['customer_name'] }}</div>
                                     <div style="font-size: 11px; color: #94a3b8;">Terakhir: {{ $pred['last_purchase'] }}</div>
                                     <div class="d-md-none" style="font-size: 11px; color: #475569; margin-top: 3px; font-weight: 500;">
-                                        📦 {{ $pred['last_product'] }}
+                                        <i data-lucide="package" style="width:12px;height:12px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> {{ $pred['last_product'] }}
                                     </div>
                                 </td>
                                 <td class="d-none d-md-table-cell" style="padding: 12px 12px; color: #475569;">{{ $pred['last_product'] }}</td>
@@ -293,7 +292,7 @@
                                 </td>
                                 <td style="padding: 12px 24px; text-align: right;">
                                     <a href="https://api.whatsapp.com/send?phone={{ $waPhone }}&text={{ rawurlencode($waMessage) }}" target="_blank" class="btn btn-sm btn-success" style="font-size: 11.5px; font-weight: 600; border-radius: 8px; padding: 4px 10px; background: #25d366; border-color: #25d366; display: inline-flex; align-items: center; gap: 4px; color: white; text-decoration: none;">
-                                        💬 Follow Up
+                                        <i data-lucide="message-square" style="width:12px;height:12px;"></i> Follow Up
                                     </a>
                                 </td>
                             </tr>
@@ -318,7 +317,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-blue shadow-sm">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i data-lucide="users" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Customers</div>
             <div class="stat-value">{{ $totalCustomers }}</div>
             <div class="stat-sub">Total terdaftar</div>
@@ -327,7 +326,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-teal shadow-sm">
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i data-lucide="package" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Products</div>
             <div class="stat-value">{{ $totalProducts }}</div>
             <div class="stat-sub">{{ $lowStockProducts }} stok rendah · {{ $outOfStock }} habis</div>
@@ -336,7 +335,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-purple shadow-sm">
-            <div class="stat-icon">🛒</div>
+            <div class="stat-icon"><i data-lucide="shopping-cart" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Total Orders</div>
             <div class="stat-value">{{ $totalOrders }}</div>
             <div class="stat-sub">{{ $pendingOrders }} pending</div>
@@ -345,7 +344,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-green shadow-sm">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i data-lucide="dollar-sign" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Total Revenue</div>
             <div class="stat-value" style="font-size:22px;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
             <div class="stat-sub">{{ $totalPayments }} transaksi</div>
@@ -354,7 +353,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-orange shadow-sm">
-            <div class="stat-icon">⏳</div>
+            <div class="stat-icon"><i data-lucide="clock" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Pending Orders</div>
             <div class="stat-value">{{ $pendingOrders }}</div>
             <div class="stat-sub">Menunggu diproses</div>
@@ -363,7 +362,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-pink shadow-sm">
-            <div class="stat-icon">🧾</div>
+            <div class="stat-icon"><i data-lucide="file-text" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Unpaid Invoices</div>
             <div class="stat-value">{{ $unpaidInvoices }}</div>
             <div class="stat-sub">{{ $paidInvoices }} sudah dibayar</div>
@@ -372,7 +371,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-gray shadow-sm">
-            <div class="stat-icon">🚚</div>
+            <div class="stat-icon"><i data-lucide="truck" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Deliveries</div>
             <div class="stat-value">{{ $totalDeliveries }}</div>
             <div class="stat-sub">{{ $completedDeliveries }} selesai · {{ $todayDeliveries }} hari ini</div>
@@ -381,7 +380,7 @@
 
     <div class="col-6 col-md-3">
         <div class="stat-card bg-grad-red shadow-sm">
-            <div class="stat-icon">⚠️</div>
+            <div class="stat-icon"><i data-lucide="alert-triangle" style="width:48px;height:48px;stroke-width:1.5;"></i></div>
             <div class="stat-label">Low Stock</div>
             <div class="stat-value">{{ $lowStockProducts }}</div>
             <div class="stat-sub">{{ $outOfStock }} produk habis</div>
@@ -398,7 +397,7 @@
     <div class="col-12 col-md-8">
         <div class="chart-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-                <h5 id="ordersChartTitle" style="margin:0; font-size:15px; font-weight:700; color:#1f2937;">📊 Order Bulanan (6 Bulan Terakhir)</h5>
+                <h5 id="ordersChartTitle" style="margin:0; font-size:15px; font-weight:700; color:#1f2937;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Order Bulanan (6 Bulan Terakhir)</h5>
                 <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:8px; gap:4px;">
                     <button type="button" onclick="updateOrdersChart('daily')" id="btn-ord-daily" style="border:none; background:transparent; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer; outline:none; transition: all 0.15s;">Harian</button>
                     <button type="button" onclick="updateOrdersChart('weekly')" id="btn-ord-weekly" style="border:none; background:transparent; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer; outline:none; transition: all 0.15s;">Mingguan</button>
@@ -413,7 +412,7 @@
     {{-- Donut Chart: Status Delivery --}}
     <div class="col-12 col-md-4">
         <div class="chart-card">
-            <h5>🚚 Status Pengiriman</h5>
+            <h5><i data-lucide="truck" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Status Pengiriman</h5>
             <canvas id="deliveryChart" height="180"></canvas>
         </div>
     </div>
@@ -422,7 +421,7 @@
     <div class="col-12 col-md-8">
         <div class="chart-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-                <h5 id="revenueChartTitle" style="margin:0; font-size:15px; font-weight:700; color:#1f2937;">💵 Revenue (6 Bulan Terakhir)</h5>
+                <h5 id="revenueChartTitle" style="margin:0; font-size:15px; font-weight:700; color:#1f2937;"><i data-lucide="dollar-sign" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Revenue (6 Bulan Terakhir)</h5>
                 <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:8px; gap:4px;">
                     <button type="button" onclick="updateRevenueChart('daily')" id="btn-rev-daily" style="border:none; background:transparent; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer; outline:none; transition: all 0.15s;">Harian</button>
                     <button type="button" onclick="updateRevenueChart('weekly')" id="btn-rev-weekly" style="border:none; background:transparent; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer; outline:none; transition: all 0.15s;">Mingguan</button>
@@ -437,19 +436,19 @@
     {{-- Recent Activity Log --}}
     <div class="col-12 col-md-4">
         <div class="chart-card" style="height: 100%; min-height: 290px; overflow-y: auto;">
-            <h5>📋 Riwayat Aktivitas Terbaru</h5>
+            <h5><i data-lucide="clipboard-list" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Riwayat Aktivitas Terbaru</h5>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 @forelse($activityLogs as $log)
                     <div style="display:flex; gap:10px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">
-                        <div style="font-size:18px; padding-top:2px;">
+                        <div style="padding-top:2px;">
                             @if($log->action === 'Create')
-                                🟢
+                                <i data-lucide="plus-circle" style="width:16px;height:16px;color:#10b981;vertical-align:middle;"></i>
                             @elseif($log->action === 'Update')
-                                🟡
+                                <i data-lucide="edit-3" style="width:16px;height:16px;color:#f59e0b;vertical-align:middle;"></i>
                             @elseif($log->action === 'Delete')
-                                🔴
+                                <i data-lucide="minus-circle" style="width:16px;height:16px;color:#ef4444;vertical-align:middle;"></i>
                             @else
-                                🔵
+                                <i data-lucide="info" style="width:16px;height:16px;color:#3b82f6;vertical-align:middle;"></i>
                             @endif
                         </div>
                         <div style="flex:1;">
@@ -571,22 +570,23 @@
         if (period === 'daily') {
             labels = orderDailyLabels;
             data = orderDailyData;
-            titleText = '📊 Order Harian (7 Hari Terakhir)';
+            titleText = 'Order Harian (7 Hari Terakhir)';
         } else if (period === 'weekly') {
             labels = orderWeeklyLabels;
             data = orderWeeklyData;
-            titleText = '📊 Order Mingguan (12 Minggu Terakhir)';
+            titleText = 'Order Mingguan (12 Minggu Terakhir)';
         } else if (period === 'yearly') {
             labels = orderYearlyLabels;
             data = orderYearlyData;
-            titleText = '📊 Order Tahunan (5 Tahun Terakhir)';
+            titleText = 'Order Tahunan (5 Tahun Terakhir)';
         } else {
             labels = orderMonthlyLabels;
             data = orderMonthlyData;
-            titleText = '📊 Order Bulanan (6 Bulan Terakhir)';
+            titleText = 'Order Bulanan (6 Bulan Terakhir)';
         }
 
-        document.getElementById('ordersChartTitle').innerText = titleText;
+        document.getElementById('ordersChartTitle').innerHTML = '<i data-lucide="bar-chart-3" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> ' + titleText;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         ordersChartInstance.data.labels = labels.length ? labels : ['Belum ada data'];
         ordersChartInstance.data.datasets[0].data = data.length ? data : [0];
@@ -652,22 +652,23 @@
         if (period === 'daily') {
             labels = revenueDailyLabels;
             data = revenueDailyData;
-            titleText = '💵 Revenue Harian (7 Hari Terakhir)';
+            titleText = 'Revenue Harian (7 Hari Terakhir)';
         } else if (period === 'weekly') {
             labels = revenueWeeklyLabels;
             data = revenueWeeklyData;
-            titleText = '💵 Revenue Mingguan (12 Minggu Terakhir)';
+            titleText = 'Revenue Mingguan (12 Minggu Terakhir)';
         } else if (period === 'yearly') {
             labels = revenueYearlyLabels;
             data = revenueYearlyData;
-            titleText = '💵 Revenue Tahunan (5 Tahun Terakhir)';
+            titleText = 'Revenue Tahunan (5 Tahun Terakhir)';
         } else {
             labels = revenueMonthlyLabels;
             data = revenueMonthlyData;
-            titleText = '💵 Revenue Bulanan (6 Bulan Terakhir)';
+            titleText = 'Revenue Bulanan (6 Bulan Terakhir)';
         }
 
-        document.getElementById('revenueChartTitle').innerText = titleText;
+        document.getElementById('revenueChartTitle').innerHTML = '<i data-lucide="dollar-sign" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> ' + titleText;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         revenueChartInstance.data.labels = labels.length ? labels : ['Belum ada data'];
         revenueChartInstance.data.datasets[0].data = data.length ? data : [0];

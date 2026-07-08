@@ -19,16 +19,16 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">🚚 Tambah Driver</h1>
+        <h1 class="page-title"><i data-lucide="user-plus" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Tambah Driver</h1>
         <p class="page-subtitle">Pendaftaran driver/kurir pengiriman baru</p>
     </div>
-    <a href="{{ route('drivers.index') }}" class="btn-secondary-custom">← Kembali</a>
+    <a href="{{ route('drivers.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="form-card">
     @if($errors->any())
         <div class="alert-error">
-            <strong>⚠️ Ada kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
             <ul style="margin:6px 0 0;padding-left:18px;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
@@ -56,8 +56,8 @@
             <div class="form-group">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-input" required>
-                    <option value="Active" {{ old('status') === 'Active' ? 'selected' : '' }}>🟢 Active</option>
-                    <option value="Inactive" {{ old('status') === 'Inactive' ? 'selected' : '' }}>🔴 Inactive</option>
+                    <option value="Active" {{ old('status') === 'Active' ? 'selected' : '' }}>Active</option>
+                    <option value="Inactive" {{ old('status') === 'Inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
             </div>
         </div>
@@ -80,7 +80,7 @@
         </div>
 
         <div style="display:flex;gap:10px;margin-top:8px;">
-            <button type="submit" class="btn-primary-custom">💾 Simpan Driver</button>
+            <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan Driver</button>
             <a href="{{ route('drivers.index') }}" class="btn-secondary-custom">Batal</a>
         </div>
     </form>

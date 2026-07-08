@@ -32,14 +32,14 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">🚚 Drivers</h1>
+        <h1 class="page-title"><i data-lucide="users" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Drivers</h1>
         <p class="page-subtitle">Kelola data kurir/pengemudi</p>
     </div>
-    <a href="{{ route('drivers.create') }}" class="btn-primary-custom">+ Add Driver</a>
+    <a href="{{ route('drivers.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Driver</a>
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -64,17 +64,17 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <td><span class="badge-pill badge-gray">{{ $d->license_plate }}</span></td>
                     <td>
                         @if($d->status === 'Active')
-                            <span class="badge-pill badge-green">🟢 Active</span>
+                            <span class="badge-pill badge-green"><i data-lucide="check" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Active</span>
                         @else
-                            <span class="badge-pill badge-red">🔴 Inactive</span>
+                            <span class="badge-pill badge-red"><i data-lucide="x" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Inactive</span>
                         @endif
                     </td>
                     <td>
                         <div style="display:flex;gap:6px;">
-                            <a href="{{ route('drivers.edit', $d->id) }}" class="action-edit">✏️ Edit</a>
+                            <a href="{{ route('drivers.edit', $d->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                             <form action="{{ route('drivers.destroy', $d->id) }}" method="POST" id="del-{{ $d->id }}" style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="button" class="action-delete" onclick="confirmDelete({{ $d->id }})">🗑 Delete</button>
+                                <button type="button" class="action-delete" onclick="confirmDelete({{ $d->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                             </form>
                         </div>
                     </td>
@@ -83,7 +83,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
-                            <div class="empty-icon">🚚</div>
+                            <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="users" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                             <p>Belum ada data driver</p>
                         </div>
                     </td>

@@ -31,14 +31,14 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">🧾 Invoices</h1>
+        <h1 class="page-title"><i data-lucide="file-text" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Invoices</h1>
         <p class="page-subtitle">Kelola data faktur</p>
     </div>
-    <a href="{{ route('invoices.create') }}" class="btn-primary-custom">+ Add Invoice</a>
+    <a href="{{ route('invoices.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Invoice</a>
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -68,9 +68,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td style="font-weight:700;color:#0f172a;">Rp {{ number_format($inv->total_amount, 0, ',', '.') }}</td>
                     <td>
                         @if($inv->status === 'Unpaid')
-                            <span class="badge-pill badge-orange">⏳ Unpaid</span>
+                            <span class="badge-pill badge-orange"><i data-lucide="clock" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Unpaid</span>
                         @elseif($inv->status === 'Paid')
-                            <span class="badge-pill badge-green">✅ Paid</span>
+                            <span class="badge-pill badge-green"><i data-lucide="check" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Paid</span>
                         @else
                             <span class="badge-pill" style="background:#f1f5f9;color:#475569;">{{ $inv->status }}</span>
                         @endif
@@ -78,8 +78,8 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td style="color:#64748b;">{{ \Carbon\Carbon::parse($inv->created_at)->format('d M Y') }}</td>
                     <td>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                            <a href="{{ route('invoices.edit', $inv->id) }}" class="action-edit">✏️ Edit</a>
-                            <a href="{{ route('invoices.print', $inv->id) }}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#374151;border:none;padding:6px 12px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;" title="Cetak Faktur">🖨 Print</a>
+                            <a href="{{ route('invoices.edit', $inv->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
+                            <a href="{{ route('invoices.print', $inv->id) }}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#374151;border:none;padding:6px 12px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;" title="Cetak Faktur"><i data-lucide="printer" style="width:13px;height:13px;margin-right:2px;"></i> Print</a>
                             
                             @php
                                 $customerName = $inv->order->customer->customer_name ?? 'Pelanggan';
@@ -100,16 +100,16 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                             @endphp
                             
                             @if($cleanPhone)
-                                <a href="https://api.whatsapp.com/send?phone={{ $cleanPhone }}&text={{ rawurlencode($message) }}" target="_blank" style="display:inline-flex;align-items:center;background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Kirim via WhatsApp">💬 WA</a>
+                                <a href="https://api.whatsapp.com/send?phone={{ $cleanPhone }}&text={{ rawurlencode($message) }}" target="_blank" style="display:inline-flex;align-items:center;background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Kirim via WhatsApp"><i data-lucide="message-square" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> WA</a>
                             @endif
 
                             @if($customerEmail)
-                                <button type="button" onclick="sendEmail('{{ $customerEmail }}', '{{ rawurlencode($subject) }}', '{{ rawurlencode($message) }}')" style="display:inline-flex;align-items:center;background:#dbeafe;color:#1d4ed8;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;" title="Kirim via Email">✉️ Email</button>
+                                <button type="button" onclick="sendEmail('{{ $customerEmail }}', '{{ rawurlencode($subject) }}', '{{ rawurlencode($message) }}')" style="display:inline-flex;align-items:center;background:#dbeafe;color:#1d4ed8;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;" title="Kirim via Email"><i data-lucide="mail" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Email</button>
                              @endif
 
                             <form action="{{ route('invoices.destroy', $inv->id) }}" method="POST" id="del-{{ $inv->id }}" style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="button" class="action-delete" onclick="confirmDelete({{ $inv->id }})">🗑 Delete</button>
+                                <button type="button" class="action-delete" onclick="confirmDelete({{ $inv->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                             </form>
                         </div>
                     </td>
@@ -118,7 +118,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 <tr>
                     <td colspan="7">
                         <div class="empty-state">
-                            <div class="empty-icon">🧾</div>
+                            <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="file-text" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                             <p>Belum ada invoice</p>
                         </div>
                     </td>
@@ -154,9 +154,9 @@ function sendEmail(email, rawSubject, rawBody) {
         icon: 'question',
         showCancelButton: true,
         showDenyButton: true,
-        confirmButtonText: '🌐 Gmail (Web)',
-        denyButtonText: '✉️ Aplikasi Default (Mailto)',
-        cancelButtonText: '📋 Salin Teks Invoice',
+        confirmButtonText: 'Gmail (Web)',
+        denyButtonText: 'Aplikasi Default (Mailto)',
+        cancelButtonText: 'Salin Teks Invoice',
         confirmButtonColor: '#2563eb',
         denyButtonColor: '#475569',
         cancelButtonColor: '#10b981',

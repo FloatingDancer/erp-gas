@@ -105,17 +105,17 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">⚙️ Account Settings</h1>
+        <h1 class="page-title"><i data-lucide="settings" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Account Settings</h1>
         <p class="page-subtitle">Kelola informasi dan keamanan akun Anda</p>
     </div>
-    <a href="{{ route('profile.index') }}" class="btn-back">← My Profile</a>
+    <a href="{{ route('profile.index') }}" class="btn-back"><i data-lucide="arrow-left" style="width:14px;height:14px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> My Profile</a>
 </div>
 
 @if(session('status') === 'profile-updated')
-    <div class="alert-success">✅ Informasi profil berhasil diperbarui!</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Informasi profil berhasil diperbarui!</div>
 @endif
 @if(session('status') === 'password-updated')
-    <div class="alert-success">🔐 Password berhasil diperbarui!</div>
+    <div class="alert-success"><i data-lucide="shield-check" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Password berhasil diperbarui!</div>
 @endif
 
 <div class="settings-page">
@@ -124,7 +124,7 @@
         {{-- ===== 1. Profile Information ===== --}}
         <div class="settings-card">
             <div class="settings-card-header">
-                <div class="settings-card-icon icon-blue">👤</div>
+                <div class="settings-card-icon icon-blue" style="display:flex;align-items:center;justify-content:center;"><i data-lucide="user" style="width:20px;height:20px;"></i></div>
                 <div>
                     <p class="settings-card-title">Informasi Profil</p>
                     <p class="settings-card-sub">Perbarui nama dan alamat email Anda</p>
@@ -153,7 +153,7 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn-primary-custom">💾 Simpan</button>
+                    <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan</button>
                 </form>
             </div>
         </div>
@@ -161,7 +161,7 @@
         {{-- ===== 2. Update Password ===== --}}
         <div class="settings-card">
             <div class="settings-card-header">
-                <div class="settings-card-icon icon-amber">🔐</div>
+                <div class="settings-card-icon icon-amber" style="display:flex;align-items:center;justify-content:center;"><i data-lucide="key-round" style="width:20px;height:20px;"></i></div>
                 <div>
                     <p class="settings-card-title">Update Password</p>
                     <p class="settings-card-sub">Pastikan menggunakan password yang kuat dan aman</p>
@@ -199,7 +199,7 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn-primary-custom">🔐 Update Password</button>
+                    <button type="submit" class="btn-primary-custom"><i data-lucide="key-round" style="width:15px;height:15px;margin-right:4px;"></i> Update Password</button>
                 </form>
             </div>
         </div>
@@ -207,7 +207,7 @@
         {{-- ===== 3. Danger Zone ===== --}}
         <div class="settings-card">
             <div class="settings-card-header">
-                <div class="settings-card-icon icon-red">⚠️</div>
+                <div class="settings-card-icon icon-red" style="display:flex;align-items:center;justify-content:center;"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></div>
                 <div>
                     <p class="settings-card-title">Hapus Akun</p>
                     <p class="settings-card-sub">Tindakan ini tidak dapat dibatalkan</p>
@@ -215,10 +215,10 @@
             </div>
             <div class="settings-card-body">
                 <div class="danger-notice">
-                    ⚠️ Setelah akun dihapus, semua data akan hilang permanen. Harap unduh data Anda sebelum menghapus akun.
+                    <i data-lucide="alert-triangle" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Setelah akun dihapus, semua data akan hilang permanen. Harap unduh data Anda sebelum menghapus akun.
                 </div>
                 <button type="button" class="btn-danger" onclick="confirmDeleteAccount()">
-                    🗑 Hapus Akun Saya
+                    <i data-lucide="trash-2" style="width:15px;height:15px;margin-right:4px;"></i> Hapus Akun Saya
                 </button>
 
                 <form id="delete-account-form" method="post" action="{{ route('profile.destroy') }}" style="display:none;">

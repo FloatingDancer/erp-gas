@@ -20,16 +20,16 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">✏️ Edit Payment</h1>
+        <h1 class="page-title"><i data-lucide="edit" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Edit Payment</h1>
         <p class="page-subtitle">Perbarui data pembayaran</p>
     </div>
-    <a href="{{ route('payments.index') }}" class="btn-secondary-custom">← Kembali</a>
+    <a href="{{ route('payments.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="form-card">
     @if($errors->any())
         <div class="alert-error">
-            <strong>⚠️ Ada kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
             <ul style="margin:6px 0 0;padding-left:18px;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
@@ -63,14 +63,14 @@
         <div class="form-group">
             <label class="form-label">Metode Pembayaran</label>
             <select name="method" class="form-input" required>
-                <option value="Cash"     {{ $payment->method === 'Cash'     ? 'selected' : '' }}>💵 Cash</option>
-                <option value="Transfer" {{ $payment->method === 'Transfer' ? 'selected' : '' }}>🏦 Transfer</option>
-                <option value="E-Wallet" {{ $payment->method === 'E-Wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
+                <option value="Cash"     {{ $payment->method === 'Cash'     ? 'selected' : '' }}>Cash</option>
+                <option value="Transfer" {{ $payment->method === 'Transfer' ? 'selected' : '' }}>Transfer</option>
+                <option value="E-Wallet" {{ $payment->method === 'E-Wallet' ? 'selected' : '' }}>E-Wallet</option>
             </select>
         </div>
 
         <div style="display:flex;gap:10px;margin-top:8px;">
-            <button type="submit" class="btn-primary-custom">💾 Update Payment</button>
+            <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Update Payment</button>
             <a href="{{ route('payments.index') }}" class="btn-secondary-custom">Batal</a>
         </div>
     </form>

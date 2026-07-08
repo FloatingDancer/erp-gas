@@ -8,6 +8,7 @@
     <meta name="keywords" content="Naga Sakti Jaya, ERP Naga Sakti Jaya, erp-nagasaktijaya, Manajemen Gas, Vercel ERP">
     <title>TK. NAGA SAKTI JAYA — Sistem ERP</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -219,11 +220,14 @@
 
         {{-- Card --}}
         <div class="auth-card">
-            <h2>{{ $title ?? 'Selamat Datang 👋' }}</h2>
+            <h2>{{ $title ?? 'Selamat Datang' }}</h2>
             <p class="subtitle">{{ $subtitle ?? 'Masuk ke akun Anda untuk melanjutkan' }}</p>
 
             {{ $slot }}
         </div>
     </div>
+    <script>
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    </script>
 </body>
 </html>

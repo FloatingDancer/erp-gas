@@ -39,14 +39,14 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">📦 Products</h1>
+    <h1 class="page-title"><i data-lucide="package" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Products</h1>
     <p class="page-subtitle">Kelola data produk gas</p>
   </div>
-  <a href="{{ route('products.create') }}" class="btn-primary-custom">+ Add Product</a>
+  <a href="{{ route('products.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Product</a>
 </div>
 
 @if(session('success'))
-  <div class="alert-success">✅ {{ session('success') }}</div>
+  <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -80,11 +80,11 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
             </td>
             <td>
               <div style="display:flex;gap:6px;">
-                <a href="{{ route('products.edit', $p->id) }}" class="action-edit">✏️ Edit</a>
+                <a href="{{ route('products.edit', $p->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                 <form action="{{ route('products.destroy', $p->id) }}" method="POST" id="del-{{ $p->id }}" style="display:inline;">
                   @csrf
                   @method('DELETE')
-                  <button type="button" class="action-delete" onclick="confirmDelete({{ $p->id }})">🗑 Delete</button>
+                  <button type="button" class="action-delete" onclick="confirmDelete({{ $p->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                 </form>
               </div>
             </td>
@@ -93,7 +93,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
           <tr>
             <td colspan="6">
               <div class="empty-state">
-                <div class="empty-icon">📦</div>
+                <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="package" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada produk</p>
               </div>
             </td>

@@ -39,16 +39,16 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">📦 Tambah Product</h1>
+    <h1 class="page-title"><i data-lucide="package-plus" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Tambah Product</h1>
     <p class="page-subtitle">Isi data produk baru</p>
   </div>
-  <a href="{{ route('products.index') }}" class="btn-secondary-custom">← Kembali</a>
+  <a href="{{ route('products.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="form-card">
   @if($errors->any())
     <div class="alert-error">
-      <strong>⚠️ Ada kesalahan:</strong>
+      <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
       <ul style="margin:6px 0 0;padding-left:18px;">
         @foreach($errors->all() as $e)
           <li>{{ $e }}</li>
@@ -82,7 +82,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px;">
-      <button type="submit" class="btn-primary-custom">💾 Simpan Product</button>
+      <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan Product</button>
       <a href="{{ route('products.index') }}" class="btn-secondary-custom">Batal</a>
     </div>
   </form>

@@ -104,8 +104,8 @@
                     style="padding-right:44px;"
                     required autocomplete="current-password"
                 >
-                <button type="button" class="toggle-pw" id="togglePw" title="Tampilkan password">
-                    👁
+                <button type="button" class="toggle-pw" id="togglePw" title="Tampilkan password" style="display:inline-flex;align-items:center;justify-content:center;">
+                    <i data-lucide="eye" style="width:18px;height:18px;"></i>
                 </button>
             </div>
             @error('password')
@@ -136,10 +136,10 @@
             {{-- Quick Login Buttons --}}
             <div class="quick-login-grid">
                 <button type="button" class="btn-demo-login" onclick="quickLogin('admin@gmail.com', '12345678')">
-                    🔑 Admin
+                    <i data-lucide="key-round" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Admin
                 </button>
                 <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
-                    🚚 Driver
+                    <i data-lucide="truck" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Driver
                 </button>
             </div>
         @endif
@@ -150,11 +150,12 @@
         const pw = document.getElementById('password');
         if (pw.type === 'password') {
             pw.type = 'text';
-            this.innerHTML = '🙈';
+            this.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
         } else {
             pw.type = 'password';
-            this.innerHTML = '👁';
+            this.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
         }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 
     function quickLogin(email, password) {
@@ -163,7 +164,7 @@
         
         const form = document.querySelector('form');
         const submitBtn = form.querySelector('.btn-login');
-        submitBtn.innerHTML = 'Memproses masuk... ⏳';
+        submitBtn.innerHTML = 'Memproses masuk...';
         submitBtn.style.opacity = '0.7';
         
         setTimeout(() => {

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Invoice #INV-{{ str_pad($invoice->id, 5, '0', STR_PAD_LEFT) }}</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -120,7 +121,7 @@
 </head>
 <body>
     <div class="invoice-box">
-        <button class="no-print-btn" onclick="window.print()">🖨 Cetak Halaman Ini</button>
+        <button class="no-print-btn" onclick="window.print()" style="display:inline-flex;align-items:center;"><i data-lucide="printer" style="width:16px;height:16px;margin-right:6px;"></i> Cetak Halaman Ini</button>
 
         <div class="header">
             <div>
@@ -203,6 +204,7 @@
 
     <script>
         window.onload = function() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             // Otomatis cetak saat halaman terbuka
             setTimeout(function() {
                 window.print();

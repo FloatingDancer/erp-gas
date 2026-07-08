@@ -125,20 +125,20 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">✏️ Edit Order</h1>
+    <h1 class="page-title"><i data-lucide="edit" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Edit Order</h1>
     <p class="page-subtitle">Perbarui data pesanan</p>
   </div>
-  <a href="{{ route('orders.index') }}" class="btn-secondary-custom">← Kembali</a>
+  <a href="{{ route('orders.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 @if(session('error'))
-  <div class="alert-error">⚠️ {{ session('error') }}</div>
+  <div class="alert-error"><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('error') }}</div>
 @endif
 
 <div class="form-card">
   @if($errors->any())
     <div class="alert-error">
-      <strong>⚠️ Ada kesalahan:</strong>
+      <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
       <ul style="margin:6px 0 0;padding-left:18px;">
         @foreach($errors->all() as $e)
           <li>{{ $e }}</li>
@@ -188,13 +188,13 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     <div class="form-group">
       <label class="form-label">Status</label>
       <select name="status" class="form-input">
-        <option value="Pending" {{ $order->status == 'Pending' ? 'selected' : '' }}>⏳ Pending</option>
-        <option value="Completed" {{ $order->status == 'Completed' ? 'selected' : '' }}>✅ Completed</option>
+        <option value="Pending" {{ $order->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+        <option value="Completed" {{ $order->status == 'Completed' ? 'selected' : '' }}>Completed</option>
       </select>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px;">
-      <button type="submit" class="btn-primary-custom">💾 Update Order</button>
+      <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Update Order</button>
       <a href="{{ route('orders.index') }}" class="btn-secondary-custom">Batal</a>
     </div>
   </form>

@@ -49,16 +49,16 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">🚚 Deliveries</h1>
+        <h1 class="page-title"><i data-lucide="truck" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Deliveries</h1>
         <p class="page-subtitle">Kelola data pengiriman</p>
     </div>
     @if(!auth()->user()->isDriver())
-        <a href="{{ route('deliveries.create') }}" class="btn-primary-custom">+ Add Delivery</a>
+        <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>
     @endif
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -90,11 +90,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td style="color:#64748b;">{{ \Carbon\Carbon::parse($d->delivery_date)->format('d M Y') }}</td>
                     <td>
                         @if($d->status === 'Scheduled')
-                            <span class="badge-pill badge-yellow">📅 Scheduled</span>
+                            <span class="badge-pill badge-yellow"><i data-lucide="calendar" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Scheduled</span>
                         @elseif($d->status === 'On Delivery')
-                            <span class="badge-pill badge-blue">🚚 On Delivery</span>
+                            <span class="badge-pill badge-blue"><i data-lucide="truck" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> On Delivery</span>
                         @elseif($d->status === 'Delivered')
-                            <span class="badge-pill badge-green">✅ Delivered</span>
+                            <span class="badge-pill badge-green"><i data-lucide="check" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Delivered</span>
                         @else
                             <span class="badge-pill badge-gray">{{ $d->status }}</span>
                         @endif
@@ -104,15 +104,15 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                             @if(auth()->user()->isDriver() && $d->status === 'On Delivery')
                                 <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-{{ $d->id }}" style="display:inline;">
                                     @csrf
-                                    <button type="button" class="action-confirm" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}')">✅ Sampai</button>
+                                    <button type="button" class="action-confirm" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}')"><i data-lucide="check" style="width:13px;height:13px;margin-right:2px;"></i> Sampai</button>
                                 </form>
                             @endif
 
                             @if(!auth()->user()->isDriver())
-                                <a href="{{ route('deliveries.edit', $d->id) }}" class="action-edit">✏️ Edit</a>
+                                <a href="{{ route('deliveries.edit', $d->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                                 <form action="{{ route('deliveries.destroy', $d->id) }}" method="POST" id="del-{{ $d->id }}" style="display:inline;">
                                     @csrf @method('DELETE')
-                                    <button type="button" class="action-delete" onclick="confirmDelete({{ $d->id }})">🗑 Delete</button>
+                                    <button type="button" class="action-delete" onclick="confirmDelete({{ $d->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                                 </form>
                             @endif
                         </div>
@@ -122,7 +122,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
-                            <div class="empty-icon">🚚</div>
+                            <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="truck" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                             <p>Belum ada data pengiriman</p>
                         </div>
                     </td>
@@ -140,11 +140,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 <span class="delivery-card-title">Order #{{ $d->order->id }}</span>
                 <div>
                     @if($d->status === 'Scheduled')
-                        <span class="badge-pill badge-yellow">📅 Scheduled</span>
+                        <span class="badge-pill badge-yellow"><i data-lucide="calendar" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Scheduled</span>
                     @elseif($d->status === 'On Delivery')
-                        <span class="badge-pill badge-blue">🚚 On Delivery</span>
+                        <span class="badge-pill badge-blue"><i data-lucide="truck" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> On Delivery</span>
                     @elseif($d->status === 'Delivered')
-                        <span class="badge-pill badge-green">✅ Delivered</span>
+                        <span class="badge-pill badge-green"><i data-lucide="check" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Delivered</span>
                     @else
                         <span class="badge-pill badge-gray">{{ $d->status }}</span>
                     @endif
@@ -158,7 +158,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 <div class="delivery-card-item">
                     <span class="delivery-card-label">No. Telp Pelanggan</span>
                     <span class="delivery-card-value" style="color: #2563eb; font-weight:600;">
-                        <a href="tel:{{ $d->order->customer->phone }}" style="text-decoration: none; color:inherit;">📞 {{ $d->order->customer->phone }}</a>
+                        <a href="tel:{{ $d->order->customer->phone }}" style="text-decoration: none; color:inherit;"><i data-lucide="phone" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> {{ $d->order->customer->phone }}</a>
                     </span>
                 </div>
                 <div class="delivery-card-item">
@@ -184,7 +184,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-mob-{{ $d->id }}" style="display:block;">
                         @csrf
                         <button type="button" class="btn-primary-custom action-confirm btn-confirm-mobile" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}', true)">
-                            ✅ Konfirmasi Sampai
+                            <i data-lucide="check" style="width:14px;height:14px;margin-right:4px;"></i> Konfirmasi Sampai
                         </button>
                     </form>
                 @endif
@@ -193,7 +193,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     @empty
         <div class="card-clean" style="display:block; padding: 24px; text-align:center;">
             <div class="empty-state">
-                <div class="empty-icon">🚚</div>
+                <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="truck" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada data pengiriman</p>
             </div>
         </div>

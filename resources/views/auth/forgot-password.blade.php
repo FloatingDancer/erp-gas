@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <x-slot name="title">Lupa Password? 🔒</x-slot>
+    <x-slot name="title">Lupa Password?</x-slot>
     <x-slot name="subtitle">Atur ulang password Anda</x-slot>
 
     @if (session('status'))
@@ -31,7 +31,7 @@
         </div>
 
         <button type="submit" class="btn-login" style="margin-bottom: 20px;">
-            Kirim Link Reset Password →
+            Kirim Link Reset Password <i data-lucide="arrow-right" style="width:14px;height:14px;margin-left:4px;vertical-align:middle;margin-top:-2px;"></i>
         </button>
 
         <div style="text-align: center;">

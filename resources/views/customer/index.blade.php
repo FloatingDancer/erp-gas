@@ -40,14 +40,14 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">👤 Customers</h1>
+        <h1 class="page-title"><i data-lucide="users" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Customers</h1>
         <p class="page-subtitle">Kelola data pelanggan</p>
     </div>
-    <a href="{{ route('customers.create') }}" class="btn-primary-custom">+ Add Customer</a>
+    <a href="{{ route('customers.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Customer</a>
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -66,16 +66,16 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <td style="color:#64748b;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $c->address }}</td>
                     <td>
                         <div style="display:flex;gap:6px;">
-                            <a href="{{ route('customers.edit', $c->id) }}" class="action-edit">✏️ Edit</a>
+                            <a href="{{ route('customers.edit', $c->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                             <form action="{{ route('customers.destroy', $c->id) }}" method="POST" id="del-{{ $c->id }}" style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="button" class="action-delete" onclick="confirmDelete({{ $c->id }},'customer')">🗑 Delete</button>
+                                <button type="button" class="action-delete" onclick="confirmDelete({{ $c->id }},'customer')"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                             </form>
                         </div>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👤</div><p>Belum ada customer</p></div></td></tr>
+                <tr><td colspan="6"><div class="empty-state"><div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="users" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div><p>Belum ada customer</p></div></td></tr>
             @endforelse
             </tbody>
         </table>

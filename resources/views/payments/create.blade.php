@@ -45,13 +45,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     {{-- Page Header --}}
     <div class="page-header">
         <div>
-            <h1 class="page-title">💳 Tambah Pembayaran</h1>
+            <h1 class="page-title"><i data-lucide="credit-card" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Tambah Pembayaran</h1>
             <p class="page-subtitle">Catat transaksi pembayaran baru</p>
         </div>
         <a href="{{ route('payments.index') }}" class="btn-secondary-custom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-            </svg>
+            <i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i>
             Kembali
         </a>
     </div>
@@ -59,7 +57,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     {{-- Validation Errors --}}
     @if($errors->any())
         <div class="alert-error" style="max-width:680px;margin-bottom:20px;">
-            <strong>⚠️ Terdapat kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Terdapat kesalahan:</strong>
             <ul style="margin:8px 0 0 18px;padding:0;">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -109,18 +107,16 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
             <div class="form-group">
                 <label class="form-label" for="method">Metode Pembayaran</label>
                 <select id="method" name="method" class="form-input" required>
-                    <option value="Cash"     {{ old('method') === 'Cash'     ? 'selected' : '' }}>💵 Cash</option>
-                    <option value="Transfer" {{ old('method') === 'Transfer' ? 'selected' : '' }}>🏦 Transfer</option>
-                    <option value="E-Wallet" {{ old('method') === 'E-Wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
+                    <option value="Cash"     {{ old('method') === 'Cash'     ? 'selected' : '' }}>Cash</option>
+                    <option value="Transfer" {{ old('method') === 'Transfer' ? 'selected' : '' }}>Transfer</option>
+                    <option value="E-Wallet" {{ old('method') === 'E-Wallet' ? 'selected' : '' }}>E-Wallet</option>
                 </select>
             </div>
 
             {{-- Actions --}}
             <div style="display:flex;gap:12px;margin-top:28px;">
                 <button type="submit" class="btn-primary-custom">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
-                    </svg>
+                    <i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i>
                     Simpan Pembayaran
                 </button>
                 <a href="{{ route('payments.index') }}" class="btn-secondary-custom">Batal</a>

@@ -19,16 +19,16 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">✏️ Edit Delivery</h1>
+        <h1 class="page-title"><i data-lucide="edit" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Edit Delivery</h1>
         <p class="page-subtitle">Perbarui data pengiriman</p>
     </div>
-    <a href="{{ route('deliveries.index') }}" class="btn-secondary-custom">← Kembali</a>
+    <a href="{{ route('deliveries.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="form-card">
     @if($errors->any())
         <div class="alert-error">
-            <strong>⚠️ Ada kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
             <ul style="margin:6px 0 0;padding-left:18px;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
@@ -70,15 +70,15 @@
             <div class="form-group">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-input" required>
-                    <option value="Scheduled"   {{ $delivery->status === 'Scheduled'   ? 'selected' : '' }}>📅 Scheduled</option>
-                    <option value="On Delivery" {{ $delivery->status === 'On Delivery' ? 'selected' : '' }}>🚚 On Delivery</option>
-                    <option value="Delivered"   {{ $delivery->status === 'Delivered'   ? 'selected' : '' }}>✅ Delivered</option>
+                    <option value="Scheduled"   {{ $delivery->status === 'Scheduled'   ? 'selected' : '' }}>Scheduled</option>
+                    <option value="On Delivery" {{ $delivery->status === 'On Delivery' ? 'selected' : '' }}>On Delivery</option>
+                    <option value="Delivered"   {{ $delivery->status === 'Delivered'   ? 'selected' : '' }}>Delivered</option>
                 </select>
             </div>
         </div>
 
         <div style="display:flex;gap:10px;margin-top:8px;">
-            <button type="submit" class="btn-primary-custom">💾 Update Delivery</button>
+            <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Update Delivery</button>
             <a href="{{ route('deliveries.index') }}" class="btn-secondary-custom">Batal</a>
         </div>
     </form>

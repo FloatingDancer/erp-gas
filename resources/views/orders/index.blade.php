@@ -38,17 +38,17 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">🛒 Orders</h1>
+    <h1 class="page-title"><i data-lucide="shopping-cart" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Orders</h1>
     <p class="page-subtitle">Kelola data pesanan</p>
   </div>
-  <a href="{{ route('orders.create') }}" class="btn-primary-custom">+ Add Order</a>
+  <a href="{{ route('orders.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Order</a>
 </div>
 
 @if(session('error'))
-  <div class="alert-error">⚠️ {{ session('error') }}</div>
+  <div class="alert-error"><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('error') }}</div>
 @endif
 @if(session('success'))
-  <div class="alert-success">✅ {{ session('success') }}</div>
+  <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 
 <div class="card-clean">
@@ -77,20 +77,20 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
             <td style="color:#64748b;">{{ \Carbon\Carbon::parse($order->order_date)->format('d M Y') }}</td>
             <td>
               @if($order->status == 'Pending')
-                <span class="badge-pill badge-orange">⏳ Pending</span>
+                <span class="badge-pill badge-orange"><i data-lucide="clock" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Pending</span>
               @elseif($order->status == 'Completed')
-                <span class="badge-pill badge-green">✅ Completed</span>
+                <span class="badge-pill badge-green"><i data-lucide="check" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Completed</span>
               @else
                 <span class="badge-pill badge-gray">{{ $order->status }}</span>
               @endif
             </td>
             <td>
               <div style="display:flex;gap:6px;">
-                <a href="{{ route('orders.edit', $order->id) }}" class="action-edit">✏️ Edit</a>
+                <a href="{{ route('orders.edit', $order->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                 <form action="{{ route('orders.destroy', $order->id) }}" method="POST" id="del-{{ $order->id }}" style="display:inline;">
                   @csrf
                   @method('DELETE')
-                  <button type="button" class="action-delete" onclick="confirmDelete({{ $order->id }})">🗑 Delete</button>
+                  <button type="button" class="action-delete" onclick="confirmDelete({{ $order->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;margin-right:2px;"></i> Delete</button>
                 </form>
               </div>
             </td>
@@ -99,7 +99,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
           <tr>
             <td colspan="8">
               <div class="empty-state">
-                <div class="empty-icon">🛒</div>
+                <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="shopping-cart" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada order</p>
               </div>
             </td>
@@ -117,12 +117,12 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
   @if(session('show_navigation_popup'))
     Swal.fire({
       icon: 'success',
-      title: 'Order Berhasil Dibuat! 🎉',
+      title: 'Order Berhasil Dibuat!',
       text: 'Pilih modul tujuan Anda selanjutnya:',
       showDenyButton: true,
       showCancelButton: true,
-      confirmButtonText: '🔍 Cek Invoice',
-      denyButtonText: '💳 Buat Pembayaran',
+      confirmButtonText: 'Cek Invoice',
+      denyButtonText: 'Buat Pembayaran',
       cancelButtonText: 'Batal / Tetap di Sini',
       confirmButtonColor: '#2563eb',
       denyButtonColor: '#10b981',

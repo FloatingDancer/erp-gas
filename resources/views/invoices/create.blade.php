@@ -20,16 +20,16 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">🧾 Tambah Invoice</h1>
+        <h1 class="page-title"><i data-lucide="file-plus" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Tambah Invoice</h1>
         <p class="page-subtitle">Buat faktur baru dari order</p>
     </div>
-    <a href="{{ route('invoices.index') }}" class="btn-secondary-custom">← Kembali</a>
+    <a href="{{ route('invoices.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="form-card">
     @if($errors->any())
         <div class="alert-error">
-            <strong>⚠️ Ada kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
             <ul style="margin:6px 0 0;padding-left:18px;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
@@ -63,13 +63,13 @@
         <div class="form-group">
             <label class="form-label">Status</label>
             <select name="status" class="form-input" required>
-                <option value="Unpaid" {{ old('status', 'Unpaid') === 'Unpaid' ? 'selected' : '' }}>⏳ Unpaid</option>
-                <option value="Paid"   {{ old('status') === 'Paid'   ? 'selected' : '' }}>✅ Paid</option>
+                <option value="Unpaid" {{ old('status', 'Unpaid') === 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                <option value="Paid"   {{ old('status') === 'Paid'   ? 'selected' : '' }}>Paid</option>
             </select>
         </div>
 
         <div style="display:flex;gap:10px;margin-top:8px;">
-            <button type="submit" class="btn-primary-custom">💾 Simpan Invoice</button>
+            <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan Invoice</button>
             <a href="{{ route('invoices.index') }}" class="btn-secondary-custom">Batal</a>
         </div>
     </form>

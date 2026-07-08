@@ -25,10 +25,10 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">📋 Log Aktivitas</h1>
+        <h1 class="page-title"><i data-lucide="clipboard-list" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Log Aktivitas</h1>
         <p class="page-subtitle">Daftar lengkap riwayat aktivitas sistem</p>
     </div>
-    <a href="{{ route('dashboard') }}" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#374151; border:none; padding:9px 18px; border-radius:10px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; transition:background 0.15s;">← Kembali</a>
+    <a href="{{ route('dashboard') }}" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#374151; border:none; padding:9px 18px; border-radius:10px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; transition:background 0.15s;"><i data-lucide="arrow-left" style="width:15px;height:15px;margin-right:2px;"></i> Kembali</a>
 </div>
 
 <div class="card-clean">
@@ -51,13 +51,13 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     </td>
                     <td>
                         @if($log->action === 'Create')
-                            <span class="badge-pill badge-green">🟢 Create</span>
+                            <span class="badge-pill badge-green"><i data-lucide="plus-circle" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Create</span>
                         @elseif($log->action === 'Update')
-                            <span class="badge-pill badge-yellow">🟡 Update</span>
+                            <span class="badge-pill badge-yellow"><i data-lucide="edit-3" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Update</span>
                         @elseif($log->action === 'Delete')
-                            <span class="badge-pill badge-red">🔴 Delete</span>
+                            <span class="badge-pill badge-red"><i data-lucide="minus-circle" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> Delete</span>
                         @else
-                            <span class="badge-pill badge-blue">🔵 {{ $log->action }}</span>
+                            <span class="badge-pill badge-blue"><i data-lucide="info" style="width:12px;height:12px;margin-right:3px;vertical-align:middle;margin-top:-2px;"></i> {{ $log->action }}</span>
                         @endif
                     </td>
                     <td style="font-weight:500; color:#374151; max-width: 500px; word-break: break-word;">
@@ -78,7 +78,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                 <tr>
                     <td colspan="4">
                         <div class="empty-state">
-                            <div class="empty-icon">📋</div>
+                            <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="clipboard-list" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                             <p>Belum ada riwayat aktivitas</p>
                         </div>
                     </td>
