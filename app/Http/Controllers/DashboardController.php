@@ -16,288 +16,289 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalCustomers = Customer::count();
-        $totalProducts  = Product::count();
-        $totalOrders    = Order::count();
-        $pendingOrders  = Order::where('status', 'Pending')->count();
+        $data = \Illuminate\Support\Facades\Cache::remember('dashboard_data', 1800, function () {
+            $totalCustomers = Customer::count();
+            $totalProducts  = Product::count();
+            $totalOrders    = Order::count();
+            $pendingOrders  = Order::where('status', 'Pending')->count();
 
-        $totalDeliveries    = Delivery::count();
-        $completedDeliveries = Delivery::where('status', 'Delivered')->count();
-        $todayDeliveries    = Delivery::whereDate('delivery_date', now())->count();
+            $totalDeliveries    = Delivery::count();
+            $completedDeliveries = Delivery::where('status', 'Delivered')->count();
+            $todayDeliveries    = Delivery::whereDate('delivery_date', now())->count();
 
-        $unpaidInvoices = Invoice::where('status', 'Unpaid')->count();
-        $paidInvoices   = Invoice::where('status', 'Paid')->count();
+            $unpaidInvoices = Invoice::where('status', 'Unpaid')->count();
+            $paidInvoices   = Invoice::where('status', 'Paid')->count();
 
-        $totalPayments = Payment::count();
-        $totalRevenue  = Payment::sum('amount');
+            $totalPayments = Payment::count();
+            $totalRevenue  = Payment::sum('amount');
 
-        $lowStockProducts = Product::whereBetween('stock', [1, 10])->count();
-        $outOfStock       = Product::where('stock', '<=', 0)->count();
+            $lowStockProducts = Product::whereBetween('stock', [1, 10])->count();
+            $outOfStock       = Product::where('stock', '<=', 0)->count();
 
-        // --- Data untuk Grafik ---
+            // --- Data untuk Grafik ---
 
-        // --- Orders per Hari (7 hari terakhir) ---
-        $ordersLast7Days = Order::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        $orderDailyLabels = $ordersLast7Days->map(fn($r) =>
-            \Carbon\Carbon::parse($r->date)->format('d M')
-        );
-        $orderDailyData = $ordersLast7Days->pluck('total');
-
-        // --- Orders per Minggu (12 minggu terakhir) ---
-        $ordersPerWeek = Order::select(
-                DB::raw('WEEK(created_at) as week'),
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('created_at', '>=', now()->subWeeks(12))
-            ->groupBy('year', 'week')
-            ->orderBy('year')
-            ->orderBy('week')
-            ->get();
-
-        $orderWeeklyLabels = $ordersPerWeek->map(fn($r) =>
-            'Wk ' . $r->week . ' (' . $r->year . ')'
-        );
-        $orderWeeklyData = $ordersPerWeek->pluck('total');
-
-        // --- Orders per Bulan (6 bulan terakhir) ---
-        $ordersPerMonth = Order::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
-
-        $orderMonthlyLabels = $ordersPerMonth->map(fn($r) =>
-            \Carbon\Carbon::createFromDate($r->year, $r->month, 1)->format('M Y')
-        );
-        $orderMonthlyData = $ordersPerMonth->pluck('total');
-
-        // --- Orders per Tahun (5 tahun terakhir) ---
-        $ordersPerYear = Order::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('created_at', '>=', now()->subYears(5))
-            ->groupBy('year')
-            ->orderBy('year')
-            ->get();
-
-        $orderYearlyLabels = $ordersPerYear->map(fn($r) => (string)$r->year);
-        $orderYearlyData = $ordersPerYear->pluck('total');
-
-        // Revenue per bulan (6 bulan terakhir)
-        $revenuePerMonth = Payment::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('SUM(amount) as total')
-            )
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
-
-        $revenueLabels = $revenuePerMonth->map(fn($r) =>
-            \Carbon\Carbon::createFromDate($r->year, $r->month, 1)->format('M Y')
-        );
-        $revenueData = $revenuePerMonth->pluck('total');
-
-        // Revenue 7 hari terakhir (Harian)
-        $revenueLast7Days = Payment::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(amount) as total')
-            )
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        $revenueDailyLabels = $revenueLast7Days->map(fn($r) =>
-            \Carbon\Carbon::parse($r->date)->format('d M')
-        );
-        $revenueDailyData = $revenueLast7Days->pluck('total');
-
-        // Revenue per minggu (12 minggu terakhir)
-        $revenuePerWeek = Payment::select(
-                DB::raw('WEEK(created_at) as week'),
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('SUM(amount) as total')
-            )
-            ->where('created_at', '>=', now()->subWeeks(12))
-            ->groupBy('year', 'week')
-            ->orderBy('year')
-            ->orderBy('week')
-            ->get();
-
-        $revenueWeekLabels = $revenuePerWeek->map(fn($r) =>
-            'Wk ' . $r->week . ' (' . $r->year . ')'
-        );
-        $revenueWeekData = $revenuePerWeek->pluck('total');
-
-        // Revenue per tahun (5 tahun terakhir)
-        $revenuePerYear = Payment::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('SUM(amount) as total')
-            )
-            ->where('created_at', '>=', now()->subYears(5))
-            ->groupBy('year')
-            ->orderBy('year')
-            ->get();
-
-        $revenueYearLabels = $revenuePerYear->map(fn($r) => (string)$r->year);
-        $revenueYearData = $revenuePerYear->pluck('total');
-
-        // Distribusi status order
-        $orderStatusData = [
-            Order::where('status', 'Pending')->count(),
-            Order::where('status', 'Completed')->count(),
-            Order::whereNotIn('status', ['Pending', 'Completed'])->count(),
-        ];
-
-        // Distribusi status delivery
-        $deliveryStatusData = [
-            Delivery::where('status', 'Scheduled')->count(),
-            Delivery::where('status', 'On Delivery')->count(),
-            Delivery::where('status', 'Delivered')->count(),
-        ];
-
-        // =============================================
-        // PREDICATIVE ANALYTICS CALCULATIONS
-        // =============================================
-        
-        // 1. Demand Forecasting (Simple Moving Average - SMA)
-        // Ambil data total order bulanan selama 3 bulan terakhir
-        $monthlySales = Order::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as total_orders'),
-                DB::raw('SUM(total_amount) as total_revenue')
-            )
-            ->groupBy('year', 'month')
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
-            ->take(3)
-            ->get();
-
-        $forecastOrders = 0;
-        $forecastRevenue = 0;
-        $hasEnoughData = $monthlySales->count() >= 2;
-
-        if ($monthlySales->isNotEmpty()) {
-            $forecastOrders = round($monthlySales->avg('total_orders'));
-            $forecastRevenue = $monthlySales->avg('total_revenue');
-        }
-
-        // 2. Customer Gas Run-out Prediction
-        $customersList = Customer::all();
-        $predictions = [];
-
-        foreach ($customersList as $cust) {
-            $custOrders = Order::with('product')
-                ->where('customer_id', $cust->id)
-                ->orderBy('created_at', 'asc')
+            // --- Orders per Hari (7 hari terakhir) ---
+            $ordersLast7Days = Order::select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->where('created_at', '>=', now()->subDays(7))
+                ->groupBy('date')
+                ->orderBy('date')
                 ->get();
 
-            if ($custOrders->isEmpty()) {
-                continue;
-            }
+            $orderDailyLabels = $ordersLast7Days->map(fn($r) =>
+                \Carbon\Carbon::parse($r->date)->format('d M')
+            );
+            $orderDailyData = $ordersLast7Days->pluck('total');
 
-            $lastOrd = $custOrders->last();
-            $lastPurchase = \Carbon\Carbon::parse($lastOrd->created_at);
-            
-            // Tentukan estimasi masa pakai gas berdasarkan jenis produk terakhir
-            $avgInterval = 30; // default jika produk tidak terdeteksi
-            if ($lastOrd->product) {
-                $pName = strtolower($lastOrd->product->name);
-                if (str_contains($pName, '3 kg') || str_contains($pName, '3kg') || str_contains($pName, 'hijau')) {
-                    $avgInterval = 25;
-                } elseif (str_contains($pName, '5,5 kg') || str_contains($pName, '5.5kg') || str_contains($pName, '5,5kg')) {
-                    $avgInterval = 45;
-                } elseif (str_contains($pName, '12 kg') || str_contains($pName, '12kg')) {
-                    $avgInterval = 60;
-                }
-            }
+            // --- Orders per Minggu (12 minggu terakhir) ---
+            $ordersPerWeek = Order::select(
+                    DB::raw('WEEK(created_at) as week'),
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->where('created_at', '>=', now()->subWeeks(12))
+                ->groupBy('year', 'week')
+                ->orderBy('year')
+                ->orderBy('week')
+                ->get();
 
-            $predDate = $lastPurchase->copy()->addDays($avgInterval);
-            $remaining = round(now()->diffInDays($predDate, false));
+            $orderWeeklyLabels = $ordersPerWeek->map(fn($r) =>
+                'Wk ' . $r->week . ' (' . $r->year . ')'
+            );
+            $orderWeeklyData = $ordersPerWeek->pluck('total');
 
-            $predictions[] = [
-                'customer_name' => $cust->customer_name,
-                'customer_phone' => $cust->phone,
-                'last_product' => $lastOrd->product->name ?? 'Gas Cylinder',
-                'last_purchase' => $lastPurchase->format('d M Y'),
-                'predicted_date' => $predDate->format('d M Y'),
-                'raw_predicted_date' => $predDate,
-                'days_remaining' => $remaining,
-                'interval' => $avgInterval,
-                'is_calculated' => true
+            // --- Orders per Bulan (6 bulan terakhir) ---
+            $ordersPerMonth = Order::select(
+                    DB::raw('MONTH(created_at) as month'),
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->where('created_at', '>=', now()->subMonths(6))
+                ->groupBy('year', 'month')
+                ->orderBy('year')
+                ->orderBy('month')
+                ->get();
+
+            $orderMonthlyLabels = $ordersPerMonth->map(fn($r) =>
+                \Carbon\Carbon::createFromDate($r->year, $r->month, 1)->format('M Y')
+            );
+            $orderMonthlyData = $ordersPerMonth->pluck('total');
+
+            // --- Orders per Tahun (5 tahun terakhir) ---
+            $ordersPerYear = Order::select(
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->where('created_at', '>=', now()->subYears(5))
+                ->groupBy('year')
+                ->orderBy('year')
+                ->get();
+
+            $orderYearlyLabels = $ordersPerYear->map(fn($r) => (string)$r->year);
+            $orderYearlyData = $ordersPerYear->pluck('total');
+
+            // Revenue per bulan (6 bulan terakhir)
+            $revenuePerMonth = Payment::select(
+                    DB::raw('MONTH(created_at) as month'),
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('SUM(amount) as total')
+                )
+                ->where('created_at', '>=', now()->subMonths(6))
+                ->groupBy('year', 'month')
+                ->orderBy('year')
+                ->orderBy('month')
+                ->get();
+
+            $revenueLabels = $revenuePerMonth->map(fn($r) =>
+                \Carbon\Carbon::createFromDate($r->year, $r->month, 1)->format('M Y')
+            );
+            $revenueData = $revenuePerMonth->pluck('total');
+
+            // Revenue 7 hari terakhir (Harian)
+            $revenueLast7Days = Payment::select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('SUM(amount) as total')
+                )
+                ->where('created_at', '>=', now()->subDays(7))
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
+
+            $revenueDailyLabels = $revenueLast7Days->map(fn($r) =>
+                \Carbon\Carbon::parse($r->date)->format('d M')
+            );
+            $revenueDailyData = $revenueLast7Days->pluck('total');
+
+            // Revenue per minggu (12 minggu terakhir)
+            $revenuePerWeek = Payment::select(
+                    DB::raw('WEEK(created_at) as week'),
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('SUM(amount) as total')
+                )
+                ->where('created_at', '>=', now()->subWeeks(12))
+                ->groupBy('year', 'week')
+                ->orderBy('year')
+                ->orderBy('week')
+                ->get();
+
+            $revenueWeekLabels = $revenuePerWeek->map(fn($r) =>
+                'Wk ' . $r->week . ' (' . $r->year . ')'
+            );
+            $revenueWeekData = $revenuePerWeek->pluck('total');
+
+            // Revenue per tahun (5 tahun terakhir)
+            $revenuePerYear = Payment::select(
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('SUM(amount) as total')
+                )
+                ->where('created_at', '>=', now()->subYears(5))
+                ->groupBy('year')
+                ->orderBy('year')
+                ->get();
+
+            $revenueYearLabels = $revenuePerYear->map(fn($r) => (string)$r->year);
+            $revenueYearData = $revenuePerYear->pluck('total');
+
+            // Distribusi status order
+            $orderStatusData = [
+                Order::where('status', 'Pending')->count(),
+                Order::where('status', 'Completed')->count(),
+                Order::whereNotIn('status', ['Pending', 'Completed'])->count(),
             ];
-        }
 
-        // Urutkan prediksi berdasarkan sisa hari tersedikit (tanggal habis terdekat)
-        usort($predictions, function($a, $b) {
-            return $a['raw_predicted_date'] <=> $b['raw_predicted_date'];
+            // Distribusi status delivery
+            $deliveryStatusData = [
+                Delivery::where('status', 'Scheduled')->count(),
+                Delivery::where('status', 'On Delivery')->count(),
+                Delivery::where('status', 'Delivered')->count(),
+            ];
+
+            // =============================================
+            // PREDICATIVE ANALYTICS CALCULATIONS
+            // =============================================
+            
+            // 1. Demand Forecasting (Simple Moving Average - SMA)
+            // Ambil data total order bulanan selama 3 bulan terakhir
+            $monthlySales = Order::select(
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('MONTH(created_at) as month'),
+                    DB::raw('COUNT(*) as total_orders'),
+                    DB::raw('SUM(total_amount) as total_revenue')
+                )
+                ->groupBy('year', 'month')
+                ->orderBy('year', 'desc')
+                ->orderBy('month', 'desc')
+                ->take(3)
+                ->get();
+
+            $forecastOrders = 0;
+            $forecastRevenue = 0;
+            $hasEnoughData = $monthlySales->count() >= 2;
+
+            if ($monthlySales->isNotEmpty()) {
+                $forecastOrders = round($monthlySales->avg('total_orders'));
+                $forecastRevenue = $monthlySales->avg('total_revenue');
+            }
+
+            // 2. Customer Gas Run-out Prediction
+            $customersList = Customer::all();
+            $predictions = [];
+
+            foreach ($customersList as $cust) {
+                $custOrders = Order::with('product')
+                    ->where('customer_id', $cust->id)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+
+                if ($custOrders->isEmpty()) {
+                    continue;
+                }
+
+                $lastOrd = $custOrders->last();
+                $lastPurchase = \Carbon\Carbon::parse($lastOrd->created_at);
+                
+                // Tentukan estimasi masa pakai gas berdasarkan jenis produk terakhir
+                $avgInterval = 30; // default jika produk tidak terdeteksi
+                if ($lastOrd->product) {
+                    $pName = strtolower($lastOrd->product->name);
+                    if (str_contains($pName, '3 kg') || str_contains($pName, '3kg') || str_contains($pName, 'hijau')) {
+                        $avgInterval = 25;
+                    } elseif (str_contains($pName, '5,5 kg') || str_contains($pName, '5.5kg') || str_contains($pName, '5,5kg')) {
+                        $avgInterval = 45;
+                    } elseif (str_contains($pName, '12 kg') || str_contains($pName, '12kg')) {
+                        $avgInterval = 60;
+                    }
+                }
+
+                $predDate = $lastPurchase->copy()->addDays($avgInterval);
+                $remaining = round(now()->diffInDays($predDate, false));
+
+                $predictions[] = [
+                    'customer_name' => $cust->customer_name,
+                    'customer_phone' => $cust->phone,
+                    'last_product' => $lastOrd->product->name ?? 'Gas Cylinder',
+                    'last_purchase' => $lastPurchase->format('d M Y'),
+                    'predicted_date' => $predDate->format('d M Y'),
+                    'raw_predicted_date' => $predDate,
+                    'days_remaining' => $remaining,
+                    'interval' => $avgInterval,
+                    'is_calculated' => true
+                ];
+            }
+
+            // Urutkan prediksi berdasarkan sisa hari tersedikit (tanggal habis terdekat)
+            usort($predictions, function($a, $b) {
+                return $a['raw_predicted_date'] <=> $b['raw_predicted_date'];
+            });
+
+            $predictions = array_slice($predictions, 0, 5);
+
+            // Riwayat Aktivitas Terbaru
+            $activityLogs = ActivityLog::with('user')->latest()->take(5)->get();
+
+            return compact(
+                'totalCustomers',
+                'totalProducts',
+                'totalOrders',
+                'pendingOrders',
+                'totalDeliveries',
+                'completedDeliveries',
+                'todayDeliveries',
+                'unpaidInvoices',
+                'paidInvoices',
+                'totalPayments',
+                'totalRevenue',
+                'lowStockProducts',
+                'outOfStock',
+                'orderDailyLabels',
+                'orderDailyData',
+                'orderWeeklyLabels',
+                'orderWeeklyData',
+                'orderMonthlyLabels',
+                'orderMonthlyData',
+                'orderYearlyLabels',
+                'orderYearlyData',
+                'revenueLabels',
+                'revenueData',
+                'revenueDailyLabels',
+                'revenueDailyData',
+                'revenueWeekLabels',
+                'revenueWeekData',
+                'revenueYearLabels',
+                'revenueYearData',
+                'orderStatusData',
+                'deliveryStatusData',
+                'activityLogs',
+                'forecastOrders',
+                'forecastRevenue',
+                'hasEnoughData',
+                'predictions'
+            );
         });
 
-        $predictions = array_slice($predictions, 0, 5);
-
-        // Riwayat Aktivitas Terbaru
-        $activityLogs = ActivityLog::with('user')->latest()->take(5)->get();
-
-        return view('erp-dashboard', compact(
-            'totalCustomers',
-            'totalProducts',
-            'totalOrders',
-            'pendingOrders',
-            'totalDeliveries',
-            'completedDeliveries',
-            'todayDeliveries',
-            'unpaidInvoices',
-            'paidInvoices',
-            'totalPayments',
-            'totalRevenue',
-            'lowStockProducts',
-            'outOfStock',
-            // Chart data
-            'orderDailyLabels',
-            'orderDailyData',
-            'orderWeeklyLabels',
-            'orderWeeklyData',
-            'orderMonthlyLabels',
-            'orderMonthlyData',
-            'orderYearlyLabels',
-            'orderYearlyData',
-            'revenueLabels',
-            'revenueData',
-            'revenueDailyLabels',
-            'revenueDailyData',
-            'revenueWeekLabels',
-            'revenueWeekData',
-            'revenueYearLabels',
-            'revenueYearData',
-            'orderStatusData',
-            'deliveryStatusData',
-            // Activity logs
-            'activityLogs',
-            // Predictive Analytics
-            'forecastOrders',
-            'forecastRevenue',
-            'hasEnoughData',
-            'predictions'
-        ));
+        return view('erp-dashboard', $data);
     }
 
     public function exportCSV(Request $request)
