@@ -416,7 +416,7 @@ class DashboardController extends Controller
                     'type' => 'success',
                     'title' => 'Pengiriman On Delivery',
                     'message' => 'Pengiriman untuk Order #' . $del->order_id . ' ke ' . ($del->order->customer->customer_name ?? 'Pelanggan') . ' sedang dalam perjalanan!',
-                    'time' => 'Sedang dikirim'
+                    'time' => $del->updated_at->format('H:i')
                 ];
             }
 
@@ -431,7 +431,7 @@ class DashboardController extends Controller
                 'type' => 'warning',
                 'title' => 'Stok Rendah',
                 'message' => 'Stok produk ' . $product->name . ' sisa ' . $product->stock . ' tabung!',
-                'time' => 'Segera restock'
+                'time' => $product->updated_at->format('H:i · d M')
             ];
         }
 
@@ -442,7 +442,7 @@ class DashboardController extends Controller
                 'type' => 'info',
                 'title' => 'Order Pending',
                 'message' => 'Order #' . $order->id . ' oleh ' . ($order->customer->customer_name ?? 'Pelanggan') . ' menunggu konfirmasi.',
-                'time' => $order->created_at->diffForHumans()
+                'time' => $order->created_at->format('H:i · d M')
             ];
         }
 
@@ -453,7 +453,7 @@ class DashboardController extends Controller
                 'type' => 'danger',
                 'title' => 'Invoice Belum Lunas',
                 'message' => 'Invoice #INV-' . str_pad($inv->id, 4, '0', STR_PAD_LEFT) . ' untuk ' . ($inv->order->customer->customer_name ?? 'Pelanggan') . ' belum dibayar.',
-                'time' => $inv->created_at->diffForHumans()
+                'time' => $inv->created_at->format('H:i · d M')
             ];
         }
 
@@ -464,7 +464,7 @@ class DashboardController extends Controller
                 'type' => 'success',
                 'title' => 'Pengiriman Hari Ini',
                 'message' => 'Kirim order #' . $del->order_id . ' oleh ' . ($del->driver->name ?? 'Driver') . ' dijadwalkan hari ini.',
-                'time' => 'Hari ini'
+                'time' => $del->updated_at->format('H:i')
             ];
         }
 
