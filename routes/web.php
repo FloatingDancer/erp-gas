@@ -31,16 +31,6 @@ if (config('app.demo')) {
             return 'Error seeding database: ' . $e->getMessage();
         }
     });
-
-    Route::get('/db-diagnostic', function () {
-        try {
-            $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
-            $dbHost = config('database.connections.mysql.host');
-            return "Database Name: <strong>" . htmlspecialchars($dbName) . "</strong><br>Database Host: <strong>" . htmlspecialchars($dbHost) . "</strong><br>Connection: <strong>Success!</strong>";
-        } catch (\Throwable $e) {
-            return "Database Connection Failed: " . $e->getMessage();
-        }
-    });
 }
 
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
@@ -56,6 +46,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/activity-logs', [DashboardController::class, 'activityLogs'])->name('activity-logs.index');
     Route::get('/notifications', [DashboardController::class, 'getNotifications'])->name('notifications.index');
+
+    Route::get('/db-diagnostic', function () {
+        if (auth()->user()->isDriver()) {
+            abort(403);
+        }
+        try {
+            $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+            $dbHost = config('database.connections.mysql.host');
+            return "Database Name: <strong>" . htmlspecialchars($dbName) . "</strong><br>Database Host: <strong>" . htmlspecialchars($dbHost) . "</strong><br>Connection: <strong>Success!</strong>";
+        } catch (\Throwable $e) {
+            return "Database Connection Failed: " . $e->getMessage();
+        }
+    })->name('db-diagnostic');
 
     // Switch roles in demo mode
     if (config('app.demo')) {
