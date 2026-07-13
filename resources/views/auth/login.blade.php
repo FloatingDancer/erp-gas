@@ -133,10 +133,9 @@
                 <span class="divider-text">Atau Quick Login</span>
             </div>
 
-            {{-- Quick Login Buttons --}}
             <div class="quick-login-grid">
-                <button type="button" class="btn-demo-login" onclick="quickLogin('admin@gmail.com', '12345678')">
-                    <i data-lucide="key-round" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Admin
+                <button type="button" class="btn-demo-login" onclick="quickLogin('guest@gmail.com', '12345678')">
+                    <i data-lucide="user" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Guest
                 </button>
                 <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
                     <i data-lucide="truck" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Driver
