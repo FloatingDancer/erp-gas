@@ -17,19 +17,23 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin Client',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Admin Client',
+                'password' => bcrypt('12345678'),
+                'role' => 'admin',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Guest Evaluator',
-            'email' => 'guest@gmail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'guest@gmail.com'],
+            [
+                'name' => 'Guest Evaluator',
+                'password' => bcrypt('12345678'),
+                'role' => 'admin',
+            ]
+        );
 
         $this->call([
             DriverUserSeeder::class,

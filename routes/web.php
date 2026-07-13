@@ -42,10 +42,30 @@ Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->n
 
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/activity-logs', [DashboardController::class, 'activityLogs'])->name('activity-logs.index');
     Route::get('/notifications', [DashboardController::class, 'getNotifications'])->name('notifications.index');
+
+    // Switch roles in demo mode
+    if (config('app.demo')) {
+        Route::get('/switch-to-driver', function () {
+            $driverUser = \App\Models\User::where('email', 'driver@gmail.com')->first();
+            if ($driverUser) {
+                auth()->login($driverUser);
+                return redirect()->route('deliveries.index')->with('success', 'Berhasil beralih ke akun Driver');
+            }
+            return redirect()->back()->with('error', 'Akun Driver tidak ditemukan');
+        })->name('switch-to-driver');
+
+        Route::get('/switch-to-guest', function () {
+            $guestUser = \App\Models\User::where('email', 'guest@gmail.com')->first();
+            if ($guestUser) {
+                auth()->login($guestUser);
+                return redirect()->route('dashboard')->with('success', 'Berhasil beralih ke akun Guest');
+            }
+            return redirect()->back()->with('error', 'Akun Guest tidak ditemukan');
+        })->name('switch-to-guest');
+    }
 
     // ERP Modules
     Route::resource('customers', CustomerController::class);

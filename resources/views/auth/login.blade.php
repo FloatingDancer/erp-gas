@@ -133,12 +133,9 @@
                 <span class="divider-text">Atau Quick Login</span>
             </div>
 
-            <div class="quick-login-grid">
-                <button type="button" class="btn-demo-login" onclick="quickLogin('guest@gmail.com', '12345678')">
-                    <i data-lucide="user" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Guest
-                </button>
-                <button type="button" class="btn-demo-login" onclick="quickLogin('driver@gmail.com', '12345678')">
-                    <i data-lucide="truck" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Driver
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn-demo-login" style="width: 100%;" onclick="quickLogin('guest@gmail.com', '12345678')">
+                    <i data-lucide="user" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Masuk sebagai Guest
                 </button>
             </div>
         @endif
