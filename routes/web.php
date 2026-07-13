@@ -31,6 +31,16 @@ if (config('app.demo')) {
             return 'Error seeding database: ' . $e->getMessage();
         }
     });
+
+    Route::get('/db-diagnostic', function () {
+        try {
+            $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+            $dbHost = config('database.connections.mysql.host');
+            return "Database Name: <strong>" . htmlspecialchars($dbName) . "</strong><br>Database Host: <strong>" . htmlspecialchars($dbHost) . "</strong><br>Connection: <strong>Success!</strong>";
+        } catch (\Throwable $e) {
+            return "Database Connection Failed: " . $e->getMessage();
+        }
+    });
 }
 
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
