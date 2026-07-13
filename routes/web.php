@@ -21,6 +21,17 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+if (config('app.demo')) {
+    Route::get('/seed-guest', function () {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('db:seed');
+            return 'Database successfully seeded with Guest Evaluator!';
+        } catch (\Throwable $e) {
+            return 'Error seeding database: ' . $e->getMessage();
+        }
+    });
+}
+
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
 
 /*
