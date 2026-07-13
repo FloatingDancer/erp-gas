@@ -24,7 +24,7 @@ Route::get('/', function () {
 if (config('app.demo')) {
     Route::get('/seed-guest', function () {
         try {
-            \Illuminate\Support\Facades\Artisan::call('db:seed');
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
             $output = \Illuminate\Support\Facades\Artisan::output();
             return 'Seeder run completed!<br><br>Console Output:<br><pre>' . htmlspecialchars($output) . '</pre>';
         } catch (\Throwable $e) {
