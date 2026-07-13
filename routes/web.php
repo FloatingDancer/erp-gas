@@ -25,7 +25,8 @@ if (config('app.demo')) {
     Route::get('/seed-guest', function () {
         try {
             \Illuminate\Support\Facades\Artisan::call('db:seed');
-            return 'Database successfully seeded with Guest Evaluator!';
+            $output = \Illuminate\Support\Facades\Artisan::output();
+            return 'Seeder run completed!<br><br>Console Output:<br><pre>' . htmlspecialchars($output) . '</pre>';
         } catch (\Throwable $e) {
             return 'Error seeding database: ' . $e->getMessage();
         }
