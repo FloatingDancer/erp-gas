@@ -32,6 +32,8 @@ class RedirectIfDriver
                 'notifications',
                 'notifications/*',
                 'logout',
+                'switch-to-guest',
+                'switch-to-driver',
             ];
 
             $isAllowed = false;

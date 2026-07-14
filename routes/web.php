@@ -54,7 +54,17 @@ Route::middleware(['auth'])->group(function () {
         try {
             $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
             $dbHost = config('database.connections.mysql.host');
-            return "Database Name: <strong>" . htmlspecialchars($dbName) . "</strong><br>Database Host: <strong>" . htmlspecialchars($dbHost) . "</strong><br>Connection: <strong>Success!</strong>";
+            
+            $users = \App\Models\User::all();
+            $userList = "";
+            foreach ($users as $u) {
+                $userList .= "- " . htmlspecialchars($u->email) . " (Role: " . htmlspecialchars($u->role) . ")<br>";
+            }
+
+            return "Database Name: <strong>" . htmlspecialchars($dbName) . "</strong><br>" .
+                   "Database Host: <strong>" . htmlspecialchars($dbHost) . "</strong><br>" .
+                   "Connection: <strong>Success!</strong><br><br>" .
+                   "Registered Users:<br>" . $userList;
         } catch (\Throwable $e) {
             return "Database Connection Failed: " . $e->getMessage();
         }
