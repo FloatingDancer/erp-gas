@@ -125,7 +125,7 @@
 
         <div class="header">
             <div>
-                <h2>TK. NAGA SAKTI JAYA</h2>
+                <h2>{{ config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA' }}</h2>
                 <p style="margin: 0; color: #475569; font-size: 12px; max-width: 400px; line-height: 1.4;">
                     Perumahan Mutiara Sampurna Blok R4/19, Jayasampurna, Kec. Serang Baru, Kabupaten Bekasi, Jawa Barat 17330
                 </p>
@@ -197,7 +197,7 @@
             </div>
             <div class="signature-block">
                 <p>Hormat Kami,</p>
-                <div class="signature-line">TK. Naga Sakti Jaya</div>
+                <div class="signature-line">{{ config('app.demo') ? 'PT XYZ' : 'TK. Naga Sakti Jaya' }}</div>
             </div>
         </div>
     </div>

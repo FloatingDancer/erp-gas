@@ -95,7 +95,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                                     $cleanPhone = '62' . substr($cleanPhone, 1);
                                 }
                                 
-                                $message = "Halo {$customerName},\n\nPerkenalkan, kami dari TK. NAGA SAKTI JAYA. Berikut adalah tagihan Invoice Anda dengan nomor #INV-" . str_pad($inv->id, 5, '0', STR_PAD_LEFT) . " untuk pembelian:\n- Produk: {$productName}\n- Qty: {$qty}\n- Total: Rp {$total}\n- Status: {$statusText}\n\nUnduh/cetak faktur PDF Anda melalui tautan berikut:\n" . route('invoices.print-public', $inv->id) . "\n\nSilakan lakukan pembayaran jika status masih Unpaid. Terima kasih!\n\nSalam hormat,\nTK. NAGA SAKTI JAYA";
+                                $message = "Halo {$customerName},\n\nPerkenalkan, kami dari " . (config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA') . ". Berikut adalah tagihan Invoice Anda dengan nomor #INV-" . str_pad($inv->id, 5, '0', STR_PAD_LEFT) . " untuk pembelian:\n- Produk: {$productName}\n- Qty: {$qty}\n- Total: Rp {$total}\n- Status: {$statusText}\n\nUnduh/cetak faktur PDF Anda melalui tautan berikut:\n" . route('invoices.print-public', $inv->id) . "\n\nSilakan lakukan pembayaran jika status masih Unpaid. Terima kasih!\n\nSalam hormat,\n" . (config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA');
                                 $subject = "Faktur Tagihan #INV-" . str_pad($inv->id, 5, '0', STR_PAD_LEFT);
                             @endphp
                             

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>TK. NAGA SAKTI JAYA</title>
+    <title>{{ config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA' }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -668,7 +668,7 @@
         {{-- Brand --}}
         <a href="{{ auth()->user()->isDriver() ? '/deliveries' : '/dashboard' }}" class="sidebar-brand">
             <div>
-                <div class="sidebar-brand-text">TK. NAGA SAKTI JAYA</div>
+                <div class="sidebar-brand-text">{{ config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA' }}</div>
                 <div class="sidebar-brand-sub">Management System</div>
             </div>
         </a>
@@ -806,7 +806,7 @@
             @yield('content')
         </div>
         <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #94a3b8; letter-spacing: 0.3px;">
-            &copy; {{ now()->year }} TK. NAGA SAKTI JAYA. All rights reserved.
+            &copy; {{ now()->year }} {{ config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA' }}. All rights reserved.
         </footer>
     </main>
 

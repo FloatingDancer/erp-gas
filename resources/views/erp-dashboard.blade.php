@@ -282,7 +282,7 @@
                                 $custName = $pred['customer_name'];
                                 $prodName = $pred['last_product'];
                                 $predDate = $pred['predicted_date'];
-                                $waMessage = "Halo {$custName},\n\nPerkenalkan, kami dari TK. NAGA SAKTI JAYA. Menurut catatan estimasi sistem kami, tabung {$prodName} Anda diprediksi akan habis sekitar tanggal {$predDate}.\n\nApakah Anda ingin melakukan pemesanan ulang untuk menjamin ketersediaan stok?\n\nSalam hormat,\nTK. NAGA SAKTI JAYA";
+                                $waMessage = "Halo {$custName},\n\nPerkenalkan, kami dari " . (config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA') . ". Menurut catatan estimasi sistem kami, tabung {$prodName} Anda diprediksi akan habis sekitar tanggal {$predDate}.\n\nApakah Anda ingin melakukan pemesanan ulang untuk menjamin ketersediaan stok?\n\nSalam hormat,\n" . (config('app.demo') ? 'PT XYZ' : 'TK. NAGA SAKTI JAYA');
                             @endphp
                             <tr>
                                 <td style="padding: 12px 24px;">
