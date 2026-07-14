@@ -775,7 +775,7 @@
                                 <span class="dd-item-icon"><i data-lucide="truck" style="width:14px;height:14px;color:#2563eb;"></i></span>
                                 Pindah ke Akun Driver
                             </a>
-                        @elseif(auth()->user()->email === 'driver@gmail.com')
+                        @elseif(auth()->user()->email === 'driver@gmail.com' || auth()->user()->email === 'driverguest@gmail.com')
                             <a href="{{ route('switch-to-guest') }}" class="dd-item" style="color: #2563eb; font-weight: 600;">
                                 <span class="dd-item-icon"><i data-lucide="user" style="width:14px;height:14px;color:#2563eb;"></i></span>
                                 Pindah ke Akun Guest

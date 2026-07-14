@@ -73,7 +73,8 @@ Route::middleware(['auth'])->group(function () {
     // Switch roles in demo mode
     if (config('app.demo')) {
         Route::get('/switch-to-driver', function () {
-            $driverUser = \App\Models\User::where('email', 'driver@gmail.com')->first();
+            $driverEmail = config('app.demo') ? 'driverguest@gmail.com' : 'driver@gmail.com';
+            $driverUser = \App\Models\User::where('email', $driverEmail)->first();
             if ($driverUser) {
                 auth()->login($driverUser);
                 return redirect()->route('deliveries.index')->with('success', 'Berhasil beralih ke akun Driver');
