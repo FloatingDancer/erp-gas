@@ -8,7 +8,7 @@
         $parts = explode(' ', $user->name);
         $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
     }
-    $isGuest = $user->email === 'guest@gmail.com';
+    $isGuest = $user->email === 'guest@gmail.com' || $user->email === 'driverguest@gmail.com';
 @endphp
 
 <style>

@@ -24,7 +24,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        if ($request->user()->email === 'guest@gmail.com') {
+        if ($request->user()->email === 'guest@gmail.com' || $request->user()->email === 'driverguest@gmail.com') {
             return redirect()->back()->withErrors(['error' => 'Mengubah profil tidak diperbolehkan pada akun demo.'], 'updateProfileInformation');
         }
 
@@ -48,7 +48,7 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        if ($request->user()->email === 'guest@gmail.com') {
+        if ($request->user()->email === 'guest@gmail.com' || $request->user()->email === 'driverguest@gmail.com') {
             abort(403, 'Aksi ini tidak diperbolehkan pada akun demo.');
         }
 

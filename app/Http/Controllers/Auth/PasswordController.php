@@ -15,7 +15,7 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        if ($request->user()->email === 'guest@gmail.com') {
+        if ($request->user()->email === 'guest@gmail.com' || $request->user()->email === 'driverguest@gmail.com') {
             return back()->withErrors(['error' => 'Mengubah password tidak diperbolehkan pada akun demo.'], 'updatePassword');
         }
 
