@@ -8,6 +8,7 @@
         $parts = explode(' ', $user->name);
         $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
     }
+    $isGuest = $user->email === 'guest@gmail.com';
 @endphp
 
 <style>
@@ -120,6 +121,12 @@
 
 <div class="settings-page">
     <div class="settings-container">
+        @if($isGuest)
+            <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; padding: 16px; border-radius: 12px; margin-bottom: 20px; font-size: 13.5px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="info" style="width: 18px; height: 18px; flex-shrink: 0; color: #3b82f6;"></i>
+                Fitur pengaturan akun dinonaktifkan pada akun Demo/Guest untuk menjaga integritas data evaluasi.
+            </div>
+        @endif
 
         {{-- ===== 1. Profile Information ===== --}}
         <div class="settings-card">
@@ -138,7 +145,7 @@
                     <div class="form-group">
                         <label class="form-label" for="name">Nama Lengkap</label>
                         <input id="name" name="name" type="text" class="form-input"
-                               value="{{ old('name', $user->name) }}" required autofocus>
+                               value="{{ old('name', $user->name) }}" required autofocus {{ $isGuest ? 'disabled' : '' }}>
                         @error('name', 'updateProfileInformation')
                             <p class="input-error">{{ $message }}</p>
                         @enderror
@@ -147,13 +154,13 @@
                     <div class="form-group">
                         <label class="form-label" for="email">Email</label>
                         <input id="email" name="email" type="email" class="form-input"
-                               value="{{ old('email', $user->email) }}" required>
+                               value="{{ old('email', $user->email) }}" required {{ $isGuest ? 'disabled' : '' }}>
                         @error('email', 'updateProfileInformation')
                             <p class="input-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan</button>
+                    <button type="submit" class="btn-primary-custom" {{ $isGuest ? 'disabled style=opacity:0.6;cursor:not-allowed;' : '' }}><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan</button>
                 </form>
             </div>
         </div>
@@ -175,7 +182,7 @@
                     <div class="form-group">
                         <label class="form-label" for="current_password">Password Saat Ini</label>
                         <input id="current_password" name="current_password" type="password"
-                               class="form-input" autocomplete="current-password" placeholder="••••••••">
+                               class="form-input" autocomplete="current-password" placeholder="••••••••" {{ $isGuest ? 'disabled' : '' }}>
                         @error('current_password', 'updatePassword')
                             <p class="input-error">{{ $message }}</p>
                         @enderror
@@ -184,7 +191,7 @@
                     <div class="form-group">
                         <label class="form-label" for="password">Password Baru</label>
                         <input id="password" name="password" type="password"
-                               class="form-input" autocomplete="new-password" placeholder="Min. 8 karakter">
+                               class="form-input" autocomplete="new-password" placeholder="Min. 8 karakter" {{ $isGuest ? 'disabled' : '' }}>
                         @error('password', 'updatePassword')
                             <p class="input-error">{{ $message }}</p>
                         @enderror
@@ -193,13 +200,13 @@
                     <div class="form-group">
                         <label class="form-label" for="password_confirmation">Konfirmasi Password Baru</label>
                         <input id="password_confirmation" name="password_confirmation" type="password"
-                               class="form-input" autocomplete="new-password" placeholder="Ulangi password baru">
+                               class="form-input" autocomplete="new-password" placeholder="Ulangi password baru" {{ $isGuest ? 'disabled' : '' }}>
                         @error('password_confirmation', 'updatePassword')
                             <p class="input-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn-primary-custom"><i data-lucide="key-round" style="width:15px;height:15px;margin-right:4px;"></i> Update Password</button>
+                    <button type="submit" class="btn-primary-custom" {{ $isGuest ? 'disabled style=opacity:0.6;cursor:not-allowed;' : '' }}><i data-lucide="key-round" style="width:15px;height:15px;margin-right:4px;"></i> Update Password</button>
                 </form>
             </div>
         </div>
@@ -217,7 +224,7 @@
                 <div class="danger-notice">
                     <i data-lucide="alert-triangle" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Setelah akun dihapus, semua data akan hilang permanen. Harap unduh data Anda sebelum menghapus akun.
                 </div>
-                <button type="button" class="btn-danger" onclick="confirmDeleteAccount()">
+                <button type="button" class="btn-danger" onclick="confirmDeleteAccount()" {{ $isGuest ? 'disabled style=opacity:0.6;cursor:not-allowed;' : '' }}>
                     <i data-lucide="trash-2" style="width:15px;height:15px;margin-right:4px;"></i> Hapus Akun Saya
                 </button>
 

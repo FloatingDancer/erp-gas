@@ -74,85 +74,86 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        {{-- Email --}}
-        <div class="form-group">
-            <label class="form-label" for="email">Email</label>
-            <input
-                id="email"
-                type="email"
-                name="email"
-                class="form-input"
-                value="{{ old('email') }}"
-                placeholder="you@example.com"
-                required autofocus autocomplete="username"
-            >
-            @error('email')
-                <p class="input-error">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Password --}}
-        <div class="form-group">
-            <label class="form-label" for="password">Password</label>
-            <div class="input-wrap">
-                <input
-                    id="password"
-                    type="password"
-                    name="password"
-                    class="form-input"
-                    placeholder="••••••••"
-                    style="padding-right:44px;"
-                    required autocomplete="current-password"
-                >
-                <button type="button" class="toggle-pw" id="togglePw" title="Tampilkan password" style="display:inline-flex;align-items:center;justify-content:center;">
-                    <i data-lucide="eye" style="width:18px;height:18px;"></i>
-                </button>
-            </div>
-            @error('password')
-                <p class="input-error">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Remember + Forgot --}}
-        <div class="row-flex">
-            <label class="remember-label">
-                <input type="checkbox" name="remember" id="remember_me">
-                Ingat saya
-            </label>
-            @if (Route::has('password.request'))
-                <a class="forgot-link" href="{{ route('password.request') }}">Lupa password?</a>
-            @endif
-        </div>
-
-        {{-- Submit --}}
-        <button type="submit" class="btn-login">Masuk →</button>
-
         @if(config('app.demo'))
-            {{-- Quick Login Divider --}}
-            <div class="quick-login-divider">
-                <span class="divider-text">Atau Quick Login</span>
+            {{-- Hidden inputs for JavaScript to fill --}}
+            <input type="hidden" id="email" name="email">
+            <input type="hidden" id="password" name="password">
+
+            {{-- Big Guest Login Button --}}
+            <button type="button" class="btn-login" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px;" onclick="quickLogin('guest@gmail.com', '12345678')">
+                <i data-lucide="user" style="width:16px;height:16px;"></i> Masuk sebagai Guest
+            </button>
+        @else
+            {{-- Email --}}
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    class="form-input"
+                    value="{{ old('email') }}"
+                    placeholder="you@example.com"
+                    required autofocus autocomplete="username"
+                >
+                @error('email')
+                    <p class="input-error">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button type="button" class="btn-demo-login" style="width: 100%;" onclick="quickLogin('guest@gmail.com', '12345678')">
-                    <i data-lucide="user" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;margin-top:-2px;"></i> Masuk sebagai Guest
-                </button>
+            {{-- Password --}}
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-wrap">
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        style="padding-right:44px;"
+                        required autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-pw" id="togglePw" title="Tampilkan password" style="display:inline-flex;align-items:center;justify-content:center;">
+                        <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                    </button>
+                </div>
+                @error('password')
+                    <p class="input-error">{{ $message }}</p>
+                @enderror
             </div>
+
+            {{-- Remember + Forgot --}}
+            <div class="row-flex">
+                <label class="remember-label">
+                    <input type="checkbox" name="remember" id="remember_me">
+                    Ingat saya
+                </label>
+                @if (Route::has('password.request'))
+                    <a class="forgot-link" href="{{ route('password.request') }}">Lupa password?</a>
+                @endif
+            </div>
+
+            {{-- Submit --}}
+            <button type="submit" class="btn-login">Masuk →</button>
         @endif
     </form>
 
     <script>
-    document.getElementById('togglePw').addEventListener('click', function () {
-        const pw = document.getElementById('password');
-        if (pw.type === 'password') {
-            pw.type = 'text';
-            this.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
-        } else {
-            pw.type = 'password';
-            this.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
-        }
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
+    const togglePw = document.getElementById('togglePw');
+    if (togglePw) {
+        togglePw.addEventListener('click', function () {
+            const pw = document.getElementById('password');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                this.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
+            } else {
+                pw.type = 'password';
+                this.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    }
 
     function quickLogin(email, password) {
         document.getElementById('email').value = email;

@@ -24,6 +24,10 @@ class ProfileController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        if ($request->user()->email === 'guest@gmail.com') {
+            return redirect()->back()->withErrors(['error' => 'Mengubah profil tidak diperbolehkan pada akun demo.'], 'updateProfileInformation');
+        }
+
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -44,6 +48,10 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        if ($request->user()->email === 'guest@gmail.com') {
+            abort(403, 'Aksi ini tidak diperbolehkan pada akun demo.');
+        }
+
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);

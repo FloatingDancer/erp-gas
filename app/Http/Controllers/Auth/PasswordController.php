@@ -15,6 +15,10 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        if ($request->user()->email === 'guest@gmail.com') {
+            return back()->withErrors(['error' => 'Mengubah password tidak diperbolehkan pada akun demo.'], 'updatePassword');
+        }
+
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
             'password' => ['required', Password::defaults(), 'confirmed'],
