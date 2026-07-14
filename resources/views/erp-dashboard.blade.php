@@ -2,6 +2,13 @@
 
 @section('content')
 
+@if(session('success'))
+    <div style="background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:13.5px; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="check-circle-2" style="width:16px;height:16px;color:#10b981;flex-shrink:0;"></i>
+        {{ session('success') }}
+    </div>
+@endif
+
 <style>
     /* ===== STAT CARDS ===== */
     .stat-card {
@@ -721,8 +728,19 @@
             fullSpan.style.display = 'none';
             shortSpan.style.display = 'inline';
             btn.innerText = 'See More';
-        }
-    }
 </script>
+
+@if(session('success'))
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        timer: 2000,
+        showConfirmButton: false
+    });
+</script>
+@endif
 
 @endsection
