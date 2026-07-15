@@ -118,21 +118,32 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     Swal.fire({
       icon: 'success',
       title: 'Order Berhasil Dibuat!',
-      text: 'Pilih modul tujuan Anda selanjutnya:',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Cek Invoice',
-      denyButtonText: 'Buat Pembayaran',
-      cancelButtonText: 'Batal / Tetap di Sini',
-      confirmButtonColor: '#2563eb',
-      denyButtonColor: '#10b981',
-      cancelButtonColor: '#64748b',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = "{{ route('invoices.edit', session('invoice_id')) }}";
-      } else if (result.isDenied) {
-        window.location.href = "{{ route('payments.create') }}?invoice_id={{ session('invoice_id') }}";
-      }
+      html: `
+        <p style="font-size: 14px; color: #64748b; margin-top: 10px; margin-bottom: 24px;">Pilih modul tujuan Anda selanjutnya:</p>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
+          <a href="{{ route('invoices.edit', session('invoice_id')) }}" 
+             style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; color: white; background: #2563eb; transition: background 0.15s; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.18);"
+             onmouseover="this.style.background='#1d4ed8'" 
+             onmouseout="this.style.background='#2563eb'">
+            📄 Cek Invoice & Cetak
+          </a>
+          <a href="{{ route('payments.create') }}?invoice_id={{ session('invoice_id') }}" 
+             style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; color: white; background: #10b981; transition: background 0.15s; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.18);"
+             onmouseover="this.style.background='#059669'" 
+             onmouseout="this.style.background='#10b981'">
+            💸 Buat Pembayaran
+          </a>
+          <button onclick="Swal.close()" 
+             style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; border: 1.5px solid #e2e8f0; color: #475569; background: #f8fafc; transition: all 0.15s; cursor: pointer;"
+             onmouseover="this.style.background='#f1f5f9'; this.style.color='#1e293b'" 
+             onmouseout="this.style.background='#f8fafc'; this.style.color='#475569'">
+            ❌ Batal / Tetap di Sini
+          </button>
+        </div>
+      `,
+      showConfirmButton: false,
+      showDenyButton: false,
+      showCancelButton: false
     });
   @else
     Swal.fire({
