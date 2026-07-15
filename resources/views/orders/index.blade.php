@@ -117,7 +117,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
   @if(session('show_navigation_popup'))
     Swal.fire({
       icon: 'success',
-      title: 'Order Berhasil Dibuat!',
+      title: '{{ session('navigation_popup_title') ?? 'Order Berhasil Diproses!' }}',
       html: `
         <p style="font-size: 14px; color: #64748b; margin-top: 10px; margin-bottom: 24px;">Pilih modul tujuan Anda selanjutnya:</p>
         <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">

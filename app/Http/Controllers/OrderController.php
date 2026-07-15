@@ -67,6 +67,7 @@ class OrderController extends Controller
         return redirect()->route('orders.index')
             ->with('success', 'Order berhasil dibuat!')
             ->with('show_navigation_popup', true)
+            ->with('navigation_popup_title', 'Order Berhasil Dibuat!')
             ->with('invoice_id', $invoice->id);
     }
 
@@ -101,9 +102,9 @@ class OrderController extends Controller
 
         $total = $product->price * $request->quantity;
 
-        // Sesuaikan stok: kembalikan lama, kurangi baru
-        $product->increment('stock', $oldQty);
-        $product->decrement('stock', $request->quantity);
+        // Sesuaikan stok dalam satu kueri
+        $newStock = $product->stock + $oldQty - $request->quantity;
+        $product->update(['stock' => $newStock]);
 
         $order->update([
             'customer_id'  => $request->customer_id,
@@ -124,7 +125,10 @@ class OrderController extends Controller
         ActivityLog::log('Update', 'Memperbarui order #' . $order->id . ' status: ' . $order->status);
 
         return redirect()->route('orders.index')
-            ->with('success', 'Order berhasil diperbarui!');
+            ->with('success', 'Order berhasil diperbarui!')
+            ->with('show_navigation_popup', true)
+            ->with('navigation_popup_title', 'Order Berhasil Diperbarui!')
+            ->with('invoice_id', $invoice ? $invoice->id : null);
     }
 
     public function destroy(Order $order)

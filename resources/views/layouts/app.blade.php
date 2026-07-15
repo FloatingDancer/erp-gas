@@ -1036,6 +1036,29 @@
         </script>
     @endif
     
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(e) {
+                if (this.checkValidity && !this.checkValidity()) {
+                    return;
+                }
+                var $submitBtn = $(this).find('button[type="submit"]');
+                if ($submitBtn.length && !$submitBtn.hasClass('no-loader')) {
+                    if ($submitBtn.data('is-loading') === 'true') {
+                        e.preventDefault();
+                        return;
+                    }
+                    $submitBtn.data('is-loading', 'true');
+                    setTimeout(function() {
+                        $submitBtn.prop('disabled', true);
+                        $submitBtn.css('opacity', '0.75');
+                        $submitBtn.css('cursor', 'not-allowed');
+                        $submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="width:12px;height:12px;margin-right:6px;vertical-align:middle;"></span> Loading...');
+                    }, 50);
+                }
+            });
+        });
+    </script>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 </body>
 </html>
