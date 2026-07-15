@@ -203,14 +203,13 @@ class DashboardController extends Controller
             }
 
             // 2. Customer Gas Run-out Prediction
-            $customersList = Customer::all();
+            $customersList = Customer::with(['orders' => function ($query) {
+                $query->orderBy('created_at', 'asc')->with('product');
+            }])->get();
             $predictions = [];
 
             foreach ($customersList as $cust) {
-                $custOrders = Order::with('product')
-                    ->where('customer_id', $cust->id)
-                    ->orderBy('created_at', 'asc')
-                    ->get();
+                $custOrders = $cust->orders;
 
                 if ($custOrders->isEmpty()) {
                     continue;
