@@ -31,7 +31,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
         <h1 class="page-title"><i data-lucide="store" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Suppliers</h1>
         <p class="page-subtitle">Kelola mitra supplier pengadaan gas</p>
     </div>
-    @if(auth()->user() && auth()->user()->isAdmin())
+    @if(auth()->user() && !auth()->user()->isDriver())
         <a href="{{ route('suppliers.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:14px;height:14px;margin-right:2px;"></i> Add Supplier</a>
     @endif
 </div>
@@ -50,7 +50,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <th>No. Telepon</th>
                     <th>Email</th>
                     <th>Alamat</th>
-                    @if(auth()->user() && auth()->user()->isAdmin())
+                    @if(auth()->user() && !auth()->user()->isDriver())
                         <th>Aksi</th>
                     @endif
                 </tr>
@@ -63,7 +63,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <td>{{ $s->phone }}</td>
                     <td style="color:#64748b;">{{ $s->email ?? '-' }}</td>
                     <td style="color:#64748b;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $s->address }}</td>
-                    @if(auth()->user() && auth()->user()->isAdmin())
+                    @if(auth()->user() && !auth()->user()->isDriver())
                         <td>
                             <div style="display:flex;gap:6px;">
                                 <a href="{{ route('suppliers.edit', $s->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;"></i> Edit</a>

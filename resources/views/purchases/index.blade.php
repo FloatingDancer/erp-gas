@@ -35,7 +35,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
         <h1 class="page-title"><i data-lucide="shopping-bag" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Purchases</h1>
         <p class="page-subtitle">Kelola pembelian stok gas dari supplier</p>
     </div>
-    @if(auth()->user() && auth()->user()->isAdmin())
+    @if(auth()->user() && !auth()->user()->isDriver())
         <a href="{{ route('purchases.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:14px;height:14px;margin-right:2px;"></i> New PO</a>
     @endif
 </div>
@@ -60,7 +60,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <th>Total</th>
                     <th>Tanggal PO</th>
                     <th>Status</th>
-                    @if(auth()->user() && auth()->user()->isAdmin())
+                    @if(auth()->user() && !auth()->user()->isDriver())
                         <th>Aksi</th>
                     @endif
                 </tr>
@@ -82,7 +82,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                             <span class="badge-pill badge-orange"><i data-lucide="clock" style="width:12px;height:12px;vertical-align:middle;margin-top:-2px;margin-right:2px;"></i> Pending</span>
                         @endif
                     </td>
-                    @if(auth()->user() && auth()->user()->isAdmin())
+                    @if(auth()->user() && !auth()->user()->isDriver())
                         <td>
                             <div style="display:flex;gap:6px;">
                                 @if($p->status === 'Pending')
