@@ -83,20 +83,71 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                         @endif
                     </td>
                     @if(auth()->user() && !auth()->user()->isDriver())
+                        @php
+                            $cleanPhone = preg_replace('/[^0-9]/', '', $p->supplier->phone ?? '');
+                            if (str_starts_with($cleanPhone, '0')) {
+                                $cleanPhone = '62' . substr($cleanPhone, 1);
+                            }
+                            $supplierEmail = $p->supplier->email ?? '';
+                            $supplierName = $p->supplier->name ?? '';
+                            $productName = $p->product->name ?? 'Produk';
+                            $qty = $p->quantity;
+                            $pricePerCylinder = number_format($p->purchase_price, 0, ',', '.');
+                            $totalFormatted = number_format($p->total_amount, 0, ',', '.');
+                            
+                            $waMessage = "Halo *{$supplierName}*,\n\nBerikut kami kirimkan Purchase Order (PO) baru untuk kebutuhan gas kami:\n\n"
+                                     . "*Detail Purchase Order (PO):*\n"
+                                     . "- *No. PO:* #PO-" . str_pad($p->id, 5, '0', STR_PAD_LEFT) . "\n"
+                                     . "- *Produk:* {$productName}\n"
+                                     . "- *Jumlah (Qty):* {$qty} tabung\n"
+                                     . "- *Harga Satuan:* Rp {$pricePerCylinder}\n"
+                                     . "- *Total Belanja:* Rp {$totalFormatted}\n\n"
+                                     . "Mohon segera diproses dan dikirimkan ke alamat kami.\n\n"
+                                     . "Terima kasih,\n"
+                                     . "*TK. NAGA SAKTI JAYA*";
+
+                            $emailSubject = "Purchase Order #PO-" . str_pad($p->id, 5, '0', STR_PAD_LEFT) . " - TK. NAGA SAKTI JAYA";
+                            $emailBody = "Halo {$supplierName},\n\nBerikut kami kirimkan detail Purchase Order (PO) baru:\n\n"
+                                     . "No. PO: #PO-" . str_pad($p->id, 5, '0', STR_PAD_LEFT) . "\n"
+                                     . "Produk: {$productName}\n"
+                                     . "Jumlah (Qty): {$qty} tabung\n"
+                                     . "Harga Satuan: Rp {$pricePerCylinder}\n"
+                                     . "Total Belanja: Rp {$totalFormatted}\n\n"
+                                     . "Mohon segera diproses.\n\n"
+                                     . "Terima kasih,\n"
+                                     . "TK. NAGA SAKTI JAYA";
+                        @endphp
                         <td>
-                            <div style="display:flex;gap:6px;">
+                            <div style="display:flex;gap:6px;align-items:center;">
                                 @if($p->status === 'Pending')
                                     <form action="{{ route('purchases.receive', $p->id) }}" method="POST" id="rec-{{ $p->id }}" style="display:inline;">
                                         @csrf
-                                        <button type="button" class="action-receive" onclick="confirmReceive({{ $p->id }}, '{{ $p->product->name ?? 'Gas' }}', {{ $p->quantity }})"><i data-lucide="download" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;"></i> Terima Barang</button>
+                                        <button type="button" class="action-receive" onclick="confirmReceive({{ $p->id }}, '{{ $p->product->name ?? 'Gas' }}', {{ $p->quantity }})"><i data-lucide="download" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;"></i> Terima</button>
                                     </form>
+                                @endif
+
+                                <a href="{{ route('purchases.print', $p->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#f1f5f9;color:#374151;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Cetak PO">
+                                    <i data-lucide="printer" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Print
+                                </a>
+
+                                @if($cleanPhone)
+                                    <a href="https://api.whatsapp.com/send?phone={{ $cleanPhone }}&text={{ rawurlencode($waMessage) }}" target="_blank" style="display:inline-flex;align-items:center;background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Kirim via WhatsApp">
+                                        <i data-lucide="message-square" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> WA
+                                    </a>
+                                @endif
+
+                                @if($supplierEmail)
+                                    <button type="button" onclick="sendEmail('{{ $supplierEmail }}', '{{ rawurlencode($emailSubject) }}', '{{ rawurlencode($emailBody) }}')" style="display:inline-flex;align-items:center;background:#dbeafe;color:#1d4ed8;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;" title="Kirim via Email">
+                                        <i data-lucide="mail" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Email
+                                    </button>
+                                @endif
+
+                                @if($p->status === 'Pending')
                                     <form action="{{ route('purchases.destroy', $p->id) }}" method="POST" id="del-{{ $p->id }}" style="display:inline;">
                                         @csrf 
                                         @method('DELETE')
                                         <button type="button" class="action-delete" onclick="confirmDelete({{ $p->id }})"><i data-lucide="trash-2" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;"></i> Delete</button>
                                     </form>
-                                @else
-                                    <span style="color:#94a3b8;font-size:12px;font-style:italic;">No action</span>
                                 @endif
                             </div>
                         </td>
@@ -146,6 +197,30 @@ function confirmDelete(id) {
         cancelButtonText: 'Batal'
     }).then(r => {
         if(r.isConfirmed) document.getElementById('del-'+id).submit();
+    });
+}
+
+function sendEmail(email, rawSubject, rawBody) {
+    Swal.fire({
+        title: 'Kirim PO via Email',
+        text: 'Pilih metode pengiriman untuk email ke ' + email + ':',
+        icon: 'info',
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Kirim via Gmail',
+        denyButtonText: 'Kirim via Mailto',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#2563eb',
+        denyButtonColor: '#10b981',
+        cancelButtonColor: '#64748b'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${rawSubject}&body=${rawBody}`;
+            window.open(gmailUrl, '_blank');
+        } else if (result.isDenied) {
+            const mailtoUrl = `mailto:${email}?subject=${rawSubject}&body=${rawBody}`;
+            window.open(mailtoUrl, '_self');
+        }
     });
 }
 </script>

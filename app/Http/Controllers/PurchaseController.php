@@ -109,4 +109,10 @@ class PurchaseController extends Controller
 
         return redirect()->route('purchases.index')->with('success', 'Purchase Order berhasil dihapus!');
     }
+
+    public function print(Purchase $purchase)
+    {
+        $purchase->load(['supplier', 'product']);
+        return view('purchases.print', compact('purchase'));
+    }
 }

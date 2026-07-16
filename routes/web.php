@@ -111,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchases', PurchaseController::class);
     Route::post('/purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');
+    Route::get('/purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('purchases.print');
 
     // Live Tracking
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
