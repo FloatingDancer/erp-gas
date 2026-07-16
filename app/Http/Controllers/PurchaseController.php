@@ -44,6 +44,35 @@ class PurchaseController extends Controller
             'status'         => 'Pending',
         ]);
 
+        $purchase->load(['supplier', 'product']);
+        
+        if ($purchase->supplier && $purchase->supplier->phone) {
+            $phone = preg_replace('/[^0-9]/', '', $purchase->supplier->phone);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            }
+            
+            $supplierName = $purchase->supplier->name;
+            $productName = $purchase->product->name ?? 'Produk';
+            $qty = $purchase->quantity;
+            $pricePerCylinder = number_format($purchase->purchase_price, 0, ',', '.');
+            $totalFormatted = number_format($purchase->total_amount, 0, ',', '.');
+            
+            $message = "Halo *{$supplierName}*,\n\nBerikut kami kirimkan Purchase Order (PO) baru untuk kebutuhan gas kami:\n\n"
+                     . "*Detail Purchase Order (PO):*\n"
+                     . "- *No. PO:* #PO-" . str_pad($purchase->id, 5, '0', STR_PAD_LEFT) . "\n"
+                     . "- *Produk:* {$productName}\n"
+                     . "- *Jumlah (Qty):* {$qty} tabung\n"
+                     . "- *Harga Satuan:* Rp {$pricePerCylinder}\n"
+                     . "- *Total Belanja:* Rp {$totalFormatted}\n\n"
+                     . "Mohon segera diproses dan dikirimkan ke alamat kami.\n\n"
+                     . "Terima kasih,\n"
+                     . "*TK. NAGA SAKTI JAYA*";
+                     
+            $waUrl = "https://api.whatsapp.com/send?phone=" . $phone . "&text=" . rawurlencode($message);
+            session()->flash('wa_url', $waUrl);
+        }
+
         ActivityLog::log('Create', 'Membuat PO baru #' . $purchase->id . ' ke Supplier: ' . $purchase->supplier->name);
 
         return redirect()->route('purchases.index')->with('success', 'Purchase Order berhasil dibuat!');
