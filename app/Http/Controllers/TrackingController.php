@@ -9,8 +9,8 @@ class TrackingController extends Controller
 {
     public function index()
     {
-        if (!auth()->user() || !auth()->user()->isAdmin()) {
-            abort(403, 'Akses ditolak. Hanya Manager/Admin yang dapat memantau lokasi driver.');
+        if (!auth()->user() || auth()->user()->role !== 'manager') {
+            abort(403, 'Akses ditolak. Hanya Manager yang dapat memantau lokasi driver.');
         }
 
         return view('tracking.index');

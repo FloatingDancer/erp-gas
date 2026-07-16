@@ -652,8 +652,10 @@
             ['path' => 'purchases',  'label' => 'Purchasing', 'icon' => 'shopping-bag'],
             ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
             ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
-            ['path' => 'tracking',   'label' => 'Driver Tracking', 'icon' => 'map-pin'],
         ];
+        if (auth()->user()->role === 'manager') {
+            $navItems[] = ['path' => 'tracking', 'label' => 'Driver Tracking', 'icon' => 'map-pin'];
+        }
         if (auth()->user()->isDriver()) {
             $navItems = [
                 ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],

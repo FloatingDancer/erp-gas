@@ -70,6 +70,6 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return in_array($this->role, ['admin', 'manager']);
+        return $this->role === 'admin';
     }
 }
