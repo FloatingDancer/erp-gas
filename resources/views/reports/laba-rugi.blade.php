@@ -32,7 +32,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <div class="page-header">
     <div>
-        <h1 class="page-title"><i data-lucide="trending-up" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Laba Rugi</h1>
+        <h1 class="page-title"><i data-lucide="trending-up" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Profit & Loss</h1>
         <p class="page-subtitle">Modul Keuangan & Akuntansi — Laporan Profitabilitas Periode Bulanan</p>
     </div>
     <div style="display:flex;gap:10px;">

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Laba Rugi - {{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }} {{ $year }}</title>
+    <title>Profit & Loss Report - {{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }} {{ $year }}</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
@@ -140,7 +140,7 @@
         </div>
 
         <div class="title-section">
-            <h3>LAPORAN LABA RUGI</h3>
+            <h3>PROFIT & LOSS REPORT</h3>
             <p>Untuk Periode: {{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }} {{ $year }}</p>
         </div>
 
