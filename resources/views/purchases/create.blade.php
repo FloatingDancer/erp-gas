@@ -50,7 +50,7 @@
             <select name="product_id" class="form-input" required>
                 <option value="" disabled selected>-- Pilih Produk --</option>
                 @foreach($products as $p)
-                    <option value="{{ $p->id }}">{{ $p->name }} (Stok Saat Ini: {{ $p->stock }})</option>
+                    <option value="{{ $p->id }}" data-price="{{ $p->price }}">{{ $p->name }} (Stok Saat Ini: {{ $p->stock }})</option>
                 @endforeach
             </select>
         </div>
@@ -68,4 +68,16 @@
         </div>
     </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('select[name="product_id"]').change(function() {
+        const selectedOption = $(this).find('option:selected');
+        const sellingPrice = parseFloat(selectedOption.data('price')) || 0;
+        const purchasePrice = Math.max(0, sellingPrice - 3000);
+        $('input[name="purchase_price"]').val(purchasePrice);
+    });
+});
+</script>
 @endsection
