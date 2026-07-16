@@ -650,6 +650,7 @@
             ['path' => 'payments',   'label' => 'Payments',   'icon' => 'credit-card'],
             ['path' => 'suppliers',  'label' => 'Suppliers',  'icon' => 'store'],
             ['path' => 'purchases',  'label' => 'Purchasing', 'icon' => 'shopping-bag'],
+            ['path' => 'reports/laba-rugi', 'label' => 'Laba Rugi', 'icon' => 'trending-up'],
             ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
             ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
         ];

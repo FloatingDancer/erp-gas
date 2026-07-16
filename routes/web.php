@@ -13,6 +13,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\FinancialReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('drivers', DriverController::class);
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
     Route::get('/reports/export-csv', [DashboardController::class, 'exportCSV'])->name('reports.export-csv');
+    Route::get('/reports/laba-rugi', [FinancialReportController::class, 'index'])->name('reports.laba-rugi');
+    Route::get('/reports/laba-rugi/print', [FinancialReportController::class, 'print'])->name('reports.laba-rugi.print');
     Route::post('/deliveries/{delivery}/confirm-arrival', [DeliveryController::class, 'confirmArrival'])->name('deliveries.confirm-arrival');
 
     // Suppliers & Purchases
