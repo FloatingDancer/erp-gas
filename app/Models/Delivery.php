@@ -11,7 +11,9 @@ class Delivery extends Model
         'driver_id',
         'driver_name',
         'delivery_date',
-        'status'
+        'status',
+        'latitude',
+        'longitude'
     ];
 
     public function order()

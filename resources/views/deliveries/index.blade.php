@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
 .page-title{font-size:22px;font-weight:700;color:#0f172a;margin:0;}
@@ -102,10 +103,15 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <td>
                         <div style="display:flex;gap:6px;align-items:center;">
                             @if(auth()->user()->isDriver() && $d->status === 'On Delivery')
-                                <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-{{ $d->id }}" style="display:inline;">
-                                    @csrf
-                                    <button type="button" class="action-confirm" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}')"><i data-lucide="check" style="width:13px;height:13px;margin-right:2px;"></i> Sampai</button>
-                                </form>
+                                <div style="display:flex; flex-direction:column; gap:4px; width:100%;">
+                                    <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-{{ $d->id }}" style="display:inline;">
+                                        @csrf
+                                        <button type="button" class="action-confirm" style="width:100%; justify-content:center;" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}')"><i data-lucide="check" style="width:13px;height:13px;margin-right:2px;"></i> Sampai</button>
+                                    </form>
+                                    <button type="button" class="btn-primary-custom" onclick="startDriverSimulation({{ $d->id }}, false)" id="btn-sim-desktop-{{ $d->id }}" style="background:#10b981; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px;">
+                                        <i data-lucide="play" style="width:12px;height:12px;"></i> Simulasi
+                                    </button>
+                                </div>
                             @endif
 
                             @if(!auth()->user()->isDriver())
@@ -181,7 +187,16 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 </div>
 
                 @if(auth()->user()->isDriver() && $d->status === 'On Delivery')
-                    <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-mob-{{ $d->id }}" style="display:block;">
+                    <!-- Map & Simulator for Driver -->
+                    <div style="margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                        <span class="delivery-card-label">Live GPS Simulator</span>
+                        <div id="driver-map-{{ $d->id }}" style="height: 180px; width: 100%; border-radius: 10px; border: 1.5px solid #cbd5e1; margin-top: 6px; z-index: 1;"></div>
+                        <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-sim-{{ $d->id }}" onclick="startDriverSimulation({{ $d->id }})" style="background:#10b981; border:none; margin-top:10px; font-weight:700; width:100%; justify-content:center;">
+                            <i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan
+                        </button>
+                    </div>
+
+                    <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-mob-{{ $d->id }}" style="display:block; margin-top:10px;">
                         @csrf
                         <button type="button" class="btn-primary-custom action-confirm btn-confirm-mobile" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}', true)">
                             <i data-lucide="check" style="width:14px;height:14px;margin-right:4px;"></i> Konfirmasi Sampai
@@ -257,5 +272,119 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const storeLatLng = [-6.353809, 107.114757];
+
+    function startDriverSimulation(deliveryId, isMobile = true) {
+        const customerLat = storeLatLng[0] + (Math.sin(deliveryId) * 0.012);
+        const customerLng = storeLatLng[1] + (Math.cos(deliveryId) * 0.012);
+        const customerLatLng = [customerLat, customerLng];
+
+        let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
+        
+        const btnId = isMobile ? 'btn-sim-' + deliveryId : 'btn-sim-desktop-' + deliveryId;
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = 'Simulasi Berjalan...';
+            btn.style.background = '#64748b';
+        }
+
+        if (!isMobile) {
+            Swal.fire({
+                title: 'Simulasi Perjalanan Driver',
+                html: '<div id="desktop-map-container" style="height: 300px; width: 100%; border-radius: 8px;"></div><p style="margin-top: 10px; font-size:12px; color:#64748b;">Mensimulasikan pengantaran ke lokasi pelanggan...</p>',
+                width: 500,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    runMapSimulation('desktop-map-container', customerLatLng, deliveryId, btn);
+                }
+            });
+        } else {
+            runMapSimulation(mapElementId, customerLatLng, deliveryId, btn);
+        }
+    }
+
+    function runMapSimulation(containerId, customerLatLng, deliveryId, btnElement) {
+        const mapObj = L.map(containerId).setView(storeLatLng, 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj);
+        
+        const storeIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3670/3670910.png',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
+        });
+        const driverIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3120/3120014.png',
+            iconSize: [28, 28],
+            iconAnchor: [14, 28]
+        });
+        const customerIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776067.png',
+            iconSize: [28, 28],
+            iconAnchor: [14, 28]
+        });
+
+        L.marker(storeLatLng, {icon: storeIcon}).addTo(mapObj).bindPopup('Gudang');
+        L.marker(customerLatLng, {icon: customerIcon}).addTo(mapObj).bindPopup('Pelanggan');
+
+        const driverMarker = L.marker([...storeLatLng], {icon: driverIcon}).addTo(mapObj);
+        
+        L.polyline([storeLatLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(mapObj);
+
+        let currentStep = 0;
+        const totalSteps = 10;
+        
+        const interval = setInterval(() => {
+            currentStep++;
+            
+            const ratio = currentStep / totalSteps;
+            const curLat = storeLatLng[0] + (customerLatLng[0] - storeLatLng[0]) * ratio;
+            const curLng = storeLatLng[1] + (customerLatLng[1] - storeLatLng[1]) * ratio;
+            
+            driverMarker.setLatLng([curLat, curLng]);
+            mapObj.panTo([curLat, curLng]);
+
+            $.post(`/api/deliveries/${deliveryId}/location`, {
+                _token: '{{ csrf_token() }}',
+                latitude: curLat,
+                longitude: curLng
+            }).catch(err => console.error("Error updating location:", err));
+
+            if (currentStep >= totalSteps) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    if (containerId === 'desktop-map-container') {
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Simulasi Selesai!',
+                            text: 'Driver telah sampai di lokasi pelanggan.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sampai!',
+                            text: 'Simulasi perjalanan selesai.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                    if (btnElement) {
+                        btnElement.disabled = false;
+                        btnElement.innerHTML = '<i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan';
+                        btnElement.style.background = '#10b981';
+                    }
+                }, 1000);
+            }
+        }, 2000);
+    }
 </script>
 @endsection

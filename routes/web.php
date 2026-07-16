@@ -10,6 +10,9 @@ use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\TrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +106,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
     Route::get('/reports/export-csv', [DashboardController::class, 'exportCSV'])->name('reports.export-csv');
     Route::post('/deliveries/{delivery}/confirm-arrival', [DeliveryController::class, 'confirmArrival'])->name('deliveries.confirm-arrival');
+
+    // Suppliers & Purchases
+    Route::resource('suppliers', SupplierController::class);
+    Route::resource('purchases', PurchaseController::class);
+    Route::post('/purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');
+
+    // Live Tracking
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+    Route::get('/api/driver-coordinates', [TrackingController::class, 'getCoordinates'])->name('tracking.coordinates');
+    Route::post('/api/deliveries/{delivery}/location', [TrackingController::class, 'updateLocation'])->name('tracking.update-location');
 
     // Profile
     Route::get('/my-profile', function () {

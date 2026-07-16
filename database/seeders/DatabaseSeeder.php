@@ -35,6 +35,24 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        \App\Models\Supplier::updateOrCreate(
+            ['name' => 'PT. Pertamina Gas Retail'],
+            [
+                'phone' => '021-500000',
+                'email' => 'sales@pertaminagas.co.id',
+                'address' => 'Jl. Perwira No. 2-4, Jakarta Pusat',
+            ]
+        );
+
+        \App\Models\Supplier::updateOrCreate(
+            ['name' => 'Agen Elpiji Cikarang Abadi'],
+            [
+                'phone' => '08123456789',
+                'email' => 'cikarang_abadi@gmail.com',
+                'address' => 'Kawasan Industri Jababeka, Cikarang, Bekasi',
+            ]
+        );
+
         $this->call([
             DriverUserSeeder::class,
         ]);

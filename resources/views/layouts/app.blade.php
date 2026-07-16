@@ -646,10 +646,13 @@
             ['path' => 'customers',  'label' => 'Customers',  'icon' => 'users'],
             ['path' => 'products',   'label' => 'Products',   'icon' => 'package'],
             ['path' => 'orders',     'label' => 'Orders',     'icon' => 'shopping-cart'],
-            ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
-            ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
             ['path' => 'invoices',   'label' => 'Invoices',   'icon' => 'file-text'],
             ['path' => 'payments',   'label' => 'Payments',   'icon' => 'credit-card'],
+            ['path' => 'suppliers',  'label' => 'Suppliers',  'icon' => 'store'],
+            ['path' => 'purchases',  'label' => 'Purchasing', 'icon' => 'shopping-bag'],
+            ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
+            ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
+            ['path' => 'tracking',   'label' => 'Driver Tracking', 'icon' => 'map-pin'],
         ];
         if (auth()->user()->isDriver()) {
             $navItems = [
