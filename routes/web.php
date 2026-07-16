@@ -38,6 +38,7 @@ if (config('app.demo')) {
 }
 
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
+Route::get('/share/purchases/{id}', [PurchaseController::class, 'printPublic'])->name('purchases.print-public');
 
 /*
 |--------------------------------------------------------------------------

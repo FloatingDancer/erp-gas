@@ -65,6 +65,8 @@ class PurchaseController extends Controller
                      . "- *Jumlah (Qty):* {$qty} tabung\n"
                      . "- *Harga Satuan:* Rp {$pricePerCylinder}\n"
                      . "- *Total Belanja:* Rp {$totalFormatted}\n\n"
+                     . "Unduh/cetak PO Anda melalui tautan berikut:\n"
+                     . route('purchases.print-public', $purchase->id) . "\n\n"
                      . "Mohon segera diproses dan dikirimkan ke alamat kami.\n\n"
                      . "Terima kasih,\n"
                      . "*TK. NAGA SAKTI JAYA*";
@@ -114,5 +116,16 @@ class PurchaseController extends Controller
     {
         $purchase->load(['supplier', 'product']);
         return view('purchases.print', compact('purchase'));
+    }
+
+    public function printPublic($id)
+    {
+        try {
+            $purchase = Purchase::with(['supplier', 'product'])->findOrFail($id);
+            return view('purchases.print', compact('purchase'));
+        } catch (\Throwable $e) {
+            return response("Error: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)
+                ->header('Content-Type', 'text/plain');
+        }
     }
 }

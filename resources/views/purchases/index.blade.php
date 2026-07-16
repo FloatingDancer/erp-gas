@@ -102,6 +102,8 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                                      . "- *Jumlah (Qty):* {$qty} tabung\n"
                                      . "- *Harga Satuan:* Rp {$pricePerCylinder}\n"
                                      . "- *Total Belanja:* Rp {$totalFormatted}\n\n"
+                                     . "Unduh/cetak PO Anda melalui tautan berikut:\n"
+                                     . route('purchases.print-public', $p->id) . "\n\n"
                                      . "Mohon segera diproses dan dikirimkan ke alamat kami.\n\n"
                                      . "Terima kasih,\n"
                                      . "*TK. NAGA SAKTI JAYA*";
@@ -113,6 +115,8 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                                      . "Jumlah (Qty): {$qty} tabung\n"
                                      . "Harga Satuan: Rp {$pricePerCylinder}\n"
                                      . "Total Belanja: Rp {$totalFormatted}\n\n"
+                                     . "Unduh/cetak PO Anda melalui tautan berikut:\n"
+                                     . route('purchases.print-public', $p->id) . "\n\n"
                                      . "Mohon segera diproses.\n\n"
                                      . "Terima kasih,\n"
                                      . "TK. NAGA SAKTI JAYA";
