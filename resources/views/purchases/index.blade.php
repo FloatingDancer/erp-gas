@@ -41,10 +41,10 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 </div>
 
 @if(session('success'))
-    <div class="alert-success">✅ {{ session('success') }}</div>
+    <div class="alert-success"><i data-lucide="check-circle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
 @if(session('error'))
-    <div class="alert-error">⚠️ {{ session('error') }}</div>
+    <div class="alert-error"><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('error') }}</div>
 @endif
 
 <div class="card-clean">

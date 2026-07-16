@@ -18,7 +18,7 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">➕ Buat Purchase Order</h1>
+        <h1 class="page-title"><i data-lucide="plus-circle" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Buat Purchase Order</h1>
         <p class="page-subtitle">Ajukan PO baru ke supplier</p>
     </div>
     <a href="{{ route('purchases.index') }}" class="btn-secondary-custom"><i data-lucide="arrow-left" style="width:14px;height:14px;vertical-align:middle;margin-top:-2px;"></i> Kembali</a>
@@ -27,7 +27,7 @@
 <div class="form-card">
     @if($errors->any())
         <div class="alert-error">
-            <strong>Ada kesalahan:</strong>
+            <strong><i data-lucide="alert-triangle" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> Ada kesalahan:</strong>
             <ul style="margin:6px 0 0;padding-left:18px;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
