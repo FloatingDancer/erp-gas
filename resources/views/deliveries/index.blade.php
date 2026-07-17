@@ -300,7 +300,48 @@ $(document).ready(function() {
 <script>
     const storeLatLng = [-6.3825657, 107.0871247];
 
+    let activeMaps = {};
+    let activeMarkers = {};
+    let activeRoutes = {};
+    let simulationIntervals = {};
+    let gpsWatchIds = {};
+
+    function destroyActiveMap(deliveryId) {
+        if (simulationIntervals[deliveryId]) {
+            clearInterval(simulationIntervals[deliveryId]);
+            delete simulationIntervals[deliveryId];
+        }
+        if (activeMaps[deliveryId]) {
+            try {
+                activeMaps[deliveryId].remove();
+            } catch (e) {
+                console.error("Error removing map:", e);
+            }
+            delete activeMaps[deliveryId];
+        }
+        if (activeMarkers[deliveryId]) {
+            delete activeMarkers[deliveryId];
+        }
+        if (activeRoutes[deliveryId]) {
+            delete activeRoutes[deliveryId];
+        }
+        
+        // Also clear any DOM residual leaflet IDs
+        const mapContainer = document.getElementById('driver-map-' + deliveryId);
+        if (mapContainer && mapContainer._leaflet_id) {
+            delete mapContainer._leaflet_id;
+            mapContainer.innerHTML = ''; // reset DOM content
+        }
+        const desktopContainer = document.getElementById('desktop-map-container');
+        if (desktopContainer && desktopContainer._leaflet_id) {
+            delete desktopContainer._leaflet_id;
+            desktopContainer.innerHTML = ''; // reset DOM content
+        }
+    }
+
     function startDriverSimulation(deliveryId, lat, lng, isMobile = true) {
+        destroyActiveMap(deliveryId);
+
         let customerLatLng;
         if (lat && lng) {
             customerLatLng = [lat, lng];
@@ -338,7 +379,6 @@ $(document).ready(function() {
 
     function runMapSimulation(containerId, customerLatLng, deliveryId, btnElement) {
         const mapObj = L.map(containerId).setView(storeLatLng, 13);
-        
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj);
         
         const storeIcon = L.icon({
@@ -361,8 +401,10 @@ $(document).ready(function() {
         L.marker(customerLatLng, {icon: customerIcon}).addTo(mapObj).bindPopup('Pelanggan');
 
         const driverMarker = L.marker([...storeLatLng], {icon: driverIcon}).addTo(mapObj);
-        
         L.polyline([storeLatLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(mapObj);
+
+        activeMaps[deliveryId] = mapObj;
+        activeMarkers[deliveryId] = driverMarker;
 
         let currentStep = 0;
         const totalSteps = 10;
@@ -385,6 +427,7 @@ $(document).ready(function() {
 
             if (currentStep >= totalSteps) {
                 clearInterval(interval);
+                delete simulationIntervals[deliveryId];
                 setTimeout(() => {
                     if (containerId === 'desktop-map-container') {
                         Swal.close();
@@ -412,11 +455,9 @@ $(document).ready(function() {
                 }, 1000);
             }
         }, 2000);
-    }
 
-    let gpsWatchIds = {};
-    let gpsMarkers = {};
-    let gpsMaps = {};
+        simulationIntervals[deliveryId] = interval;
+    }
 
     function toggleRealGPSTracking(deliveryId, isMobile = true) {
         const btnId = 'btn-real-header';
@@ -425,6 +466,7 @@ $(document).ready(function() {
         if (gpsWatchIds[deliveryId]) {
             navigator.geolocation.clearWatch(gpsWatchIds[deliveryId]);
             delete gpsWatchIds[deliveryId];
+            destroyActiveMap(deliveryId);
             
             if (btn) {
                 btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli';
@@ -449,6 +491,8 @@ $(document).ready(function() {
             });
             return;
         }
+
+        destroyActiveMap(deliveryId);
 
         if (btn) {
             btn.innerHTML = 'Menghubungkan GPS...';
@@ -498,7 +542,6 @@ $(document).ready(function() {
             function(error) {
                 console.error("GPS error:", error);
                 
-                // If high accuracy failed, try low accuracy fallback
                 if (highAccuracy) {
                     console.log("Retrying with low accuracy fallback...");
                     navigator.geolocation.clearWatch(watchId);
@@ -542,19 +585,12 @@ $(document).ready(function() {
     }
 
     function setupRealMap(containerId, lat, lng, deliveryId) {
-        const mapContainer = document.getElementById(containerId);
-        if (!mapContainer) return;
-        
-        if (gpsMaps[deliveryId] && !mapContainer._leaflet_id) {
-            delete gpsMaps[deliveryId];
-        }
-
-        if (gpsMaps[deliveryId]) {
+        if (activeMaps[deliveryId]) {
             const latLng = [lat, lng];
-            if (gpsMarkers[deliveryId]) {
-                gpsMarkers[deliveryId].setLatLng(latLng);
+            if (activeMarkers[deliveryId]) {
+                activeMarkers[deliveryId].setLatLng(latLng);
             }
-            gpsMaps[deliveryId].setView(latLng, 15);
+            activeMaps[deliveryId].setView(latLng, 15);
             return;
         }
 
@@ -567,8 +603,8 @@ $(document).ready(function() {
             iconAnchor: [14, 28]
         });
 
-        gpsMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
-        gpsMaps[deliveryId] = mapObj;
+        activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
+        activeMaps[deliveryId] = mapObj;
     }
 </script>
 @endsection
