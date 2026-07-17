@@ -74,6 +74,7 @@
 
     let markers = {};
     let routes = {};
+    let customerMarkers = {};
     let selectedDriverId = null;
 
     const driverIcon = L.icon({
@@ -81,6 +82,13 @@
         iconSize: [32, 32],
         iconAnchor: [16, 32],
         popupAnchor: [0, -28]
+    });
+
+    const customerIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776067.png',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+        popupAnchor: [0, -24]
     });
 
     function updateDriverLocations() {
@@ -100,9 +108,11 @@
                     for (let id in markers) {
                         map.removeLayer(markers[id]);
                         if (routes[id]) map.removeLayer(routes[id]);
+                        if (customerMarkers[id]) map.removeLayer(customerMarkers[id]);
                     }
                     markers = {};
                     routes = {};
+                    customerMarkers = {};
                     lucide.createIcons();
                     return;
                 }
@@ -114,8 +124,10 @@
                     if (!currentIds.includes(parseInt(id))) {
                         map.removeLayer(markers[id]);
                         if (routes[id]) map.removeLayer(routes[id]);
+                        if (customerMarkers[id]) map.removeLayer(customerMarkers[id]);
                         delete markers[id];
                         delete routes[id];
+                        delete customerMarkers[id];
                     }
                 }
                 
@@ -135,6 +147,15 @@
                     if (d.latitude && d.longitude) {
                         const latLng = [parseFloat(d.latitude), parseFloat(d.longitude)];
                         
+                        let customerLatLng;
+                        if (d.customer_lat && d.customer_lng) {
+                            customerLatLng = [parseFloat(d.customer_lat), parseFloat(d.customer_lng)];
+                        } else {
+                            const customerLat = storeLatLng[0] + (Math.sin(d.id) * 0.012);
+                            const customerLng = storeLatLng[1] + (Math.cos(d.id) * 0.012);
+                            customerLatLng = [customerLat, customerLng];
+                        }
+
                         if (markers[d.id]) {
                             markers[d.id].setLatLng(latLng);
                         } else {
@@ -145,6 +166,20 @@
                                     Nopol: ${d.vehicle}<br>
                                     Order: #${d.order_id} ke ${d.customer_name}
                                 `);
+                        }
+
+                        if (customerMarkers[d.id]) {
+                            customerMarkers[d.id].setLatLng(customerLatLng);
+                        } else {
+                            customerMarkers[d.id] = L.marker(customerLatLng, {icon: customerIcon})
+                                .addTo(map)
+                                .bindPopup(`<strong>Pelanggan: ${d.customer_name}</strong><br>${d.address}`);
+                        }
+
+                        if (routes[d.id]) {
+                            routes[d.id].setLatLngs([latLng, customerLatLng]);
+                        } else {
+                            routes[d.id] = L.polyline([latLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(map);
                         }
                     }
                 });

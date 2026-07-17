@@ -111,7 +111,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                                         @csrf
                                         <button type="button" class="action-confirm" style="width:100%; justify-content:center;" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}')"><i data-lucide="check" style="width:13px;height:13px;margin-right:2px;"></i> Sampai</button>
                                     </form>
-                                    <button type="button" class="btn-primary-custom" onclick="startDriverSimulation({{ $d->id }}, false)" id="btn-sim-desktop-{{ $d->id }}" style="background:#10b981; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px;">
+                                    <button type="button" class="btn-primary-custom" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, false)" id="btn-sim-desktop-{{ $d->id }}" style="background:#10b981; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px;">
                                         <i data-lucide="play" style="width:12px;height:12px;"></i> Simulasi
                                     </button>
                                 </div>
@@ -202,7 +202,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                     <div style="margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
                         <span class="delivery-card-label">Live GPS Simulator</span>
                         <div id="driver-map-{{ $d->id }}" style="height: 180px; width: 100%; border-radius: 10px; border: 1.5px solid #cbd5e1; margin-top: 6px; z-index: 1;"></div>
-                        <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-sim-{{ $d->id }}" onclick="startDriverSimulation({{ $d->id }})" style="background:#10b981; border:none; margin-top:10px; font-weight:700; width:100%; justify-content:center;">
+                        <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-sim-{{ $d->id }}" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, true)" style="background:#10b981; border:none; margin-top:10px; font-weight:700; width:100%; justify-content:center;">
                             <i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan
                         </button>
                     </div>
@@ -289,10 +289,15 @@ $(document).ready(function() {
 <script>
     const storeLatLng = [-6.353809, 107.114757];
 
-    function startDriverSimulation(deliveryId, isMobile = true) {
-        const customerLat = storeLatLng[0] + (Math.sin(deliveryId) * 0.012);
-        const customerLng = storeLatLng[1] + (Math.cos(deliveryId) * 0.012);
-        const customerLatLng = [customerLat, customerLng];
+    function startDriverSimulation(deliveryId, lat, lng, isMobile = true) {
+        let customerLatLng;
+        if (lat && lng) {
+            customerLatLng = [lat, lng];
+        } else {
+            const customerLat = storeLatLng[0] + (Math.sin(deliveryId) * 0.012);
+            const customerLng = storeLatLng[1] + (Math.cos(deliveryId) * 0.012);
+            customerLatLng = [customerLat, customerLng];
+        }
 
         let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
         

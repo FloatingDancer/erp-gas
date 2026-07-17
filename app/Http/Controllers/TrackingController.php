@@ -33,6 +33,8 @@ class TrackingController extends Controller
                 'address'       => $del->order->customer->address ?? '-',
                 'latitude'      => $del->latitude,
                 'longitude'     => $del->longitude,
+                'customer_lat'  => $del->order->customer->latitude ?? null,
+                'customer_lng'  => $del->order->customer->longitude ?? null,
             ];
         });
 
