@@ -720,6 +720,7 @@ $(document).ready(function() {
                 activeMarkers[deliveryId].setLatLng(latLng);
             }
             activeMaps[deliveryId].setView(latLng, 15);
+            activeMaps[deliveryId].invalidateSize();
             return;
         }
 
@@ -734,6 +735,10 @@ $(document).ready(function() {
 
         activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
         activeMaps[deliveryId] = mapObj;
+        
+        setTimeout(() => {
+            mapObj.invalidateSize();
+        }, 200);
     }
 </script>
 @endsection
