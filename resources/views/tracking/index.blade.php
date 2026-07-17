@@ -221,6 +221,6 @@
     }
 
     updateDriverLocations();
-    setInterval(updateDriverLocations, 1000);
+    setInterval(updateDriverLocations, 4000);
 </script>
 @endsection

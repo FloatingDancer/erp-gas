@@ -698,7 +698,7 @@ $(document).ready(function() {
 
         gpsWatchIds[deliveryId] = watchId;
 
-        // Post coordinates to database exactly every 1 second (1000ms)
+        // Post coordinates to database exactly every 8 seconds (8000ms)
         const intervalId = setInterval(function() {
             if (latestCoords) {
                 const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
@@ -708,7 +708,7 @@ $(document).ready(function() {
                     longitude: latestCoords.lng
                 }).catch(err => console.error("Error updating location via real GPS:", err));
             }
-        }, 1000);
+        }, 8000);
 
         gpsIntervalIds[deliveryId] = intervalId;
     }
