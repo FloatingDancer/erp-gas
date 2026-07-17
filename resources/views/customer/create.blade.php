@@ -74,6 +74,20 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
             <label class="form-label">Alamat</label>
             <textarea name="address" class="form-input" rows="3" placeholder="Masukkan alamat lengkap" required>{{ old('address') }}</textarea>
         </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom: 20px;">
+            <div>
+                <label class="form-label">Latitude</label>
+                <input type="text" name="latitude" id="latitude" class="form-input" value="{{ old('latitude') }}" placeholder="Contoh: -6.2088">
+            </div>
+            <div>
+                <label class="form-label">Longitude</label>
+                <input type="text" name="longitude" id="longitude" class="form-input" value="{{ old('longitude') }}" placeholder="Contoh: 106.8456">
+            </div>
+        </div>
+        <div style="margin-bottom: 20px; font-size:12.5px; color:#64748b;">
+            <i data-lucide="help-circle" style="width:14px;height:14px;vertical-align:middle;margin-top:-2px;margin-right:2px;"></i>
+            Masukkan koordinat Latitude & Longitude agar lokasi pengantaran driver di Google Maps 100% akurat.
+        </div>
         <div style="display:flex;gap:10px;margin-top:8px;">
             <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Simpan Customer</button>
             <a href="{{ route('customers.index') }}" class="btn-secondary-custom">Batal</a>

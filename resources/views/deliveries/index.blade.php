@@ -172,7 +172,15 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 </div>
                 <div class="delivery-card-item">
                     <span class="delivery-card-label">Alamat Pengiriman</span>
-                    <span class="delivery-card-value" style="color:#0f172a; font-weight: 600;">{{ $d->order->customer->address }}</span>
+                    <span class="delivery-card-value" style="color:#0f172a; font-weight: 600;">
+                        @if($d->order->customer->latitude && $d->order->customer->longitude)
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ $d->order->customer->latitude }},{{ $d->order->customer->longitude }}" target="_blank" style="color: #2563eb; text-decoration: none;" title="Buka Rute di Google Maps">
+                                <i data-lucide="map-pin" style="width:12px;height:12px;vertical-align:middle;margin-top:-2px;margin-right:2px;color:#ef4444;"></i>{{ $d->order->customer->address }}
+                            </a>
+                        @else
+                            {{ $d->order->customer->address }}
+                        @endif
+                    </span>
                 </div>
                 <div class="delivery-card-item">
                     <span class="delivery-card-label">Driver & Nopol</span>

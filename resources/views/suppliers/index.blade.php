@@ -62,7 +62,15 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <td><span style="font-weight:600;color:#0f172a;">{{ $s->name }}</span></td>
                     <td>{{ $s->phone }}</td>
                     <td style="color:#64748b;">{{ $s->email ?? '-' }}</td>
-                    <td style="color:#64748b;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $s->address }}</td>
+                    <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        @if($s->latitude && $s->longitude)
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ $s->latitude }},{{ $s->longitude }}" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 500;" title="Buka di Google Maps">
+                                <i data-lucide="map-pin" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;margin-right:2px;color:#ef4444;"></i>{{ $s->address }}
+                            </a>
+                        @else
+                            <span style="color:#64748b;">{{ $s->address }}</span>
+                        @endif
+                    </td>
                     @if(auth()->user() && !auth()->user()->isDriver())
                         <td>
                             <div style="display:flex;gap:6px;">

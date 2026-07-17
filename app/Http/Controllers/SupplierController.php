@@ -26,6 +26,8 @@ class SupplierController extends Controller
             'phone'   => 'required|string|max:20',
             'email'   => 'nullable|email|max:255',
             'address' => 'required|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $supplier = Supplier::create($request->all());
@@ -47,6 +49,8 @@ class SupplierController extends Controller
             'phone'   => 'required|string|max:20',
             'email'   => 'nullable|email|max:255',
             'address' => 'required|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $supplier->update($request->all());

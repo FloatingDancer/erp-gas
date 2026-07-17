@@ -11,6 +11,8 @@ class Supplier extends Model
         'phone',
         'email',
         'address',
+        'latitude',
+        'longitude',
     ];
 
     public function purchases()

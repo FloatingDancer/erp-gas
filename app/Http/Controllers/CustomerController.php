@@ -26,6 +26,8 @@ class CustomerController extends Controller
             'address' => 'required',
             'phone' => 'required',
             'email' => 'required|email|unique:customers,email',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $customer = Customer::create([
@@ -33,6 +35,8 @@ class CustomerController extends Controller
             'address' => $request->address,
             'phone' => $request->phone,
             'email' => $request->email,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
         ]);
 
         ActivityLog::log('Create', 'Menambahkan customer baru: ' . $customer->customer_name);
@@ -54,6 +58,8 @@ class CustomerController extends Controller
             'address' => 'required',
             'phone' => 'required',
             'email' => 'required|email|unique:customers,email,' . $id,
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $customer = Customer::findOrFail($id);
@@ -63,6 +69,8 @@ class CustomerController extends Controller
             'address' => $request->address,
             'phone' => $request->phone,
             'email' => $request->email,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
         ]);
 
         ActivityLog::log('Update', 'Memperbarui data customer: ' . $customer->customer_name);

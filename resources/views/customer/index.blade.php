@@ -63,7 +63,15 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                     <td><span style="font-weight:600;color:#0f172a;">{{ $c->customer_name }}</span></td>
                     <td style="color:#64748b;">{{ $c->email }}</td>
                     <td>{{ $c->phone }}</td>
-                    <td style="color:#64748b;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $c->address }}</td>
+                    <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        @if($c->latitude && $c->longitude)
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ $c->latitude }},{{ $c->longitude }}" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 500;" title="Buka di Google Maps">
+                                <i data-lucide="map-pin" style="width:13px;height:13px;vertical-align:middle;margin-top:-2px;margin-right:2px;color:#ef4444;"></i>{{ $c->address }}
+                            </a>
+                        @else
+                            <span style="color:#64748b;">{{ $c->address }}</span>
+                        @endif
+                    </td>
                     <td>
                         <div style="display:flex;gap:6px;">
                             <a href="{{ route('customers.edit', $c->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
