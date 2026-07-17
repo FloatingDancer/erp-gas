@@ -58,9 +58,12 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     </div>
     @if(!auth()->user()->isDriver())
         <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>
-    @elseif($isLiveOrderPage ?? false)
+    @elseif(auth()->user()->isDriver())
         @php
-            $activeDeliveryId = $deliveries->isNotEmpty() ? $deliveries->first()->id : 0;
+            $activeDelivery = \App\Models\Delivery::where('driver_id', auth()->user()->driver_id)
+                ->where('status', 'On Delivery')
+                ->first();
+            $activeDeliveryId = $activeDelivery ? $activeDelivery->id : 0;
         @endphp
         <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDeliveryId }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
             <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
