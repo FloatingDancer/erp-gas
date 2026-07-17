@@ -58,6 +58,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     </div>
     @if(!auth()->user()->isDriver())
         <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>
+    @elseif(($isLiveOrderPage ?? false) && $deliveries->isNotEmpty())
+        @php $activeDelivery = $deliveries->first(); @endphp
+        <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDelivery->id }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
+            <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
+        </button>
     @endif
 </div>
 
@@ -114,9 +119,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                                     <button type="button" class="btn-primary-custom" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, false)" id="btn-sim-desktop-{{ $d->id }}" style="background:#10b981; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px;">
                                         <i data-lucide="play" style="width:12px;height:12px;"></i> Simulasi
                                     </button>
-                                    <button type="button" class="btn-primary-custom" onclick="toggleRealGPSTracking({{ $d->id }}, false)" id="btn-real-desktop-{{ $d->id }}" style="background:#3b82f6; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px; margin-top:4px;">
-                                        <i data-lucide="locate" style="width:12px;height:12px;"></i> GPS Asli
-                                    </button>
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ $d->order->customer->latitude && $d->order->customer->longitude ? $d->order->customer->latitude . ',' . $d->order->customer->longitude : urlencode($d->order->customer->address) }}" target="_blank" class="btn-primary-custom" style="background:#3b82f6; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px; margin-top:4px; text-decoration:none;">
+                                        <i data-lucide="map" style="width:12px;height:12px;"></i> Buka Maps
+                                    </a>
                                 </div>
                             @endif
 
@@ -208,9 +213,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                         <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-sim-{{ $d->id }}" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, true)" style="background:#10b981; border:none; margin-top:10px; font-weight:700; width:100%; justify-content:center;">
                             <i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan
                         </button>
-                        <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-real-{{ $d->id }}" onclick="toggleRealGPSTracking({{ $d->id }}, true)" style="background:#3b82f6; border:none; margin-top:8px; font-weight:700; width:100%; justify-content:center;">
-                            <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli (Real-time)
-                        </button>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ $d->order->customer->latitude && $d->order->customer->longitude ? $d->order->customer->latitude . ',' . $d->order->customer->longitude : urlencode($d->order->customer->address) }}" target="_blank" class="btn-primary-custom btn-confirm-mobile" style="background:#3b82f6; border:none; margin-top:8px; font-weight:700; width:100%; justify-content:center; text-decoration:none;">
+                            <i data-lucide="map" style="width:14px;height:14px;margin-right:4px;"></i> Buka Google Maps (Rute Pelanggan)
+                        </a>
                     </div>
 
                     <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-mob-{{ $d->id }}" style="display:block; margin-top:10px;">
@@ -414,7 +419,7 @@ $(document).ready(function() {
     let gpsMaps = {};
 
     function toggleRealGPSTracking(deliveryId, isMobile = true) {
-        const btnId = isMobile ? 'btn-real-' + deliveryId : 'btn-real-desktop-' + deliveryId;
+        const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
         
         if (gpsWatchIds[deliveryId]) {
@@ -422,7 +427,7 @@ $(document).ready(function() {
             delete gpsWatchIds[deliveryId];
             
             if (btn) {
-                btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Aktifkan GPS Asli (Real-time)' : 'GPS Asli');
+                btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli';
                 btn.style.background = '#3b82f6';
             }
             
@@ -454,7 +459,7 @@ $(document).ready(function() {
     }
 
     function startWatching(deliveryId, isMobile, highAccuracy = true) {
-        const btnId = isMobile ? 'btn-real-' + deliveryId : 'btn-real-desktop-' + deliveryId;
+        const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
 
         const watchId = navigator.geolocation.watchPosition(
@@ -463,7 +468,7 @@ $(document).ready(function() {
                 const lng = position.coords.longitude;
                 
                 if (btn) {
-                    btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Matikan GPS Asli' : 'Matikan GPS');
+                    btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> Matikan GPS Asli';
                     btn.style.background = '#ef4444';
                 }
 
@@ -511,7 +516,7 @@ $(document).ready(function() {
                 }
                 
                 if (btn) {
-                    btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Aktifkan GPS Asli (Real-time)' : 'GPS Asli');
+                    btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli';
                     btn.style.background = '#3b82f6';
                 }
                 
