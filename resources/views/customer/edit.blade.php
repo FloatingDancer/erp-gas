@@ -103,7 +103,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const storeLatLng = [-6.353809, 107.114757];
+    const storeLatLng = [-6.3825657, 107.0871247];
     let latInput = document.getElementById('latitude');
     let lngInput = document.getElementById('longitude');
     

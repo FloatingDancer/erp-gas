@@ -293,7 +293,7 @@ $(document).ready(function() {
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const storeLatLng = [-6.353809, 107.114757];
+    const storeLatLng = [-6.3825657, 107.0871247];
 
     function startDriverSimulation(deliveryId, lat, lng, isMobile = true) {
         let customerLatLng;
