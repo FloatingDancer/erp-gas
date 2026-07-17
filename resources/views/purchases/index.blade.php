@@ -174,6 +174,16 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+@if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        timer: 2000,
+        showConfirmButton: false
+    });
+@endif
+
 function confirmReceive(id, prodName, qty) {
     Swal.fire({
         title: 'Konfirmasi Penerimaan',
