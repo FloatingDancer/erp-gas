@@ -464,7 +464,6 @@ $(document).ready(function() {
         simulationIntervals[deliveryId] = interval;
     }
 
-    let gpsWatchIds = {};
     let gpsIntervalIds = {};
 
     function toggleRealGPSTracking(deliveryId, isMobile = true) {
