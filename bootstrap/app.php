@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('web', \App\Http\Middleware\RedirectIfDriver::class);
         $middleware->trustProxies(at: '*');
+        $middleware->validateCsrfTokens(except: [
+            'api/deliveries/*/location',
+            'api/driver/location',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->report(function (\Throwable $e) {

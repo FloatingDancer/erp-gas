@@ -233,12 +233,13 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
             </div>
         </div>
     @empty
-        <div class="card-clean" style="display:block; padding: 24px; text-align:center;">
+        <div id="empty-state-card" class="card-clean" style="display:block; padding: 24px; text-align:center;">
             <div class="empty-state">
                 <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="truck" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada data pengiriman</p>
             </div>
         </div>
+        <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative;"></div>
     @endforelse
 </div>
 
@@ -341,6 +342,11 @@ $(document).ready(function() {
         if (desktopContainer && desktopContainer._leaflet_id) {
             delete desktopContainer._leaflet_id;
             desktopContainer.innerHTML = ''; // reset DOM content
+        }
+        const standbyContainer = document.getElementById('standby-map-container');
+        if (standbyContainer && standbyContainer._leaflet_id) {
+            delete standbyContainer._leaflet_id;
+            standbyContainer.innerHTML = ''; // reset DOM content
         }
     }
 
@@ -481,6 +487,13 @@ $(document).ready(function() {
             
             destroyActiveMap(deliveryId);
             
+            if (deliveryId === 0) {
+                const standbyMap = document.getElementById('standby-map-container');
+                const emptyCard = document.getElementById('empty-state-card');
+                if (standbyMap) standbyMap.style.display = 'none';
+                if (emptyCard) emptyCard.style.display = 'block';
+            }
+            
             if (btn) {
                 btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli';
                 btn.style.background = '#3b82f6';
@@ -554,7 +567,15 @@ $(document).ready(function() {
                     });
                 }
 
-                if (deliveryId !== 0) {
+                if (deliveryId === 0) {
+                    const standbyMap = document.getElementById('standby-map-container');
+                    const emptyCard = document.getElementById('empty-state-card');
+                    if (standbyMap) {
+                        standbyMap.style.display = 'block';
+                        if (emptyCard) emptyCard.style.display = 'none';
+                        setupRealMap('standby-map-container', lat, lng, 0);
+                    }
+                } else {
                     let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
                     setupRealMap(mapElementId, lat, lng, deliveryId);
                 }
@@ -594,7 +615,15 @@ $(document).ready(function() {
                     });
                 }
 
-                if (deliveryId !== 0) {
+                if (deliveryId === 0) {
+                    const standbyMap = document.getElementById('standby-map-container');
+                    const emptyCard = document.getElementById('empty-state-card');
+                    if (standbyMap) {
+                        standbyMap.style.display = 'block';
+                        if (emptyCard) emptyCard.style.display = 'none';
+                        setupRealMap('standby-map-container', lat, lng, 0);
+                    }
+                } else {
                     let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
                     
                     if (!isMobile && !document.getElementById('desktop-map-container')) {
@@ -654,7 +683,7 @@ $(document).ready(function() {
             },
             {
                 enableHighAccuracy: highAccuracy,
-                maximumAge: 10000,
+                maximumAge: 0,
                 timeout: 8000
             }
         );
