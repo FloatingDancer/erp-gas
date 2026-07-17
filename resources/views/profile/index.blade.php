@@ -141,7 +141,7 @@
             <div class="profile-avatar">{{ $initials }}</div>
             <div class="profile-name">{{ $user->name }}</div>
             <div class="profile-email">{{ $user->email }}</div>
-            <div class="profile-role-badge">{{ $user->isDriver() ? 'Driver' : 'Administrator' }}</div>
+            <div class="profile-role-badge">{{ $user->role === 'manager' ? 'Manager' : ($user->role === 'driver' ? 'Driver' : 'Administrator') }}</div>
         </div>
 
         @if(session('status') === 'profile-updated' || session('success'))
@@ -164,7 +164,7 @@
 
             <div class="form-group">
                 <label class="form-label">Role</label>
-                <input type="text" class="form-input" value="{{ $user->isDriver() ? 'Driver' : 'Administrator' }}" readonly>
+                <input type="text" class="form-input" value="{{ $user->role === 'manager' ? 'Manager' : ($user->role === 'driver' ? 'Driver' : 'Administrator') }}" readonly>
             </div>
 
             <div style="display:flex;gap:10px;margin-top:8px;">

@@ -748,7 +748,7 @@
                 <div class="topbar-profile-avatar">{{ $initials }}</div>
                 <div class="topbar-profile-info d-none d-sm-block">
                     <div class="topbar-profile-name">{{ auth()->user()->name }}</div>
-                    <div class="topbar-profile-role d-none d-sm-block">{{ auth()->user()->isDriver() ? 'Driver' : 'Administrator' }}</div>
+                    <div class="topbar-profile-role d-none d-sm-block">{{ auth()->user()->role === 'manager' ? 'Manager' : (auth()->user()->role === 'driver' ? 'Driver' : 'Administrator') }}</div>
                 </div>
                 <span class="topbar-profile-chevron d-none d-sm-inline" id="profileChevron" style="display:inline-flex; align-items:center;"><i data-lucide="chevron-down" style="width:12px;height:12px;"></i></span>
 
