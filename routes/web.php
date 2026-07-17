@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('deliveries', DeliveryController::class);
+    Route::get('/live-orders', [DeliveryController::class, 'liveOrders'])->name('deliveries.live-orders');
     Route::resource('payments', PaymentController::class);
     Route::resource('invoices', InvoiceController::class);
     Route::resource('drivers', DriverController::class);

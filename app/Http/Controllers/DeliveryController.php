@@ -16,11 +16,27 @@ class DeliveryController extends Controller
         if ($user && $user->isDriver()) {
             $deliveries = Delivery::with(['order', 'driver'])
                 ->where('driver_id', $user->driver_id)
+                ->where('status', 'Delivered')
                 ->get();
         } else {
             $deliveries = Delivery::with(['order', 'driver'])->get();
         }
-        return view('deliveries.index', compact('deliveries'));
+        $isLiveOrderPage = false;
+        return view('deliveries.index', compact('deliveries', 'isLiveOrderPage'));
+    }
+
+    public function liveOrders()
+    {
+        $user = auth()->user();
+        if (!$user || !$user->isDriver()) {
+            abort(403);
+        }
+        $deliveries = Delivery::with(['order.customer', 'order.product', 'driver'])
+            ->where('driver_id', $user->driver_id)
+            ->where('status', '!=', 'Delivered')
+            ->get();
+        $isLiveOrderPage = true;
+        return view('deliveries.index', compact('deliveries', 'isLiveOrderPage'));
     }
 
     public function create()

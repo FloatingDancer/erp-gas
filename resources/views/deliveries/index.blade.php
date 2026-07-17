@@ -50,8 +50,11 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 <div class="page-header">
     <div>
-        <h1 class="page-title"><i data-lucide="truck" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Deliveries</h1>
-        <p class="page-subtitle">Kelola data pengiriman</p>
+        <h1 class="page-title">
+            <i data-lucide="{{ ($isLiveOrderPage ?? false) ? 'compass' : 'truck' }}" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> 
+            {{ ($isLiveOrderPage ?? false) ? 'Live Order' : 'Deliveries' }}
+        </h1>
+        <p class="page-subtitle">{{ ($isLiveOrderPage ?? false) ? 'Daftar pengantaran aktif/berlangsung' : 'Kelola data pengiriman' }}</p>
     </div>
     @if(!auth()->user()->isDriver())
         <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>

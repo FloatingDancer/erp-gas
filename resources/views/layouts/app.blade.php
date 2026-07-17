@@ -526,7 +526,7 @@
         @media (max-width: 576px) {
             .notification-dropdown-menu {
                 width: 280px;
-                right: -120px;
+                right: -50px;
             }
         }
         .bell-badge {
@@ -659,6 +659,7 @@
         }
         if (auth()->user()->isDriver()) {
             $navItems = [
+                ['path' => 'live-orders', 'label' => 'Live Order', 'icon' => 'compass'],
                 ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
             ];
         }
