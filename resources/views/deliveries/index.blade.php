@@ -475,6 +475,32 @@ $(document).ready(function() {
 
     let gpsIntervalIds = {};
 
+    function showGpsDebugError(errorObj) {
+        let errorMsg = "Gagal mengirim data lokasi ke server.";
+        if (errorObj) {
+            errorMsg += " Status: " + errorObj.status + " (" + errorObj.statusText + ")";
+            if (errorObj.responseText) {
+                try {
+                    const parsed = JSON.parse(errorObj.responseText);
+                    if (parsed.message) errorMsg += " - " + parsed.message;
+                } catch(e) {}
+            }
+        }
+        
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'bottom',
+            showConfirmButton: false,
+            timer: 4500,
+            timerProgressBar: true
+        });
+        toast.fire({
+            icon: 'warning',
+            title: 'GPS Sync Error',
+            text: errorMsg
+        });
+    }
+
     function toggleRealGPSTracking(deliveryId, isMobile = true) {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
@@ -489,16 +515,19 @@ $(document).ready(function() {
             }
             
             // Clear coordinates in database on deactivate
-            const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+            const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
             $.post(url, {
                 _token: '{{ csrf_token() }}',
                 latitude: null,
                 longitude: null
-            }).catch(err => console.error("Error clearing location:", err));
+            }).catch(err => {
+                console.error("Error clearing location:", err);
+                showGpsDebugError(err);
+            });
             
             destroyActiveMap(deliveryId);
             
-            if (deliveryId === 0) {
+            if (deliveryId == 0) {
                 const standbyMap = document.getElementById('standby-map-container');
                 const desktopList = document.querySelector('.card-clean');
                 const mobileList = document.querySelector('.delivery-mobile-cards');
@@ -563,19 +592,22 @@ $(document).ready(function() {
                 }
 
                 // Send immediate post to database
-                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                 $.post(url, {
                     _token: '{{ csrf_token() }}',
                     latitude: lat,
                     longitude: lng
-                }).catch(err => console.error("Error sending initial position:", err));
+                }).catch(err => {
+                    console.error("Error sending initial position:", err);
+                    showGpsDebugError(err);
+                });
 
                 if (!hasShownSuccess) {
                     hasShownSuccess = true;
                     Swal.fire({
                         icon: 'success',
-                        title: deliveryId === 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
-                        text: deliveryId === 0 
+                        title: deliveryId == 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
+                        text: deliveryId == 0 
                             ? 'Status siaga aktif. Posisi Anda dipantau oleh Manager.' 
                             : 'Pelacakan pengiriman aktif.',
                         timer: 2500,
@@ -583,7 +615,7 @@ $(document).ready(function() {
                     });
                 }
 
-                if (deliveryId === 0) {
+                if (deliveryId == 0) {
                     const standbyMap = document.getElementById('standby-map-container');
                     const desktopList = document.querySelector('.card-clean');
                     const mobileList = document.querySelector('.delivery-mobile-cards');
@@ -624,8 +656,8 @@ $(document).ready(function() {
                     hasShownSuccess = true;
                     Swal.fire({
                         icon: 'success',
-                        title: deliveryId === 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
-                        text: deliveryId === 0 
+                        title: deliveryId == 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
+                        text: deliveryId == 0 
                             ? 'Status siaga aktif. Posisi Anda dipantau oleh Manager.' 
                             : 'Pelacakan pengiriman aktif.',
                         timer: 2500,
@@ -633,7 +665,7 @@ $(document).ready(function() {
                     });
                 }
 
-                if (deliveryId === 0) {
+                if (deliveryId == 0) {
                     const standbyMap = document.getElementById('standby-map-container');
                     const desktopList = document.querySelector('.card-clean');
                     const mobileList = document.querySelector('.delivery-mobile-cards');
@@ -713,12 +745,15 @@ $(document).ready(function() {
         // Post coordinates to database exactly every 8 seconds (8000ms)
         const intervalId = setInterval(function() {
             if (latestCoords) {
-                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                 $.post(url, {
                     _token: '{{ csrf_token() }}',
                     latitude: latestCoords.lat,
                     longitude: latestCoords.lng
-                }).catch(err => console.error("Error updating location via real GPS:", err));
+                }).catch(err => {
+                    console.error("Error updating location via real GPS:", err);
+                    showGpsDebugError(err);
+                });
             }
         }, 8000);
 
