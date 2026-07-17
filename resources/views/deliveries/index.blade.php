@@ -461,6 +461,9 @@ $(document).ready(function() {
         simulationIntervals[deliveryId] = interval;
     }
 
+    let gpsWatchIds = {};
+    let gpsIntervalIds = {};
+
     function toggleRealGPSTracking(deliveryId, isMobile = true) {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
@@ -468,6 +471,12 @@ $(document).ready(function() {
         if (gpsWatchIds[deliveryId]) {
             navigator.geolocation.clearWatch(gpsWatchIds[deliveryId]);
             delete gpsWatchIds[deliveryId];
+            
+            if (gpsIntervalIds[deliveryId]) {
+                clearInterval(gpsIntervalIds[deliveryId]);
+                delete gpsIntervalIds[deliveryId];
+            }
+            
             destroyActiveMap(deliveryId);
             
             if (btn) {
@@ -517,11 +526,13 @@ $(document).ready(function() {
     function startWatching(deliveryId, isMobile, highAccuracy = true) {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
+        let latestCoords = null;
 
         const watchId = navigator.geolocation.watchPosition(
             function(position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                latestCoords = { lat: lat, lng: lng };
                 
                 if (btn) {
                     btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> Matikan GPS Asli';
@@ -546,13 +557,6 @@ $(document).ready(function() {
                         setupRealMap(mapElementId, lat, lng, deliveryId);
                     }
                 }
-
-                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
-                $.post(url, {
-                    _token: '{{ csrf_token() }}',
-                    latitude: lat,
-                    longitude: lng
-                }).catch(err => console.error("Error updating location via real GPS:", err));
             },
             function(error) {
                 console.error("GPS error:", error);
@@ -582,6 +586,10 @@ $(document).ready(function() {
                     navigator.geolocation.clearWatch(gpsWatchIds[deliveryId]);
                     delete gpsWatchIds[deliveryId];
                 }
+                if (gpsIntervalIds[deliveryId]) {
+                    clearInterval(gpsIntervalIds[deliveryId]);
+                    delete gpsIntervalIds[deliveryId];
+                }
                 
                 Swal.fire({
                     icon: 'error',
@@ -597,6 +605,20 @@ $(document).ready(function() {
         );
 
         gpsWatchIds[deliveryId] = watchId;
+
+        // Post coordinates to database exactly every 1 second (1000ms)
+        const intervalId = setInterval(function() {
+            if (latestCoords) {
+                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                $.post(url, {
+                    _token: '{{ csrf_token() }}',
+                    latitude: latestCoords.lat,
+                    longitude: latestCoords.lng
+                }).catch(err => console.error("Error updating location via real GPS:", err));
+            }
+        }, 1000);
+
+        gpsIntervalIds[deliveryId] = intervalId;
     }
 
     function setupRealMap(containerId, lat, lng, deliveryId) {
