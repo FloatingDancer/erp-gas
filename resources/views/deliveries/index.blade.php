@@ -114,6 +114,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                                     <button type="button" class="btn-primary-custom" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, false)" id="btn-sim-desktop-{{ $d->id }}" style="background:#10b981; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px;">
                                         <i data-lucide="play" style="width:12px;height:12px;"></i> Simulasi
                                     </button>
+                                    <button type="button" class="btn-primary-custom" onclick="toggleRealGPSTracking({{ $d->id }}, false)" id="btn-real-desktop-{{ $d->id }}" style="background:#3b82f6; padding:6px 12px; font-size:12px; border-radius:8px; width:100%; justify-content:center; gap:2px; margin-top:4px;">
+                                        <i data-lucide="locate" style="width:12px;height:12px;"></i> GPS Asli
+                                    </button>
                                 </div>
                             @endif
 
@@ -204,6 +207,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                         <div id="driver-map-{{ $d->id }}" style="height: 180px; width: 100%; border-radius: 10px; border: 1.5px solid #cbd5e1; margin-top: 6px; z-index: 1;"></div>
                         <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-sim-{{ $d->id }}" onclick="startDriverSimulation({{ $d->id }}, {{ $d->order->customer->latitude ?? 'null' }}, {{ $d->order->customer->longitude ?? 'null' }}, true)" style="background:#10b981; border:none; margin-top:10px; font-weight:700; width:100%; justify-content:center;">
                             <i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan
+                        </button>
+                        <button type="button" class="btn-primary-custom btn-confirm-mobile" id="btn-real-{{ $d->id }}" onclick="toggleRealGPSTracking({{ $d->id }}, true)" style="background:#3b82f6; border:none; margin-top:8px; font-weight:700; width:100%; justify-content:center;">
+                            <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli (Real-time)
                         </button>
                     </div>
 
@@ -401,6 +407,140 @@ $(document).ready(function() {
                 }, 1000);
             }
         }, 2000);
+    }
+
+    let gpsWatchIds = {};
+    let gpsMarkers = {};
+    let gpsMaps = {};
+
+    function toggleRealGPSTracking(deliveryId, isMobile = true) {
+        const btnId = isMobile ? 'btn-real-' + deliveryId : 'btn-real-desktop-' + deliveryId;
+        const btn = document.getElementById(btnId);
+        
+        if (gpsWatchIds[deliveryId]) {
+            navigator.geolocation.clearWatch(gpsWatchIds[deliveryId]);
+            delete gpsWatchIds[deliveryId];
+            
+            if (btn) {
+                btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Aktifkan GPS Asli (Real-time)' : 'GPS Asli');
+                btn.style.background = '#3b82f6';
+            }
+            
+            Swal.fire({
+                icon: 'info',
+                title: 'Pelacakan Dinonaktifkan',
+                text: 'Pelacakan GPS fisik telah dihentikan.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Tidak Didukung',
+                text: 'Browser Anda tidak mendukung fitur Geolocation GPS.',
+            });
+            return;
+        }
+
+        if (btn) {
+            btn.innerHTML = 'Menghubungkan GPS...';
+            btn.style.background = '#64748b';
+        }
+
+        const watchId = navigator.geolocation.watchPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Matikan GPS Asli' : 'Matikan GPS');
+                    btn.style.background = '#ef4444';
+                }
+
+                let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
+                
+                if (!isMobile && !document.getElementById('desktop-map-container')) {
+                    Swal.fire({
+                        title: 'Pelacakan GPS Fisik Driver',
+                        html: '<div id="desktop-map-container" style="height: 300px; width: 100%; border-radius: 8px;"></div><p style="margin-top: 10px; font-size:12px; color:#10b981; font-weight:600;">Pelacakan GPS fisik sedang aktif...</p>',
+                        width: 500,
+                        showConfirmButton: true,
+                        confirmButtonText: 'Tutup Peta (Pelacakan Tetap Berjalan)',
+                        didOpen: () => {
+                            setupRealMap(mapElementId, lat, lng, deliveryId);
+                        }
+                    });
+                } else {
+                    setupRealMap(mapElementId, lat, lng, deliveryId);
+                }
+
+                $.post(`/api/deliveries/${deliveryId}/location`, {
+                    _token: '{{ csrf_token() }}',
+                    latitude: lat,
+                    longitude: lng
+                }).catch(err => console.error("Error updating location via real GPS:", err));
+            },
+            function(error) {
+                console.error("GPS error:", error);
+                let msg = 'Gagal mengakses sensor GPS HP Anda.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = 'Perizinan lokasi ditolak oleh browser/perangkat Anda.';
+                }
+                
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> ' + (isMobile ? 'Aktifkan GPS Asli (Real-time)' : 'GPS Asli');
+                    btn.style.background = '#3b82f6';
+                }
+                
+                delete gpsWatchIds[deliveryId];
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GPS Gagal',
+                    text: msg
+                });
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 10000
+            }
+        );
+
+        gpsWatchIds[deliveryId] = watchId;
+    }
+
+    function setupRealMap(containerId, lat, lng, deliveryId) {
+        const mapContainer = document.getElementById(containerId);
+        if (!mapContainer) return;
+        
+        if (gpsMaps[deliveryId] && !mapContainer._leaflet_id) {
+            delete gpsMaps[deliveryId];
+        }
+
+        if (gpsMaps[deliveryId]) {
+            const latLng = [lat, lng];
+            if (gpsMarkers[deliveryId]) {
+                gpsMarkers[deliveryId].setLatLng(latLng);
+            }
+            gpsMaps[deliveryId].setView(latLng, 15);
+            return;
+        }
+
+        const mapObj = L.map(containerId).setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj);
+        
+        const driverIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3120/3120014.png',
+            iconSize: [28, 28],
+            iconAnchor: [14, 28]
+        });
+
+        gpsMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
+        gpsMaps[deliveryId] = mapObj;
     }
 </script>
 @endsection
