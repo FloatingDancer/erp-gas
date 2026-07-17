@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
 .page-title { font-size:22px; font-weight:700; color:#0f172a; margin:0; }
@@ -74,19 +75,23 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
             <label class="form-label">Alamat</label>
             <textarea name="address" class="form-input" rows="3" required>{{ old('address', $customer->address) }}</textarea>
         </div>
+        <div style="margin-bottom: 20px;">
+            <label class="form-label" style="margin-bottom: 8px;">Pilih Lokasi di Peta</label>
+            <div style="font-size:12px; color:#64748b; margin-bottom:8px;">
+                <i data-lucide="info" style="width:14px;height:14px;vertical-align:middle;margin-top:-2px;margin-right:2px;color:#3b82f6;"></i>
+                Klik pada peta atau geser pin merah untuk mendapatkan koordinat lokasi secara otomatis.
+            </div>
+            <div id="map-picker" style="height: 260px; width: 100%; border-radius: 12px; border: 1.5px solid #cbd5e1; z-index: 1;"></div>
+        </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom: 20px;">
             <div>
                 <label class="form-label">Latitude</label>
-                <input type="text" name="latitude" id="latitude" class="form-input" value="{{ old('latitude', $customer->latitude) }}" placeholder="Contoh: -6.2088">
+                <input type="text" name="latitude" id="latitude" class="form-input" value="{{ old('latitude', $customer->latitude) }}" placeholder="Pilih dari peta atau isi manual">
             </div>
             <div>
                 <label class="form-label">Longitude</label>
-                <input type="text" name="longitude" id="longitude" class="form-input" value="{{ old('longitude', $customer->longitude) }}" placeholder="Contoh: 106.8456">
+                <input type="text" name="longitude" id="longitude" class="form-input" value="{{ old('longitude', $customer->longitude) }}" placeholder="Pilih dari peta atau isi manual">
             </div>
-        </div>
-        <div style="margin-bottom: 20px; font-size:12.5px; color:#64748b;">
-            <i data-lucide="help-circle" style="width:14px;height:14px;vertical-align:middle;margin-top:-2px;margin-right:2px;"></i>
-            Masukkan koordinat Latitude & Longitude agar lokasi pengantaran driver di Google Maps 100% akurat.
         </div>
         <div style="display:flex;gap:10px;margin-top:8px;">
             <button type="submit" class="btn-primary-custom"><i data-lucide="save" style="width:15px;height:15px;margin-right:4px;"></i> Update Customer</button>
@@ -94,4 +99,73 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
         </div>
     </form>
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const storeLatLng = [-6.353809, 107.114757];
+    let latInput = document.getElementById('latitude');
+    let lngInput = document.getElementById('longitude');
+    
+    let initialLat = latInput.value ? parseFloat(latInput.value) : null;
+    let initialLng = lngInput.value ? parseFloat(lngInput.value) : null;
+    
+    let startPoint = (initialLat && initialLng) ? [initialLat, initialLng] : storeLatLng;
+    
+    let mapPicker = L.map('map-picker').setView(startPoint, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(mapPicker);
+    
+    let marker;
+    if (initialLat && initialLng) {
+        marker = L.marker(startPoint, {draggable: true}).addTo(mapPicker);
+    }
+    
+    function updateInputs(lat, lng) {
+        latInput.value = parseFloat(lat).toFixed(6);
+        lngInput.value = parseFloat(lng).toFixed(6);
+    }
+    
+    mapPicker.on('click', function(e) {
+        let lat = e.latlng.lat;
+        let lng = e.latlng.lng;
+        
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng, {draggable: true}).addTo(mapPicker);
+        }
+        updateInputs(lat, lng);
+        
+        marker.on('dragend', function(event) {
+            let position = marker.getLatLng();
+            updateInputs(position.lat, position.lng);
+        });
+    });
+    
+    if (marker) {
+        marker.on('dragend', function(event) {
+            let position = marker.getLatLng();
+            updateInputs(position.lat, position.lng);
+        });
+    }
+    
+    function onInputChange() {
+        let lat = parseFloat(latInput.value);
+        let lng = parseFloat(lngInput.value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            let newLatLng = [lat, lng];
+            if (marker) {
+                marker.setLatLng(newLatLng);
+            } else {
+                marker = L.marker(newLatLng, {draggable: true}).addTo(mapPicker);
+            }
+            mapPicker.setView(newLatLng, 15);
+        }
+    }
+    latInput.addEventListener('change', onInputChange);
+    lngInput.addEventListener('change', onInputChange);
+});
+</script>
 @endsection
