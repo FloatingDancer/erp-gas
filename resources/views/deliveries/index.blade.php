@@ -512,16 +512,6 @@ $(document).ready(function() {
             btn.style.background = '#64748b';
         }
 
-        if (deliveryId === 0) {
-            Swal.fire({
-                icon: 'success',
-                title: 'GPS Dinas Aktif',
-                text: 'Status siaga aktif. Posisi Anda dipantau oleh Manager.',
-                timer: 2500,
-                showConfirmButton: false
-            });
-        }
-
         startWatching(deliveryId, isMobile, true);
     }
 
@@ -529,7 +519,57 @@ $(document).ready(function() {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
         let latestCoords = null;
+        let hasShownSuccess = false;
 
+        // Fetch initial position immediately
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                latestCoords = { lat: lat, lng: lng };
+                
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> Matikan GPS Asli';
+                    btn.style.background = '#ef4444';
+                }
+
+                // Send immediate post to database
+                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                $.post(url, {
+                    _token: '{{ csrf_token() }}',
+                    latitude: lat,
+                    longitude: lng
+                }).catch(err => console.error("Error sending initial position:", err));
+
+                if (!hasShownSuccess) {
+                    hasShownSuccess = true;
+                    Swal.fire({
+                        icon: 'success',
+                        title: deliveryId === 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
+                        text: deliveryId === 0 
+                            ? 'Status siaga aktif. Posisi Anda dipantau oleh Manager.' 
+                            : 'Pelacakan pengiriman aktif.',
+                        timer: 2500,
+                        showConfirmButton: false
+                    });
+                }
+
+                if (deliveryId !== 0) {
+                    let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
+                    setupRealMap(mapElementId, lat, lng, deliveryId);
+                }
+            },
+            function(error) {
+                console.warn("Initial getCurrentPosition failed:", error);
+            },
+            {
+                enableHighAccuracy: highAccuracy,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+
+        // Keep watching for continuous position changes
         const watchId = navigator.geolocation.watchPosition(
             function(position) {
                 const lat = position.coords.latitude;
@@ -539,6 +579,19 @@ $(document).ready(function() {
                 if (btn) {
                     btn.innerHTML = '<i data-lucide="stop-circle" style="width:14px;height:14px;margin-right:4px;"></i> Matikan GPS Asli';
                     btn.style.background = '#ef4444';
+                }
+
+                if (!hasShownSuccess) {
+                    hasShownSuccess = true;
+                    Swal.fire({
+                        icon: 'success',
+                        title: deliveryId === 0 ? 'GPS Dinas Aktif' : 'GPS Pengiriman Aktif',
+                        text: deliveryId === 0 
+                            ? 'Status siaga aktif. Posisi Anda dipantau oleh Manager.' 
+                            : 'Pelacakan pengiriman aktif.',
+                        timer: 2500,
+                        showConfirmButton: false
+                    });
                 }
 
                 if (deliveryId !== 0) {
@@ -561,7 +614,7 @@ $(document).ready(function() {
                 }
             },
             function(error) {
-                console.error("GPS error:", error);
+                console.error("GPS watch error:", error);
                 
                 if (highAccuracy) {
                     console.log("Retrying with low accuracy fallback...");
@@ -601,7 +654,7 @@ $(document).ready(function() {
             },
             {
                 enableHighAccuracy: highAccuracy,
-                maximumAge: 30000,
+                maximumAge: 10000,
                 timeout: 8000
             }
         );
