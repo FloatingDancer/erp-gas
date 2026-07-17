@@ -73,6 +73,10 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
 
 @if(auth()->user()->isDriver())
     <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative; background: #f8fafc; overflow:hidden;"></div>
+    <!-- Floating debug badge -->
+    <div id="gps-debug-badge" style="position: fixed; bottom: 8px; left: 8px; z-index: 9999; background: rgba(15, 23, 42, 0.9); color: #10b981; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-family: monospace; border: 1px solid #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none;">
+        GPS: Siaga | Sent: <span id="debug-sent">0</span> | Ok: <span id="debug-ok">0</span> | Err: <span id="debug-err">0</span> | Last: <span id="debug-coords">-</span>
+    </div>
 @endif
 
 @if(session('success'))
@@ -573,11 +577,40 @@ $(document).ready(function() {
         startWatching(deliveryId, isMobile, true);
     }
 
+    let debugSentCount = 0;
+    let debugOkCount = 0;
+    let debugErrCount = 0;
+
+    function updateGpsDebug(lat, lng, status = null, errorMsg = null) {
+        const sentEl = document.getElementById('debug-sent');
+        const okEl = document.getElementById('debug-ok');
+        const errEl = document.getElementById('debug-err');
+        const coordsEl = document.getElementById('debug-coords');
+        
+        if (lat !== null && lng !== null) {
+            if (coordsEl) coordsEl.innerText = lat.toFixed(5) + "," + lng.toFixed(5);
+        }
+        if (status === 'sent') {
+            debugSentCount++;
+            if (sentEl) sentEl.innerText = debugSentCount;
+        } else if (status === 'ok') {
+            debugOkCount++;
+            if (okEl) okEl.innerText = debugOkCount;
+        } else if (status === 'err') {
+            debugErrCount++;
+            if (errEl) errEl.innerText = debugErrCount;
+            if (errorMsg && coordsEl) {
+                coordsEl.innerText = "Err: " + errorMsg;
+            }
+        }
+    }
+
     function startWatching(deliveryId, isMobile, highAccuracy = true) {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
         let latestCoords = null;
         let hasShownSuccess = false;
+        let lastPostTime = 0;
 
         // Fetch initial position immediately
         navigator.geolocation.getCurrentPosition(
@@ -593,12 +626,17 @@ $(document).ready(function() {
 
                 // Send immediate post to database
                 const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                updateGpsDebug(lat, lng, 'sent');
+                
                 $.post(url, {
                     _token: '{{ csrf_token() }}',
                     latitude: lat,
                     longitude: lng
+                }).done(function() {
+                    updateGpsDebug(null, null, 'ok');
                 }).catch(err => {
                     console.error("Error sending initial position:", err);
+                    updateGpsDebug(null, null, 'err', err.status + " " + err.statusText);
                     showGpsDebugError(err);
                 });
 
@@ -662,6 +700,26 @@ $(document).ready(function() {
                             : 'Pelacakan pengiriman aktif.',
                         timer: 2500,
                         showConfirmButton: false
+                    });
+                }
+
+                // Send coordinates directly from watchPosition callback (throttled to once every 8 seconds)
+                const now = Date.now();
+                if (now - lastPostTime >= 8000) {
+                    lastPostTime = now;
+                    const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                    updateGpsDebug(lat, lng, 'sent');
+                    
+                    $.post(url, {
+                        _token: '{{ csrf_token() }}',
+                        latitude: lat,
+                        longitude: lng
+                    }).done(function() {
+                        updateGpsDebug(null, null, 'ok');
+                    }).catch(err => {
+                        console.error("Error sending watch update:", err);
+                        updateGpsDebug(null, null, 'err', err.status + " " + err.statusText);
+                        showGpsDebugError(err);
                     });
                 }
 
@@ -746,12 +804,17 @@ $(document).ready(function() {
         const intervalId = setInterval(function() {
             if (latestCoords) {
                 const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                updateGpsDebug(latestCoords.lat, latestCoords.lng, 'sent');
+                
                 $.post(url, {
                     _token: '{{ csrf_token() }}',
                     latitude: latestCoords.lat,
                     longitude: latestCoords.lng
+                }).done(function() {
+                    updateGpsDebug(null, null, 'ok');
                 }).catch(err => {
                     console.error("Error updating location via real GPS:", err);
+                    updateGpsDebug(null, null, 'err', err.status + " " + err.statusText);
                     showGpsDebugError(err);
                 });
             }
