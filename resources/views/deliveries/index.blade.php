@@ -71,6 +71,10 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     @endif
 </div>
 
+@if(auth()->user()->isDriver())
+    <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative; background: #f8fafc; overflow:hidden;"></div>
+@endif
+
 @if(session('success'))
     <div class="alert-success"><i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:middle;margin-top:-2px;margin-right:4px;"></i> {{ session('success') }}</div>
 @endif
@@ -233,13 +237,12 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
             </div>
         </div>
     @empty
-        <div id="empty-state-card" class="card-clean" style="display:block; padding: 24px; text-align:center;">
+        <div class="card-clean" style="display:block; padding: 24px; text-align:center;">
             <div class="empty-state">
                 <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="truck" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada data pengiriman</p>
             </div>
         </div>
-        <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative;"></div>
     @endforelse
 </div>
 
@@ -497,9 +500,14 @@ $(document).ready(function() {
             
             if (deliveryId === 0) {
                 const standbyMap = document.getElementById('standby-map-container');
-                const emptyCard = document.getElementById('empty-state-card');
-                if (standbyMap) standbyMap.style.display = 'none';
-                if (emptyCard) emptyCard.style.display = 'block';
+                const desktopList = document.querySelector('.card-clean');
+                const mobileList = document.querySelector('.delivery-mobile-cards');
+                if (standbyMap) standbyMap.style.setProperty('display', 'none', 'important');
+                if (window.innerWidth > 768) {
+                    if (desktopList) desktopList.style.setProperty('display', 'block', 'important');
+                } else {
+                    if (mobileList) mobileList.style.setProperty('display', 'block', 'important');
+                }
             }
             
             if (btn) {
@@ -577,10 +585,12 @@ $(document).ready(function() {
 
                 if (deliveryId === 0) {
                     const standbyMap = document.getElementById('standby-map-container');
-                    const emptyCard = document.getElementById('empty-state-card');
+                    const desktopList = document.querySelector('.card-clean');
+                    const mobileList = document.querySelector('.delivery-mobile-cards');
                     if (standbyMap) {
-                        standbyMap.style.display = 'block';
-                        if (emptyCard) emptyCard.style.display = 'none';
+                        standbyMap.style.setProperty('display', 'block', 'important');
+                        if (desktopList) desktopList.style.setProperty('display', 'none', 'important');
+                        if (mobileList) mobileList.style.setProperty('display', 'none', 'important');
                         setupRealMap('standby-map-container', lat, lng, 0);
                     }
                 } else {
@@ -625,10 +635,12 @@ $(document).ready(function() {
 
                 if (deliveryId === 0) {
                     const standbyMap = document.getElementById('standby-map-container');
-                    const emptyCard = document.getElementById('empty-state-card');
+                    const desktopList = document.querySelector('.card-clean');
+                    const mobileList = document.querySelector('.delivery-mobile-cards');
                     if (standbyMap) {
-                        standbyMap.style.display = 'block';
-                        if (emptyCard) emptyCard.style.display = 'none';
+                        standbyMap.style.setProperty('display', 'block', 'important');
+                        if (desktopList) desktopList.style.setProperty('display', 'none', 'important');
+                        if (mobileList) mobileList.style.setProperty('display', 'none', 'important');
                         setupRealMap('standby-map-container', lat, lng, 0);
                     }
                 } else {
