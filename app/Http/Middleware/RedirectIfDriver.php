@@ -22,10 +22,11 @@ class RedirectIfDriver
         $user = auth()->user();
 
         if ($user->role === 'driver') {
-            // Driver only allowed to access deliveries, profile, notifications, and logout
+            // Driver only allowed to access deliveries, live-orders, profile, notifications, and logout
             $allowedPaths = [
                 'deliveries',
                 'deliveries/*',
+                'live-orders',
                 'my-profile',
                 'profile',
                 'profile/*',
@@ -45,7 +46,7 @@ class RedirectIfDriver
             }
 
             if (!$isAllowed) {
-                return redirect()->route('deliveries.index');
+                return redirect()->route('deliveries.live-orders');
             }
         }
 
