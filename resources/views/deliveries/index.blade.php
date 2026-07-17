@@ -450,6 +450,13 @@ $(document).ready(function() {
             btn.style.background = '#64748b';
         }
 
+        startWatching(deliveryId, isMobile, true);
+    }
+
+    function startWatching(deliveryId, isMobile, highAccuracy = true) {
+        const btnId = isMobile ? 'btn-real-' + deliveryId : 'btn-real-desktop-' + deliveryId;
+        const btn = document.getElementById(btnId);
+
         const watchId = navigator.geolocation.watchPosition(
             function(position) {
                 const lat = position.coords.latitude;
@@ -485,9 +492,22 @@ $(document).ready(function() {
             },
             function(error) {
                 console.error("GPS error:", error);
-                let msg = 'Gagal mengakses sensor GPS HP Anda.';
+                
+                // If high accuracy failed, try low accuracy fallback
+                if (highAccuracy) {
+                    console.log("Retrying with low accuracy fallback...");
+                    navigator.geolocation.clearWatch(watchId);
+                    startWatching(deliveryId, isMobile, false);
+                    return;
+                }
+
+                let msg = 'Gagal mengakses sensor GPS HP Anda. Pastikan layanan lokasi/GPS di HP Anda sudah aktif.';
                 if (error.code === error.PERMISSION_DENIED) {
-                    msg = 'Perizinan lokasi ditolak oleh browser/perangkat Anda.';
+                    msg = 'Perizinan lokasi ditolak oleh browser/perangkat Anda. Mohon izinkan akses lokasi di pengaturan browser.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    msg = 'Sinyal lokasi tidak tersedia. Silakan aktifkan GPS HP Anda dan pastikan berada di area dengan sinyal GPS yang baik.';
+                } else if (error.code === error.TIMEOUT) {
+                    msg = 'Waktu permintaan lokasi habis (timeout). Silakan coba lagi.';
                 }
                 
                 if (btn) {
@@ -495,7 +515,10 @@ $(document).ready(function() {
                     btn.style.background = '#3b82f6';
                 }
                 
-                delete gpsWatchIds[deliveryId];
+                if (gpsWatchIds[deliveryId]) {
+                    navigator.geolocation.clearWatch(gpsWatchIds[deliveryId]);
+                    delete gpsWatchIds[deliveryId];
+                }
                 
                 Swal.fire({
                     icon: 'error',
@@ -504,9 +527,9 @@ $(document).ready(function() {
                 });
             },
             {
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 10000
+                enableHighAccuracy: highAccuracy,
+                maximumAge: 30000,
+                timeout: 8000
             }
         );
 
