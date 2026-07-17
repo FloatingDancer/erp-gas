@@ -59,16 +59,12 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     @if(!auth()->user()->isDriver())
         <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>
     @elseif($isLiveOrderPage ?? false)
-        @if($deliveries->isNotEmpty())
-            @php $activeDelivery = $deliveries->first(); @endphp
-            <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDelivery->id }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
-                <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
-            </button>
-        @else
-            <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="showNoActiveDeliveryAlert()" style="background:#64748b; border:none; font-weight:700; opacity:0.85;">
-                <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
-            </button>
-        @endif
+        @php
+            $activeDeliveryId = $deliveries->isNotEmpty() ? $deliveries->first()->id : 0;
+        @endphp
+        <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDeliveryId }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
+            <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
+        </button>
     @endif
 </div>
 
@@ -505,6 +501,16 @@ $(document).ready(function() {
             btn.style.background = '#64748b';
         }
 
+        if (deliveryId === 0) {
+            Swal.fire({
+                icon: 'success',
+                title: 'GPS Dinas Aktif',
+                text: 'Status siaga aktif. Posisi Anda dipantau oleh Manager.',
+                timer: 2500,
+                showConfirmButton: false
+            });
+        }
+
         startWatching(deliveryId, isMobile, true);
     }
 
@@ -522,24 +528,27 @@ $(document).ready(function() {
                     btn.style.background = '#ef4444';
                 }
 
-                let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
-                
-                if (!isMobile && !document.getElementById('desktop-map-container')) {
-                    Swal.fire({
-                        title: 'Pelacakan GPS Fisik Driver',
-                        html: '<div id="desktop-map-container" style="height: 300px; width: 100%; border-radius: 8px;"></div><p style="margin-top: 10px; font-size:12px; color:#10b981; font-weight:600;">Pelacakan GPS fisik sedang aktif...</p>',
-                        width: 500,
-                        showConfirmButton: true,
-                        confirmButtonText: 'Tutup Peta (Pelacakan Tetap Berjalan)',
-                        didOpen: () => {
-                            setupRealMap(mapElementId, lat, lng, deliveryId);
-                        }
-                    });
-                } else {
-                    setupRealMap(mapElementId, lat, lng, deliveryId);
+                if (deliveryId !== 0) {
+                    let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
+                    
+                    if (!isMobile && !document.getElementById('desktop-map-container')) {
+                        Swal.fire({
+                            title: 'Pelacakan GPS Fisik Driver',
+                            html: '<div id="desktop-map-container" style="height: 300px; width: 100%; border-radius: 8px;"></div><p style="margin-top: 10px; font-size:12px; color:#10b981; font-weight:600;">Pelacakan GPS fisik sedang aktif...</p>',
+                            width: 500,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Tutup Peta (Pelacakan Tetap Berjalan)',
+                            didOpen: () => {
+                                setupRealMap(mapElementId, lat, lng, deliveryId);
+                            }
+                        });
+                    } else {
+                        setupRealMap(mapElementId, lat, lng, deliveryId);
+                    }
                 }
 
-                $.post(`/api/deliveries/${deliveryId}/location`, {
+                const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+                $.post(url, {
                     _token: '{{ csrf_token() }}',
                     latitude: lat,
                     longitude: lng
@@ -611,15 +620,6 @@ $(document).ready(function() {
 
         activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
         activeMaps[deliveryId] = mapObj;
-    }
-
-    function showNoActiveDeliveryAlert() {
-        Swal.fire({
-            icon: 'info',
-            title: 'Belum Ada Pengiriman Aktif',
-            text: 'Pelacakan GPS fisik hanya dapat diaktifkan ketika Anda sedang dalam proses pengiriman barang ke pelanggan (On Delivery).',
-            confirmButtonColor: '#3b82f6'
-        });
     }
 </script>
 @endsection

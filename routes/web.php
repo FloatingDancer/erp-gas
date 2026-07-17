@@ -122,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('/api/driver-coordinates', [TrackingController::class, 'getCoordinates'])->name('tracking.coordinates');
     Route::post('/api/deliveries/{delivery}/location', [TrackingController::class, 'updateLocation'])->name('tracking.update-location');
+    Route::post('/api/driver/location', [TrackingController::class, 'updateLocationGlobal'])->name('tracking.update-location-global');
 
     // Profile
     Route::get('/my-profile', function () {

@@ -134,7 +134,7 @@
                 data.forEach(d => {
                     const isActive = selectedDriverId === d.id ? 'active' : '';
                     listHtml += `
-                        <div class="driver-item ${isActive}" onclick="selectDriver(${d.id}, ${d.latitude}, ${d.longitude})">
+                        <div class="driver-item ${isActive}" onclick="selectDriver('${d.id}', ${d.latitude}, ${d.longitude})">
                             <div class="driver-name">${d.driver_name}</div>
                             <div class="driver-meta">
                                 <span><i data-lucide="shopping-bag" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> Order #${d.order_id} - ${d.customer_name}</span>
@@ -149,39 +149,51 @@
                     const lng = d.longitude ? parseFloat(d.longitude) : storeLatLng[1];
                     const latLng = [lat, lng];
                     
-                    let customerLatLng;
-                    if (d.customer_lat && d.customer_lng) {
-                        customerLatLng = [parseFloat(d.customer_lat), parseFloat(d.customer_lng)];
-                    } else {
-                        const customerLat = storeLatLng[0] + (Math.sin(d.id) * 0.012);
-                        const customerLng = storeLatLng[1] + (Math.cos(d.id) * 0.012);
-                        customerLatLng = [customerLat, customerLng];
-                    }
-
                     if (markers[d.id]) {
                         markers[d.id].setLatLng(latLng);
                     } else {
+                        const popupText = d.is_active_delivery 
+                            ? `<strong>Driver: ${d.driver_name}</strong><br>Nopol: ${d.vehicle}<br>Order: #${d.order_id} ke ${d.customer_name}`
+                            : `<strong>Driver: ${d.driver_name} (Standby)</strong><br>Nopol: ${d.vehicle}`;
+
                         markers[d.id] = L.marker(latLng, {icon: driverIcon})
                             .addTo(map)
-                            .bindPopup(`
-                                <strong>Driver: ${d.driver_name}</strong><br>
-                                Nopol: ${d.vehicle}<br>
-                                Order: #${d.order_id} ke ${d.customer_name}
-                            `);
+                            .bindPopup(popupText);
                     }
 
-                    if (customerMarkers[d.id]) {
-                        customerMarkers[d.id].setLatLng(customerLatLng);
-                    } else {
-                        customerMarkers[d.id] = L.marker(customerLatLng, {icon: customerIcon})
-                            .addTo(map)
-                            .bindPopup(`<strong>Pelanggan: ${d.customer_name}</strong><br>${d.address}`);
-                    }
+                    if (d.is_active_delivery) {
+                        let customerLatLng;
+                        if (d.customer_lat && d.customer_lng) {
+                            customerLatLng = [parseFloat(d.customer_lat), parseFloat(d.customer_lng)];
+                        } else {
+                            const customerLat = storeLatLng[0] + (Math.sin(d.db_id) * 0.012);
+                            const customerLng = storeLatLng[1] + (Math.cos(d.db_id) * 0.012);
+                            customerLatLng = [customerLat, customerLng];
+                        }
 
-                    if (routes[d.id]) {
-                        routes[d.id].setLatLngs([latLng, customerLatLng]);
+                        if (customerMarkers[d.id]) {
+                            customerMarkers[d.id].setLatLng(customerLatLng);
+                        } else {
+                            customerMarkers[d.id] = L.marker(customerLatLng, {icon: customerIcon})
+                                .addTo(map)
+                                .bindPopup(`<strong>Pelanggan: ${d.customer_name}</strong><br>${d.address}`);
+                        }
+
+                        if (routes[d.id]) {
+                            routes[d.id].setLatLngs([latLng, customerLatLng]);
+                        } else {
+                            routes[d.id] = L.polyline([latLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(map);
+                        }
                     } else {
-                        routes[d.id] = L.polyline([latLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(map);
+                        // Remove markers/routes if they exist for a standby driver
+                        if (customerMarkers[d.id]) {
+                            map.removeLayer(customerMarkers[d.id]);
+                            delete customerMarkers[d.id];
+                        }
+                        if (routes[d.id]) {
+                            map.removeLayer(routes[d.id]);
+                            delete routes[d.id];
+                        }
                     }
                 });
                 
