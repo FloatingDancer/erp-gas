@@ -485,6 +485,14 @@ $(document).ready(function() {
                 delete gpsIntervalIds[deliveryId];
             }
             
+            // Clear coordinates in database on deactivate
+            const url = deliveryId === 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
+            $.post(url, {
+                _token: '{{ csrf_token() }}',
+                latitude: null,
+                longitude: null
+            }).catch(err => console.error("Error clearing location:", err));
+            
             destroyActiveMap(deliveryId);
             
             if (deliveryId === 0) {

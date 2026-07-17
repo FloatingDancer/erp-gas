@@ -75,8 +75,8 @@ class TrackingController extends Controller
     public function updateLocation(Request $request, Delivery $delivery)
     {
         $request->validate([
-            'latitude'  => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'latitude'  => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $delivery->update([
@@ -97,8 +97,8 @@ class TrackingController extends Controller
     public function updateLocationGlobal(Request $request)
     {
         $request->validate([
-            'latitude'  => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'latitude'  => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $user = auth()->user();
