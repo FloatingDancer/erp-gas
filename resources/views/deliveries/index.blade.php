@@ -58,11 +58,17 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     </div>
     @if(!auth()->user()->isDriver())
         <a href="{{ route('deliveries.create') }}" class="btn-primary-custom"><i data-lucide="plus" style="width:15px;height:15px;margin-right:2px;"></i> Add Delivery</a>
-    @elseif(($isLiveOrderPage ?? false) && $deliveries->isNotEmpty())
-        @php $activeDelivery = $deliveries->first(); @endphp
-        <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDelivery->id }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
-            <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
-        </button>
+    @elseif($isLiveOrderPage ?? false)
+        @if($deliveries->isNotEmpty())
+            @php $activeDelivery = $deliveries->first(); @endphp
+            <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDelivery->id }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
+                <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
+            </button>
+        @else
+            <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="showNoActiveDeliveryAlert()" style="background:#64748b; border:none; font-weight:700; opacity:0.85;">
+                <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
+            </button>
+        @endif
     @endif
 </div>
 
@@ -605,6 +611,15 @@ $(document).ready(function() {
 
         activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
         activeMaps[deliveryId] = mapObj;
+    }
+
+    function showNoActiveDeliveryAlert() {
+        Swal.fire({
+            icon: 'info',
+            title: 'Belum Ada Pengiriman Aktif',
+            text: 'Pelacakan GPS fisik hanya dapat diaktifkan ketika Anda sedang dalam proses pengiriman barang ke pelanggan (On Delivery).',
+            confirmButtonColor: '#3b82f6'
+        });
     }
 </script>
 @endsection
