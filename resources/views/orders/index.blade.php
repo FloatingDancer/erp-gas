@@ -121,7 +121,7 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
       html: `
         <p style="font-size: 14px; color: #64748b; margin-top: 10px; margin-bottom: 24px;">Pilih modul tujuan Anda selanjutnya:</p>
         <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
-          <a href="{{ route('invoices.edit', session('invoice_id')) }}" 
+          <a href="{{ route('invoices.index') }}" 
              style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; color: white; background: #2563eb; transition: background 0.15s; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.18);"
              onmouseover="this.style.background='#1d4ed8'" 
              onmouseout="this.style.background='#2563eb'">
