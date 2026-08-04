@@ -703,9 +703,9 @@ $(document).ready(function() {
                     });
                 }
 
-                // Send coordinates directly from watchPosition callback (throttled to once every 8 seconds)
+                // Send coordinates directly from watchPosition callback (throttled to once every 30 seconds)
                 const now = Date.now();
-                if (now - lastPostTime >= 8000) {
+                if (now - lastPostTime >= 30000) {
                     lastPostTime = now;
                     const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                     updateGpsDebug(lat, lng, 'sent');
@@ -794,13 +794,13 @@ $(document).ready(function() {
             {
                 enableHighAccuracy: highAccuracy,
                 maximumAge: 0,
-                timeout: 8000
+                timeout: 10000
             }
         );
 
         gpsWatchIds[deliveryId] = watchId;
 
-        // Post coordinates to database exactly every 8 seconds (8000ms)
+        // Post coordinates to database exactly every 30 seconds (30000ms)
         const intervalId = setInterval(function() {
             if (latestCoords) {
                 const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
@@ -818,7 +818,7 @@ $(document).ready(function() {
                     showGpsDebugError(err);
                 });
             }
-        }, 8000);
+        }, 30000);
 
         gpsIntervalIds[deliveryId] = intervalId;
     }
