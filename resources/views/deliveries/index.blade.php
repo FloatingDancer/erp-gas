@@ -705,7 +705,7 @@ $(document).ready(function() {
 
                 // Send coordinates directly from watchPosition callback (throttled to once every 10 seconds)
                 const now = Date.now();
-                if (now - lastPostTime >= 10000) {
+                if (now - lastPostTime >= 10000 && !simulationIntervals[deliveryId]) {
                     lastPostTime = now;
                     const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                     updateGpsDebug(lat, lng, 'sent');
@@ -721,6 +721,11 @@ $(document).ready(function() {
                         updateGpsDebug(null, null, 'err', err.status + " " + err.statusText);
                         showGpsDebugError(err);
                     });
+                }
+
+                // If simulation is running for this delivery, do not let real GPS override the simulation map view
+                if (simulationIntervals[deliveryId]) {
+                    return;
                 }
 
                 if (deliveryId == 0) {
@@ -802,7 +807,7 @@ $(document).ready(function() {
 
         // Post coordinates to database exactly every 10 seconds (10000ms)
         const intervalId = setInterval(function() {
-            if (latestCoords) {
+            if (latestCoords && !simulationIntervals[deliveryId]) {
                 const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                 updateGpsDebug(latestCoords.lat, latestCoords.lng, 'sent');
                 
@@ -824,6 +829,9 @@ $(document).ready(function() {
     }
 
     function setupRealMap(containerId, lat, lng, deliveryId) {
+        if (simulationIntervals[deliveryId]) {
+            return; // Skip setup/update if simulation is currently active
+        }
         if (activeMaps[deliveryId]) {
             const latLng = [lat, lng];
             if (activeMarkers[deliveryId]) {
