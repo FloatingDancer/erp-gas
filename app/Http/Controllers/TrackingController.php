@@ -37,8 +37,8 @@ class TrackingController extends Controller
                 'vehicle'            => $del->driver->license_plate ?? $del->driver->vehicle_number ?? '-',
                 'customer_name'      => $del->order->customer->customer_name ?? 'Customer',
                 'address'            => $del->order->customer->address ?? '-',
-                'latitude'           => $del->latitude,
-                'longitude'          => $del->longitude,
+                'latitude'           => $del->latitude ?: ($del->driver->latitude ?? null),
+                'longitude'          => $del->longitude ?: ($del->driver->longitude ?? null),
                 'customer_lat'       => $del->order->customer->latitude ?? null,
                 'customer_lng'       => $del->order->customer->longitude ?? null,
             ];
