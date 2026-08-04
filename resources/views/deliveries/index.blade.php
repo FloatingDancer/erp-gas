@@ -856,7 +856,6 @@ $(document).ready(function() {
             if (activeMarkers[deliveryId]) {
                 activeMarkers[deliveryId].setLatLng(latLng);
             }
-            activeMaps[deliveryId].setView(latLng, 15);
             activeMaps[deliveryId].invalidateSize();
             return;
         }
