@@ -421,6 +421,25 @@ $(document).ready(function() {
         const driverMarker = L.marker([...storeLatLng], {icon: driverIcon}).addTo(mapObj);
         L.polyline([storeLatLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(mapObj);
 
+        // Tombol Pusatkan Peta Simulasi (Recenter Control)
+        const centerControl = L.control({ position: 'topleft' });
+        centerControl.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            div.innerHTML = `
+                <a href="#" title="Pusatkan Peta Simulasi" role="button" aria-label="Pusatkan Peta Simulasi" style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; background:white; color:#0f172a; text-decoration:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+                </a>
+            `;
+            div.onclick = function(e) {
+                e.preventDefault();
+                if (driverMarker) {
+                    mapObj.setView(driverMarker.getLatLng(), 14);
+                }
+            };
+            return div;
+        };
+        centerControl.addTo(mapObj);
+
         activeMaps[deliveryId] = mapObj;
         activeMarkers[deliveryId] = driverMarker;
 
@@ -853,6 +872,29 @@ $(document).ready(function() {
 
         activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
         activeMaps[deliveryId] = mapObj;
+
+        // Tombol Pusatkan Lokasi Saya (Recenter Control)
+        const centerControl = L.control({ position: 'topleft' });
+        centerControl.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            div.innerHTML = `
+                <a href="#" title="Pusatkan ke Lokasi Saya" role="button" aria-label="Pusatkan ke Lokasi Saya" style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; background:white; color:#0f172a; text-decoration:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+                </a>
+            `;
+            div.onclick = function(e) {
+                e.preventDefault();
+                if (activeMarkers[deliveryId]) {
+                    const currentPos = activeMarkers[deliveryId].getLatLng();
+                    mapObj.setView(currentPos, 15);
+                    activeMarkers[deliveryId].openPopup();
+                } else {
+                    mapObj.setView([lat, lng], 15);
+                }
+            };
+            return div;
+        };
+        centerControl.addTo(mapObj);
         
         setTimeout(() => {
             mapObj.invalidateSize();

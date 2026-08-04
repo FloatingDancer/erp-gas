@@ -72,6 +72,42 @@
     });
     L.marker(storeLatLng, {icon: storeIcon}).addTo(map).bindPopup('<strong>TK. NAGA SAKTI JAYA (Gudang)</strong><br>Titik Awal Pengiriman.').openPopup();
 
+    // Tombol Pusatkan Peta (Recenter Control)
+    const centerControl = L.control({ position: 'topleft' });
+    centerControl.onAdd = function(map) {
+        const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        div.innerHTML = `
+            <a href="#" title="Pusatkan Peta" role="button" aria-label="Pusatkan Peta" style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; background:white; color:#0f172a; text-decoration:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+            </a>
+        `;
+        div.onclick = function(e) {
+            e.preventDefault();
+            recenterMap();
+        };
+        return div;
+    };
+    centerControl.addTo(map);
+
+    function recenterMap() {
+        if (selectedDriverId && markers[selectedDriverId]) {
+            const latLng = markers[selectedDriverId].getLatLng();
+            map.setView(latLng, 15);
+            markers[selectedDriverId].openPopup();
+        } else {
+            const allLatLngs = [storeLatLng];
+            for (let id in markers) {
+                allLatLngs.push(markers[id].getLatLng());
+            }
+            if (allLatLngs.length > 1) {
+                const bounds = L.latLngBounds(allLatLngs);
+                map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+            } else {
+                map.setView(storeLatLng, 13);
+            }
+        }
+    }
+
     let markers = {};
     let routes = {};
     let customerMarkers = {};
