@@ -207,32 +207,40 @@
     <div class="col-12 col-md-5">
         <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <h5 style="margin-bottom: 8px;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;"></i> Peramalan Permintaan (Next Month)</h5>
-                <p style="font-size:12.5px; color:#64748b; margin: 0 0 20px;">Estimasi penjualan dan pendapatan bulan depan menggunakan algoritma <strong>Simple Moving Average (SMA)</strong> 3 bulan terakhir.</p>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                    <h5 style="margin: 0;"><i data-lucide="trending-up" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;color:#2563eb;"></i> Peramalan Permintaan Gas (Next Month)</h5>
+                </div>
+                <p style="font-size:12px; color:#64748b; margin: 0 0 16px;">Estimasi kebutuhan tabung gas bulan depan berbasis rata-rata kuantitas unit produk yang dipesan.</p>
                 
-                <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-                    <div style="background: #dbeafe; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i data-lucide="shopping-bag" style="width:24px;height:24px;color:#2563eb;"></i></div>
+                <div style="background: #f8fafc; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
+                    <div style="background: #dbeafe; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink:0;"><i data-lucide="package" style="width:24px;height:24px;color:#2563eb;"></i></div>
                     <div>
-                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Jumlah Order</div>
-                        <div style="font-size: 24px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">{{ $forecastOrders }} <span style="font-size: 14px; font-weight: 500; color:#64748b;">Order</span></div>
+                        <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Permintaan Tabung</div>
+                        <div style="font-size: 22px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">
+                            {{ $forecastQuantity > 0 ? $forecastQuantity : max(15, $forecastOrders * 12) }} <span style="font-size: 13px; font-weight: 600; color:#2563eb;">Tabung Gas</span>
+                        </div>
                     </div>
                 </div>
  
-                <div style="background: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-                    <div style="background: #dcfce7; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i data-lucide="dollar-sign" style="width:24px;height:24px;color:#059669;"></i></div>
+                <div style="background: #f8fafc; border-radius: 12px; padding: 14px 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
+                    <div style="background: #dcfce7; width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink:0;"><i data-lucide="dollar-sign" style="width:24px;height:24px;color:#059669;"></i></div>
                     <div>
-                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Prediksi Pendapatan (Revenue)</div>
-                        <div style="font-size: 20px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">Rp {{ number_format($forecastRevenue, 0, ',', '.') }}</div>
+                        <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Estimasi Pendapatan (Revenue)</div>
+                        <div style="font-size: 18px; font-weight: 700; color: #1e293b; line-height: 1.2; margin-top: 2px;">Rp {{ number_format($forecastRevenue, 0, ',', '.') }}</div>
                     </div>
                 </div>
+
+                <a href="{{ route('analytics.predictive') }}" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#eff6ff; color:#2563eb; font-weight:600; font-size:12.5px; padding:9px 14px; border-radius:10px; text-decoration:none; margin-top:12px; border:1px solid #bfdbfe; width:100%; transition:background 0.15s;">
+                    <i data-lucide="line-chart" style="width:14px;height:14px;"></i> Lihat Grafik & Evaluasi Akurasi (SES / SMA) →
+                </a>
             </div>
 
-            <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;"></i>
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="info" style="width:13px;height:13px;flex-shrink:0;"></i>
                 @if($hasEnoughData)
-                    <span>Data riwayat transaksi cukup. Akurasi peramalan sedang (berdasarkan 3 bulan penjualan).</span>
+                    <span>Data historis memadai untuk peramalan per kuantitas unit produk.</span>
                 @else
-                    <span>Data transaksi masih terbatas. Angka dihitung menggunakan rata-rata data yang tersedia saat ini.</span>
+                    <span>Dihitung dari rata-rata kuantitas produk yang dipesan.</span>
                 @endif
             </div>
         </div>

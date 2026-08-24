@@ -179,12 +179,13 @@ class DashboardController extends Controller
             // PREDICATIVE ANALYTICS CALCULATIONS
             // =============================================
             
-            // 1. Demand Forecasting (Simple Moving Average - SMA)
-            // Ambil data total order bulanan selama 3 bulan terakhir
+            // 1. Demand Forecasting (Simple Moving Average - SMA berbasis Kuantitas Tabung)
+            // Ambil data total kuantitas tabung gas bulanan selama 3 bulan terakhir
             $monthlySales = Order::select(
                     DB::raw('YEAR(created_at) as year'),
                     DB::raw('MONTH(created_at) as month'),
                     DB::raw('COUNT(*) as total_orders'),
+                    DB::raw('SUM(quantity) as total_quantity'),
                     DB::raw('SUM(total_amount) as total_revenue')
                 )
                 ->groupBy('year', 'month')
@@ -194,11 +195,13 @@ class DashboardController extends Controller
                 ->get();
 
             $forecastOrders = 0;
+            $forecastQuantity = 0;
             $forecastRevenue = 0;
             $hasEnoughData = $monthlySales->count() >= 2;
 
             if ($monthlySales->isNotEmpty()) {
                 $forecastOrders = round($monthlySales->avg('total_orders'));
+                $forecastQuantity = round($monthlySales->avg('total_quantity'));
                 $forecastRevenue = $monthlySales->avg('total_revenue');
             }
 
@@ -291,6 +294,7 @@ class DashboardController extends Controller
                 'deliveryStatusData',
                 'activityLogs',
                 'forecastOrders',
+                'forecastQuantity',
                 'forecastRevenue',
                 'hasEnoughData',
                 'predictions'
