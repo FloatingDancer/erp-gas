@@ -58,7 +58,8 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
           <th>Name</th>
           <th>Category</th>
           <th>Price</th>
-          <th>Stock</th>
+          <th>Stok Siap Jual</th>
+          <th>Stok Rusak/Bocor</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -71,7 +72,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
             <td style="font-weight:600;color:#0f172a;">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
             <td>
               @if($p->stock <= 0)
-                <span class="badge-pill badge-red">Habis</span>
+                <span class="badge-pill badge-red">Habis (0)</span>
               @elseif($p->stock <= 10)
                 <span class="badge-pill badge-orange">{{ $p->stock }} — Rendah</span>
               @else
@@ -79,7 +80,29 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
               @endif
             </td>
             <td>
+              @if(($p->damaged_stock ?? 0) > 0)
+                <span class="badge-pill badge-red" style="font-weight:700;"><i data-lucide="alert-octagon" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> {{ $p->damaged_stock }} Tabung</span>
+              @else
+                <span class="badge-pill badge-gray" style="color:#94a3b8;">0</span>
+              @endif
+            </td>
+            <td>
               <div style="display:flex;gap:6px;">
+                @if($p->stock <= 10)
+                  @php
+                      $lowStockMsg = "⚠️ *PERINGATAN STOK MENIPIS (LOW STOCK ALERT)*\n"
+                                   . "*TK. NAGA SAKTI JAYA*\n\n"
+                                   . "- *Produk:* {$p->name} ({$p->category})\n"
+                                   . "- *Sisa Stok Siap Jual:* {$p->stock} Tabung\n"
+                                   . "- *Stok Rusak/Bocor:* " . ($p->damaged_stock ?? 0) . " Tabung\n"
+                                   . "- *Batas Minimum:* 10 Tabung\n"
+                                   . "- *Waktu:* " . now()->format('d M Y H:i') . " WIB\n\n"
+                                   . "Mohon segera buat Purchase Order (PO) ke Supplier untuk pengisian kembali pasokan gas.";
+                  @endphp
+                  <a href="https://api.whatsapp.com/send?text={{ rawurlencode($lowStockMsg) }}" target="_blank" style="display:inline-flex;align-items:center;background:#dcfce7;color:#15803d;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;" title="Kirim Peringatan Low-Stock ke WhatsApp Supplier / Owner">
+                    <i data-lucide="message-circle" style="width:13px;height:13px;margin-right:2px;"></i> Alert WA
+                  </a>
+                @endif
                 <a href="{{ route('products.edit', $p->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                 <form action="{{ route('products.destroy', $p->id) }}" method="POST" id="del-{{ $p->id }}" style="display:inline;">
                   @csrf
@@ -91,7 +114,7 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
           </tr>
         @empty
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="empty-state">
                 <div class="empty-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><i data-lucide="package" style="width:48px;height:48px;stroke-width:1.5;color:#94a3b8;"></i></div>
                 <p>Belum ada produk</p>

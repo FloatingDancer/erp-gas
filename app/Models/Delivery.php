@@ -26,6 +26,11 @@ class Delivery extends Model
         return $this->belongsTo(Driver::class);
     }
 
+    public function returns()
+    {
+        return $this->hasMany(ProductReturn::class);
+    }
+
     protected static function booted()
     {
         static::saved(function ($delivery) {

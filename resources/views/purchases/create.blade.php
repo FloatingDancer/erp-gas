@@ -50,13 +50,15 @@
             <select name="product_id" class="form-input" required>
                 <option value="" disabled selected>-- Pilih Produk --</option>
                 @foreach($products as $p)
-                    <option value="{{ $p->id }}" data-price="{{ $p->price }}">{{ $p->name }} (Stok Saat Ini: {{ $p->stock }})</option>
+                    <option value="{{ $p->id }}" data-price="{{ $p->price }}" {{ (old('product_id', request('product_id')) == $p->id) ? 'selected' : '' }}>
+                        {{ $p->name }} (Stok Saat Ini: {{ $p->stock }})
+                    </option>
                 @endforeach
             </select>
         </div>
         <div class="form-group">
             <label class="form-label">Jumlah Pembelian (Qty)</label>
-            <input type="number" name="quantity" class="form-input" min="1" placeholder="Masukkan jumlah tabung" required>
+            <input type="number" name="quantity" class="form-input" min="1" value="{{ old('quantity', request('quantity')) }}" placeholder="Masukkan jumlah tabung" required>
         </div>
         <div class="form-group">
             <label class="form-label">Harga Beli Per Tabung (Rp)</label>
@@ -76,8 +78,14 @@ $(document).ready(function() {
         const selectedOption = $(this).find('option:selected');
         const sellingPrice = parseFloat(selectedOption.data('price')) || 0;
         const purchasePrice = Math.max(0, sellingPrice - 3000);
-        $('input[name="purchase_price"]').val(purchasePrice);
+        if (!$('input[name="purchase_price"]').val() || $('input[name="purchase_price"]').val() == 0) {
+            $('input[name="purchase_price"]').val(purchasePrice);
+        }
     });
+
+    if ($('select[name="product_id"]').val()) {
+        $('select[name="product_id"]').trigger('change');
+    }
 });
 </script>
 @endsection

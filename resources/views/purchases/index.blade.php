@@ -130,8 +130,12 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                                     </form>
                                 @endif
 
-                                <a href="{{ route('purchases.print', $p->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#f1f5f9;color:#374151;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Cetak PO">
-                                    <i data-lucide="printer" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Print
+                                <a href="{{ route('purchases.print', $p->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#f1f5f9;color:#374151;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Cetak Purchase Order (PO)">
+                                    <i data-lucide="printer" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> PO
+                                </a>
+
+                                <a href="{{ route('purchases.invoice', $p->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#ede9fe;color:#6d28d9;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Cetak Faktur Pembelian (Purchase Invoice)">
+                                    <i data-lucide="file-text" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Faktur
                                 </a>
 
                                 @if($cleanPhone)

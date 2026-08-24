@@ -64,15 +64,24 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                 ->where('status', 'On Delivery')
                 ->first();
             $activeDeliveryId = $activeDelivery ? $activeDelivery->id : 0;
+            $activeCustLat = ($activeDelivery && $activeDelivery->order && $activeDelivery->order->customer && $activeDelivery->order->customer->latitude) ? $activeDelivery->order->customer->latitude : 'null';
+            $activeCustLng = ($activeDelivery && $activeDelivery->order && $activeDelivery->order->customer && $activeDelivery->order->customer->longitude) ? $activeDelivery->order->customer->longitude : 'null';
+            $activeCustName = ($activeDelivery && $activeDelivery->order && $activeDelivery->order->customer) ? addslashes($activeDelivery->order->customer->customer_name) : '';
         @endphp
-        <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDeliveryId }}, true)" style="background:#3b82f6; border:none; font-weight:700;">
+        <button type="button" class="btn-primary-custom" id="btn-real-header" onclick="toggleRealGPSTracking({{ $activeDeliveryId }}, {{ $activeCustLat }}, {{ $activeCustLng }}, '{{ $activeCustName }}')" style="background:#3b82f6; border:none; font-weight:700;">
             <i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli
         </button>
     @endif
 </div>
 
 @if(auth()->user()->isDriver())
-    <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative; background: #f8fafc; overflow:hidden;"></div>
+    <div id="standby-map-container" style="display:none; height:320px; width:100%; border-radius:16px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; position: relative; background: #f8fafc; overflow:hidden;">
+        <!-- Live status indicator overlay -->
+        <div id="map-live-indicator" style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: rgba(239, 68, 68, 0.95); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 6px; font-family: sans-serif; pointer-events: none;">
+            <span style="width: 8px; height: 8px; background: white; border-radius: 50%; display: inline-block; animation: pulse-live 1s infinite alternate;"></span>
+            LIVE GPS &bull; Terupdate: <span id="gps-last-updated">-</span>
+        </div>
+    </div>
     <!-- Floating debug badge -->
     <div id="gps-debug-badge" style="position: fixed; bottom: 8px; left: 8px; z-index: 9999; background: rgba(15, 23, 42, 0.9); color: #10b981; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-family: monospace; border: 1px solid #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none;">
         GPS: Siaga | Sent: <span id="debug-sent">0</span> | Ok: <span id="debug-ok">0</span> | Err: <span id="debug-err">0</span> | Last: <span id="debug-coords">-</span>
@@ -139,6 +148,12 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                             @endif
 
                             @if(!auth()->user()->isDriver())
+                                <a href="{{ route('deliveries.print-do', $d->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#ede9fe;color:#6d28d9;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Cetak Surat Jalan (Delivery Order)">
+                                    <i data-lucide="file-text" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> DO
+                                </a>
+                                <a href="{{ route('returns.create', ['delivery_id' => $d->id, 'order_id' => $d->order_id]) }}" style="display:inline-flex;align-items:center;background:#fef9c3;color:#854d0e;border:none;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:600;text-decoration:none;" title="Buat Retur Barang">
+                                    <i data-lucide="rotate-ccw" style="width:13px;height:13px;margin-right:2px;vertical-align:middle;margin-top:-2px;"></i> Retur
+                                </a>
                                 <a href="{{ route('deliveries.edit', $d->id) }}" class="action-edit"><i data-lucide="edit" style="width:13px;height:13px;margin-right:2px;"></i> Edit</a>
                                 <form action="{{ route('deliveries.destroy', $d->id) }}" method="POST" id="del-{{ $d->id }}" style="display:inline;">
                                     @csrf @method('DELETE')
@@ -231,6 +246,10 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
                         </a>
                     </div>
 
+                    <a href="{{ route('deliveries.print-do', $d->id) }}" target="_blank" class="btn-secondary-custom btn-confirm-mobile" style="background:#ede9fe; color:#6d28d9; margin-top:8px; font-weight:600; width:100%; justify-content:center; text-decoration:none; display:flex; align-items:center;">
+                        <i data-lucide="file-text" style="width:14px;height:14px;margin-right:4px;"></i> Cetak Surat Jalan (DO)
+                    </a>
+
                     <form action="{{ route('deliveries.confirm-arrival', $d->id) }}" method="POST" id="confirm-arrival-mob-{{ $d->id }}" style="display:block; margin-top:10px;">
                         @csrf
                         <button type="button" class="btn-primary-custom action-confirm btn-confirm-mobile" onclick="confirmArrival({{ $d->id }}, 'Order #{{ $d->order->id }}', true)">
@@ -250,10 +269,25 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
     @endforelse
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@if(session('success'))
+@if(session('success') && !session('wa_url'))
 <script>
 Swal.fire({icon:'success',title:'Berhasil!',text:'{{ session('success') }}',timer:2000,showConfirmButton:false});
+</script>
+@endif
+
+@if(session('wa_url'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Pengiriman Telah Sampai!',
+    html: `<p style="font-size:14px;color:#334155;margin:8px 0 16px;">Status pengiriman berhasil diperbarui menjadi <strong>Delivered</strong>.</p>
+           <a href="{{ session('wa_url') }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:white;padding:10px 18px;border-radius:10px;font-weight:600;text-decoration:none;font-size:14px;">
+               Kirim Bukti Terima ke WhatsApp Pelanggan
+           </a>`,
+    showConfirmButton: true,
+    confirmButtonText: 'Selesai',
+    confirmButtonColor: '#64748b'
+});
 </script>
 @endif
 <script>
@@ -466,34 +500,79 @@ $(document).ready(function() {
                 clearInterval(interval);
                 delete simulationIntervals[deliveryId];
                 setTimeout(() => {
-                    if (containerId === 'desktop-map-container') {
-                        Swal.close();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Simulasi Selesai!',
-                            text: 'Driver telah sampai di lokasi pelanggan.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sampai!',
-                            text: 'Simulasi perjalanan selesai.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
+                    Swal.fire({
+                        title: '📍 Driver Tiba di Lokasi!',
+                        html: `<p style="font-size:14px;color:#334155;margin:8px 0 16px;">Simulasi perjalanan selesai. Driver telah tiba di lokasi pelanggan.</p>
+                               <p style="font-size:13px;color:#64748b;">Konfirmasi barang telah sampai dan diterima pelanggan?</p>`,
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#16a34a',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: '✅ Konfirmasi Sampai Sekarang',
+                        cancelButtonText: 'Tutup'
+                    }).then(r => {
+                        if (r.isConfirmed) {
+                            confirmArrival(deliveryId, 'Order #' + deliveryId, isMobile);
+                        }
+                    });
+
                     if (btnElement) {
                         btnElement.disabled = false;
                         btnElement.innerHTML = '<i data-lucide="play" style="width:14px;height:14px;margin-right:4px;"></i> Mulai Simulasi Perjalanan';
                         btnElement.style.background = '#10b981';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
                     }
-                }, 1000);
+                }, 800);
             }
         }, 2000);
 
         simulationIntervals[deliveryId] = interval;
+    }
+
+    let geofencePrompted = {};
+
+    function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Earth radius in metres
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // in metres
+    }
+
+    function checkGeofenceArrival(deliveryId, curLat, curLng, custLat, custLng, custName, isMobile = false) {
+        if (!custLat || !custLng || deliveryId == 0 || geofencePrompted[deliveryId]) return;
+        
+        const dist = calculateDistanceMeters(curLat, curLng, parseFloat(custLat), parseFloat(custLng));
+        if (dist <= 50) {
+            geofencePrompted[deliveryId] = true;
+            
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            
+            Swal.fire({
+                title: '📍 Tiba di Lokasi Pelanggan!',
+                html: `<p style="font-size:14px;color:#334155;margin:8px 0 16px;">
+                        Posisi GPS mendeteksi Anda telah berada di depan/dekat lokasi <strong>${custName || 'Pelanggan'}</strong> (Radius: ~${Math.round(dist)} meter).
+                       </p>
+                       <p style="font-size:13px;color:#64748b;">Konfirmasi bahwa tabung gas telah diserahkan dan pengiriman selesai?</p>`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '✅ Ya, Konfirmasi Sampai!',
+                cancelButtonText: 'Nanti'
+            }).then(r => {
+                if (r.isConfirmed) {
+                    confirmArrival(deliveryId, 'Order Pelanggan: ' + (custName || ''), isMobile);
+                }
+            });
+        }
     }
 
     let gpsIntervalIds = {};
@@ -524,7 +603,7 @@ $(document).ready(function() {
         });
     }
 
-    function toggleRealGPSTracking(deliveryId, isMobile = true) {
+    function toggleRealGPSTracking(deliveryId, custLat = null, custLng = null, custName = '') {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
         
@@ -550,17 +629,8 @@ $(document).ready(function() {
             
             destroyActiveMap(deliveryId);
             
-            if (deliveryId == 0) {
-                const standbyMap = document.getElementById('standby-map-container');
-                const desktopList = document.querySelector('.card-clean');
-                const mobileList = document.querySelector('.delivery-mobile-cards');
-                if (standbyMap) standbyMap.style.setProperty('display', 'none', 'important');
-                if (window.innerWidth > 768) {
-                    if (desktopList) desktopList.style.setProperty('display', 'block', 'important');
-                } else {
-                    if (mobileList) mobileList.style.setProperty('display', 'block', 'important');
-                }
-            }
+            const standbyMap = document.getElementById('standby-map-container');
+            if (standbyMap) standbyMap.style.setProperty('display', 'none', 'important');
             
             if (btn) {
                 btn.innerHTML = '<i data-lucide="locate" style="width:14px;height:14px;margin-right:4px;"></i> Aktifkan GPS Asli';
@@ -593,7 +663,7 @@ $(document).ready(function() {
             btn.style.background = '#64748b';
         }
 
-        startWatching(deliveryId, isMobile, true);
+        startWatching(deliveryId, custLat, custLng, custName, true);
     }
 
     let debugSentCount = 0;
@@ -624,12 +694,20 @@ $(document).ready(function() {
         }
     }
 
-    function startWatching(deliveryId, isMobile, highAccuracy = true) {
+    function startWatching(deliveryId, custLat = null, custLng = null, custName = '', highAccuracy = true) {
         const btnId = 'btn-real-header';
         const btn = document.getElementById(btnId);
         let latestCoords = null;
         let hasShownSuccess = false;
         let lastPostTime = 0;
+
+        function updateLiveBadge() {
+            const timeEl = document.getElementById('gps-last-updated');
+            if (timeEl) {
+                const now = new Date();
+                timeEl.innerText = now.toTimeString().split(' ')[0];
+            }
+        }
 
         // Fetch initial position immediately
         navigator.geolocation.getCurrentPosition(
@@ -672,19 +750,11 @@ $(document).ready(function() {
                     });
                 }
 
-                if (deliveryId == 0) {
-                    const standbyMap = document.getElementById('standby-map-container');
-                    const desktopList = document.querySelector('.card-clean');
-                    const mobileList = document.querySelector('.delivery-mobile-cards');
-                    if (standbyMap) {
-                        standbyMap.style.setProperty('display', 'block', 'important');
-                        if (desktopList) desktopList.style.setProperty('display', 'none', 'important');
-                        if (mobileList) mobileList.style.setProperty('display', 'none', 'important');
-                        setupRealMap('standby-map-container', lat, lng, 0);
-                    }
-                } else {
-                    let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
-                    setupRealMap(mapElementId, lat, lng, deliveryId);
+                const standbyMap = document.getElementById('standby-map-container');
+                if (standbyMap) {
+                    standbyMap.style.setProperty('display', 'block', 'important');
+                    setupRealMap('standby-map-container', lat, lng, deliveryId, custLat, custLng, custName);
+                    updateLiveBadge();
                 }
             },
             function(error) {
@@ -692,7 +762,7 @@ $(document).ready(function() {
             },
             {
                 enableHighAccuracy: highAccuracy,
-                timeout: 5000,
+                timeout: 10000,
                 maximumAge: 0
             }
         );
@@ -722,9 +792,9 @@ $(document).ready(function() {
                     });
                 }
 
-                // Send coordinates directly from watchPosition callback (throttled to once every 10 seconds)
+                // Send coordinates directly from watchPosition callback (throttled to once every 5 seconds)
                 const now = Date.now();
-                if (now - lastPostTime >= 10000 && !simulationIntervals[deliveryId]) {
+                if (now - lastPostTime >= 5000 && !simulationIntervals[deliveryId]) {
                     lastPostTime = now;
                     const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
                     updateGpsDebug(lat, lng, 'sent');
@@ -747,33 +817,16 @@ $(document).ready(function() {
                     return;
                 }
 
-                if (deliveryId == 0) {
-                    const standbyMap = document.getElementById('standby-map-container');
-                    const desktopList = document.querySelector('.card-clean');
-                    const mobileList = document.querySelector('.delivery-mobile-cards');
-                    if (standbyMap) {
-                        standbyMap.style.setProperty('display', 'block', 'important');
-                        if (desktopList) desktopList.style.setProperty('display', 'none', 'important');
-                        if (mobileList) mobileList.style.setProperty('display', 'none', 'important');
-                        setupRealMap('standby-map-container', lat, lng, 0);
-                    }
-                } else {
-                    let mapElementId = isMobile ? 'driver-map-' + deliveryId : 'desktop-map-container';
-                    
-                    if (!isMobile && !document.getElementById('desktop-map-container')) {
-                        Swal.fire({
-                            title: 'Pelacakan GPS Fisik Driver',
-                            html: '<div id="desktop-map-container" style="height: 300px; width: 100%; border-radius: 8px;"></div><p style="margin-top: 10px; font-size:12px; color:#10b981; font-weight:600;">Pelacakan GPS fisik sedang aktif...</p>',
-                            width: 500,
-                            showConfirmButton: true,
-                            confirmButtonText: 'Tutup Peta (Pelacakan Tetap Berjalan)',
-                            didOpen: () => {
-                                setupRealMap(mapElementId, lat, lng, deliveryId);
-                            }
-                        });
-                    } else {
-                        setupRealMap(mapElementId, lat, lng, deliveryId);
-                    }
+                // Check if driver has arrived within geofence radius (<= 50m) of customer location
+                if (custLat && custLng) {
+                    checkGeofenceArrival(deliveryId, lat, lng, custLat, custLng, custName);
+                }
+
+                const standbyMap = document.getElementById('standby-map-container');
+                if (standbyMap) {
+                    standbyMap.style.setProperty('display', 'block', 'important');
+                    setupRealMap('standby-map-container', lat, lng, deliveryId, custLat, custLng, custName);
+                    updateLiveBadge();
                 }
             },
             function(error) {
@@ -782,7 +835,7 @@ $(document).ready(function() {
                 if (highAccuracy) {
                     console.log("Retrying with low accuracy fallback...");
                     navigator.geolocation.clearWatch(watchId);
-                    startWatching(deliveryId, isMobile, false);
+                    startWatching(deliveryId, custLat, custLng, custName, false);
                     return;
                 }
 
@@ -818,13 +871,13 @@ $(document).ready(function() {
             {
                 enableHighAccuracy: highAccuracy,
                 maximumAge: 0,
-                timeout: 10000
+                timeout: 15000
             }
         );
 
         gpsWatchIds[deliveryId] = watchId;
 
-        // Post coordinates to database exactly every 10 seconds (10000ms)
+        // Post coordinates to database exactly every 5 seconds (5000ms)
         const intervalId = setInterval(function() {
             if (latestCoords && !simulationIntervals[deliveryId]) {
                 const url = deliveryId == 0 ? '/api/driver/location' : `/api/deliveries/${deliveryId}/location`;
@@ -836,18 +889,19 @@ $(document).ready(function() {
                     longitude: latestCoords.lng
                 }).done(function() {
                     updateGpsDebug(null, null, 'ok');
+                    updateLiveBadge();
                 }).catch(err => {
                     console.error("Error updating location via real GPS:", err);
                     updateGpsDebug(null, null, 'err', err.status + " " + err.statusText);
                     showGpsDebugError(err);
                 });
             }
-        }, 10000);
+        }, 5000);
 
         gpsIntervalIds[deliveryId] = intervalId;
     }
 
-    function setupRealMap(containerId, lat, lng, deliveryId) {
+    function setupRealMap(containerId, lat, lng, deliveryId, custLat = null, custLng = null, custName = '') {
         if (simulationIntervals[deliveryId]) {
             return; // Skip setup/update if simulation is currently active
         }
@@ -856,21 +910,54 @@ $(document).ready(function() {
             if (activeMarkers[deliveryId]) {
                 activeMarkers[deliveryId].setLatLng(latLng);
             }
+            if (activeRoutes[deliveryId] && custLat && custLng) {
+                activeRoutes[deliveryId].setLatLngs([[lat, lng], [custLat, custLng]]);
+            }
             activeMaps[deliveryId].invalidateSize();
             return;
         }
 
-        const mapObj = L.map(containerId).setView([lat, lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj);
+        const mapObj = L.map(containerId).setView([lat, lng], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapObj);
         
         const driverIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/3120/3120014.png',
-            iconSize: [28, 28],
-            iconAnchor: [14, 28]
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
         });
 
-        activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('Lokasi GPS Fisik Anda');
+        activeMarkers[deliveryId] = L.marker([lat, lng], {icon: driverIcon}).addTo(mapObj).bindPopup('<strong>Lokasi Driver (GPS Asli)</strong><br>Posisi Anda saat ini').openPopup();
         activeMaps[deliveryId] = mapObj;
+
+        // If customer coordinates exist, add customer marker & polyline route
+        if (custLat && custLng && !isNaN(custLat) && !isNaN(custLng)) {
+            const customerIcon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776067.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker([custLat, custLng], {icon: customerIcon})
+                .addTo(mapObj)
+                .bindPopup(`<strong>Tujuan Pelanggan</strong><br>${custName || 'Lokasi Pengiriman'}`);
+                
+            const polyline = L.polyline([[lat, lng], [custLat, custLng]], {
+                color: '#2563eb',
+                weight: 4,
+                dashArray: '8, 8',
+                opacity: 0.8
+            }).addTo(mapObj);
+            
+            activeRoutes[deliveryId] = polyline;
+            
+            // Fit bounds to show both Driver and Customer
+            const bounds = L.latLngBounds([[lat, lng], [custLat, custLng]]);
+            mapObj.fitBounds(bounds, { padding: [50, 50] });
+        }
 
         // Tombol Pusatkan Lokasi Saya (Recenter Control)
         const centerControl = L.control({ position: 'topleft' });
@@ -899,5 +986,45 @@ $(document).ready(function() {
             mapObj.invalidateSize();
         }, 200);
     }
+
+    // Auto-refresh order list in background without manual page reload
+    setInterval(function() {
+        // Skip background refresh if the driver is currently playing a simulation (so the button states aren't disrupted)
+        const isSimulationActive = Object.values(simulationIntervals).length > 0;
+        if (isSimulationActive) {
+            return;
+        }
+
+        fetch(window.location.href)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // 1. Compare & update deliveries table content
+                const newTable = doc.querySelector('#deliveriesTable tbody');
+                const currentTable = document.querySelector('#deliveriesTable tbody');
+                if (newTable && currentTable && newTable.innerHTML !== currentTable.innerHTML) {
+                    currentTable.innerHTML = newTable.innerHTML;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+
+                // 2. Compare & update mobile cards content
+                const newCards = doc.querySelector('.delivery-mobile-cards');
+                const currentCards = document.querySelector('.delivery-mobile-cards');
+                if (newCards && currentCards && newCards.innerHTML !== currentCards.innerHTML) {
+                    currentCards.innerHTML = newCards.innerHTML;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+
+                // 3. Compare & update active delivery ID in header button
+                const newHeaderBtn = doc.getElementById('btn-real-header');
+                const currentHeaderBtn = document.getElementById('btn-real-header');
+                if (newHeaderBtn && currentHeaderBtn && newHeaderBtn.getAttribute('onclick') !== currentHeaderBtn.getAttribute('onclick')) {
+                    currentHeaderBtn.setAttribute('onclick', newHeaderBtn.getAttribute('onclick'));
+                }
+            })
+            .catch(err => console.error("Background sync error:", err));
+    }, 8000);
 </script>
 @endsection

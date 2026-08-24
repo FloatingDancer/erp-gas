@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Gas Naga Sakti Jaya — Banner Designer & Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* CSS Variables for Themes */
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --gradient-1: #4f46e5;
+            --gradient-2: #06b6d4;
+            --accent: #22d3ee;
+            --bg-page: #0f172a;
+            --bg-sidebar: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Banner Content Theme (Can be overridden by presets) */
+            --banner-bg: linear-gradient(180deg, #090d16 0%, #111827 50%, #030712 100%);
+            --banner-primary: #3b82f6;
+            --banner-accent: #60a5fa;
+            --banner-accent-bg: rgba(59, 130, 246, 0.1);
+            --banner-text: #f3f4f6;
+            --banner-text-muted: #9ca3af;
+            --banner-card-bg: rgba(31, 41, 55, 0.6);
+            --banner-border: rgba(55, 65, 81, 0.5);
+            --banner-gradient: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+        }
+
+        /* Color Theme Presets */
+        .theme-ocean {
+            --banner-bg: linear-gradient(180deg, #0b1528 0%, #0f1e36 50%, #060b13 100%);
+            --banner-primary: #3b82f6;
+            --banner-accent: #22d3ee;
+            --banner-accent-bg: rgba(34, 211, 238, 0.08);
+            --banner-text: #f8fafc;
+            --banner-text-muted: #94a3b8;
+            --banner-card-bg: rgba(30, 41, 59, 0.6);
+            --banner-border: rgba(51, 65, 85, 0.6);
+            --banner-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+        }
+
+        .theme-emerald {
+            --banner-bg: linear-gradient(180deg, #061512 0%, #0d221e 50%, #030907 100%);
+            --banner-primary: #10b981;
+            --banner-accent: #34d399;
+            --banner-accent-bg: rgba(52, 211, 153, 0.08);
+            --banner-text: #f0fdf4;
+            --banner-text-muted: #a7f3d0;
+            --banner-card-bg: rgba(6, 78, 59, 0.25);
+            --banner-border: rgba(16, 185, 129, 0.25);
+            --banner-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .theme-sunset {
+            --banner-bg: linear-gradient(180deg, #180f12 0%, #2a181e 50%, #0a0406 100%);
+            --banner-primary: #ec4899;
+            --banner-accent: #fb923c;
+            --banner-accent-bg: rgba(251, 146, 60, 0.08);
+            --banner-text: #fff1f2;
+            --banner-text-muted: #fda4af;
+            --banner-card-bg: rgba(88, 28, 135, 0.2);
+            --banner-border: rgba(236, 72, 153, 0.25);
+            --banner-gradient: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+        }
+
+        .theme-cyberpunk {
+            --banner-bg: linear-gradient(180deg, #0d0c15 0%, #15102a 50%, #050409 100%);
+            --banner-primary: #a855f7;
+            --banner-accent: #f43f5e;
+            --banner-accent-bg: rgba(244, 63, 94, 0.08);
+            --banner-text: #faf5ff;
+            --banner-text-muted: #d8b4fe;
+            --banner-card-bg: rgba(24, 24, 37, 0.7);
+            --banner-border: rgba(168, 85, 247, 0.3);
+            --banner-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        }
+
+        /* Global Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Editor Layout */
+        .sidebar {
+            width: 420px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            height: 100vh;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .logo-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* Preset Color Picker */
+        .preset-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .preset-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: #475569;
+        }
+
+        .preset-btn.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .preset-color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .preset-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Action Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Preview Area Layout */
+        .preview-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            overflow-y: auto;
+            height: 100vh;
+            position: relative;
+        }
+
+        .info-tip {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Scale Wrapper for Banner Container */
+        .banner-scale-container {
+            transform-origin: center center;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 8px solid #27272a;
+            position: relative;
+        }
+
+        /* Actual Banner Render Structure (Aspect ratio 60 x 160 cm = 600px width x 1600px height) */
+        .banner {
+            width: 600px;
+            height: 1600px;
+            background: var(--banner-bg);
+            color: var(--banner-text);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Background graphics for the banner */
+        .banner::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--banner-accent-bg) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .banner::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: -150px;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .banner-decoration-grid {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--banner-border) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Header design of Banner */
+        .banner-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+            border-bottom: 2px solid var(--banner-border);
+            padding-bottom: 24px;
+        }
+
+        .banner-univ-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .banner-univ-logo-placeholder {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--banner-accent-bg);
+            border: 2px dashed var(--banner-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--banner-accent);
+        }
+
+        .banner-header-text {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .banner-univ-name {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .banner-faculty {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--banner-text-muted);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .banner-badge {
+            background: var(--banner-gradient);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            align-self: flex-start;
+        }
+
+        /* Title Area of Banner */
+        .banner-title-area {
+            position: relative;
+            z-index: 2;
+            margin-top: 10px;
+        }
+
+        .banner-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.85rem;
+            line-height: 1.25;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .banner-case-study-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--banner-accent-bg);
+            border: 1px solid var(--banner-border);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--banner-accent);
+        }
+
+        /* Mockup Visualisation on Banner */
+        .banner-visual {
+            position: relative;
+            z-index: 2;
+            margin: 15px 0;
+        }
+
+        .browser-mockup {
+            background: #1f2937;
+            border: 1px solid var(--banner-border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .browser-header {
+            background: #111827;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--banner-border);
+        }
+
+        .browser-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .browser-dot.red { background-color: #ef4444; }
+        .browser-dot.yellow { background-color: #f59e0b; }
+        .browser-dot.green { background-color: #10b981; }
+
+        .browser-address {
+            background: #1f2937;
+            border-radius: 4px;
+            font-size: 0.55rem;
+            padding: 2px 16px;
+            color: var(--banner-text-muted);
+            margin-left: 12px;
+            flex-grow: 1;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .browser-content {
+            position: relative;
+            background-color: #030712;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .browser-screenshot {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Features List */
+        .banner-features-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--banner-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-card {
+            background: var(--banner-card-bg);
+            border: 1px solid var(--banner-border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            transition: all 0.2s ease;
+        }
+
+        .feature-icon-wrapper {
+            background: var(--banner-accent-bg);
+            border: 1px solid var(--banner-border);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--banner-accent);
+            flex-shrink: 0;
+        }
+
+        .feature-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .feature-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .feature-desc {
+            font-size: 0.7rem;
+            color: var(--banner-text-muted);
+            line-height: 1.4;
+        }
+
+        /* Tech Stack Badges */
+        .banner-tech {
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-tech-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--banner-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .tech-badges-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-badge {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--banner-border);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tech-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--banner-primary);
+        }
+
+        /* Footer Details / Author Credentials */
+        .banner-footer {
+            border-top: 2px solid var(--banner-border);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .author-box, .advisor-box {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .footer-sec-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--banner-accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .footer-subtext {
+            font-size: 0.68rem;
+            color: var(--banner-text-muted);
+        }
+
+        /* File Upload input formatting */
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-upload-btn {
+            border: 1px dashed var(--border-color);
+            background: #0f172a;
+            color: var(--text-muted);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-btn:hover {
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .file-upload-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .logo-preview-inline {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .logo-preview-thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            object-fit: contain;
+            background: #fff;
+            padding: 2px;
+            display: none;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: none;
+                color: #000;
+                display: block;
+                overflow: visible;
+                height: auto;
+                min-height: auto;
+            }
+
+            .sidebar, .info-tip, .logo-preview-inline {
+                display: none !important;
+            }
+
+            .preview-area {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: none !important;
+                display: block !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+
+            .banner-scale-container {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                transform: none !important;
+                width: 600px !important;
+                height: 1600px !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid;
+            }
+
+            .banner {
+                width: 600px !important;
+                height: 1600px !important;
+                box-sizing: border-box !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="theme-ocean">
+
+    <!-- Sidebar Editor Panel -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i data-lucide="layout-template" style="width: 20px; height: 20px;"></i>
+            </div>
+            <div class="logo-title">ERP Banner Designer</div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+            Alat kustomisasi banner vertikal (roll-up banner) 60x160cm untuk kebutuhan sidang atau pameran capstone project Anda.
+        </p>
+
+        <!-- PRESET THEMES -->
+        <div class="input-group">
+            <label>Pilihan Tema Warna</label>
+            <div class="preset-container">
+                <div class="preset-btn active" onclick="setTheme('ocean', this)">
+                    <div class="preset-color-dot" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);"></div>
+                    <div class="preset-name">Ocean</div>
+                </div>
+                <div class="preset-btn" onclick="setTheme('emerald', this)">
+                    <div class="preset-color-dot" style="background: linear-gradient(135deg, #10b981, #059669);"></div>
+                    <div class="preset-name">Emerald</div>
+                </div>
+                <div class="preset-btn" onclick="setTheme('sunset', this)">
+                    <div class="preset-color-dot" style="background: linear-gradient(135deg, #ec4899, #f97316);"></div>
+                    <div class="preset-name">Sunset</div>
+                </div>
+                <div class="preset-btn" onclick="setTheme('cyberpunk', this)">
+                    <div class="preset-color-dot" style="background: linear-gradient(135deg, #a855f7, #ec4899);"></div>
+                    <div class="preset-name">Cyber</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">KOP & JUDUL BANNER</div>
+
+        <!-- UNIVERSITY DETAILS -->
+        <div class="input-group">
+            <label for="input-univ">Nama Universitas</label>
+            <input type="text" id="input-univ" value="UNIVERSITAS NAGA SAKTI" oninput="bindText('banner-univ-name', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="input-faculty">Fakultas / Program Studi</label>
+            <input type="text" id="input-faculty" value="FAKULTAS TEKNOLOGI INFORMASI • TEKNIK INFORMATIKA" oninput="bindText('banner-faculty', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="input-badge">Kategori Proyek</label>
+            <input type="text" id="input-badge" value="TUGAS AKHIR" oninput="bindText('banner-badge-text', this.value)">
+        </div>
+
+        <!-- LOGO UPLOADER -->
+        <div class="input-group">
+            <label>Logo Universitas</label>
+            <div class="file-upload-wrapper">
+                <div class="file-upload-btn">
+                    <i data-lucide="upload" style="width:16px; height:16px;"></i>
+                    Pilih Logo (.png / .jpg)
+                </div>
+                <input type="file" id="input-logo" accept="image/*" onchange="uploadLogo(this)">
+            </div>
+            <div class="logo-preview-inline">
+                <img id="logo-preview-img" class="logo-preview-thumb" src="" alt="Preview">
+                <span id="logo-status-text" style="font-size: 0.75rem; color: var(--text-muted);">Gunakan logo default atau unggah logo Anda</span>
+            </div>
+        </div>
+
+        <!-- THESIS TITLE -->
+        <div class="input-group">
+            <label for="input-title">Judul Tugas Akhir / Skripsi</label>
+            <textarea id="input-title" oninput="bindText('banner-title-text', this.value)">PENGEMBANGAN SISTEM INFORMASI ENTERPRISE RESOURCE PLANNING (ERP) DISTRIBUSI GAS LPG BERBASIS WEB</textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="input-case">Studi Kasus / Nama Perusahaan</label>
+            <input type="text" id="input-case" value="TK. NAGA SAKTI JAYA" oninput="bindCaseStudy(this.value)">
+        </div>
+
+        <div class="section-title">IDENTITAS MAHASISWA & DOSEN</div>
+
+        <!-- AUTHOR INFO -->
+        <div class="input-group">
+            <label for="input-author">Nama Mahasiswa</label>
+            <input type="text" id="input-author" value="KIRJO" oninput="bindText('author-name', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="input-nim">NIM Mahasiswa</label>
+            <input type="text" id="input-nim" value="1234567890" oninput="bindText('author-nim', this.value)">
+        </div>
+
+        <!-- ADVISORS -->
+        <div class="input-group">
+            <label for="input-adv1">Dosen Pembimbing I</label>
+            <input type="text" id="input-adv1" value="Dr. Budi Santoso, M.T." oninput="bindText('adv1-name', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="input-adv2">Dosen Pembimbing II</label>
+            <input type="text" id="input-adv2" value="Siti Rahma, M.Kom." oninput="bindText('adv2-name', this.value)">
+        </div>
+
+        <!-- ACTION PRINT -->
+        <button class="btn-primary" onclick="printBanner()">
+            <i data-lucide="printer" style="width:20px; height:20px;"></i>
+            Cetak / Simpan ke PDF
+        </button>
+
+        <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top: 10px;">
+            Tip: Saat dialog print terbuka, pilih opsi <strong>"Save as PDF"</strong>, orientasi <strong>Portrait</strong>, atur margin ke <strong>None</strong>, dan pastikan centang opsi <strong>"Background graphics"</strong> agar warna latar belakang tercetak.
+        </p>
+    </div>
+
+    <!-- Live Preview Canvas Area -->
+    <div class="preview-area">
+        <div class="info-tip">
+            <i data-lucide="info" style="width:16px; height:16px; color: var(--accent);"></i>
+            <span>Skala preview disesuaikan otomatis agar pas di layar</span>
+        </div>
+
+        <!-- Scaling Wrapper to fit 600x1600px into view -->
+        <div class="banner-scale-container" id="scale-container">
+            
+            <!-- The actual 600x1600px banner -->
+            <div class="banner" id="banner">
+                <div class="banner-decoration-grid"></div>
+
+                <!-- 1. Header (University details) -->
+                <div class="banner-header">
+                    <div id="banner-logo-container">
+                        <!-- Default placeholder logo -->
+                        <div class="banner-univ-logo-placeholder" id="banner-logo-placeholder">
+                            <i data-lucide="graduation-cap" style="width:32px; height:32px;"></i>
+                        </div>
+                        <img id="banner-logo-img" class="banner-univ-logo" src="" alt="Univ Logo" style="display:none;">
+                    </div>
+                    <div class="banner-header-text">
+                        <div class="banner-univ-name" id="banner-univ-name">UNIVERSITAS NAGA SAKTI</div>
+                        <div class="banner-faculty" id="banner-faculty">FAKULTAS TEKNOLOGI INFORMASI • TEKNIK INFORMATIKA</div>
+                    </div>
+                    <div class="banner-badge" id="banner-badge-text">TUGAS AKHIR</div>
+                </div>
+
+                <!-- 2. Title and Case Study -->
+                <div class="banner-title-area">
+                    <h1 class="banner-title" id="banner-title-text">
+                        PENGEMBANGAN SISTEM INFORMASI ENTERPRISE RESOURCE PLANNING (ERP) DISTRIBUSI GAS LPG BERBASIS WEB
+                    </h1>
+                    <div class="banner-case-study-badge">
+                        <i data-lucide="store" style="width:16px; height:16px;"></i>
+                        <span>Studi Kasus: <strong id="banner-case-text">TK. NAGA SAKTI JAYA</strong></span>
+                    </div>
+                </div>
+
+                <!-- 3. Visual Mockup of ERP Dashboard -->
+                <div class="banner-visual">
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-dot red"></div>
+                            <div class="browser-dot yellow"></div>
+                            <div class="browser-dot green"></div>
+                            <div class="browser-address" id="browser-address-bar">http://nagasaktijaya-erp.com/dashboard</div>
+                        </div>
+                        <div class="browser-content">
+                            <!-- Using the generated image that we placed in the public folder -->
+                            <img class="browser-screenshot" src="./erp_dashboard_mockup.png" alt="ERP Dashboard Screenshot">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Highlight Features -->
+                <div>
+                    <h2 class="banner-features-title">Fitur Unggulan Sistem</h2>
+                    <div class="banner-features-grid">
+                        
+                        <!-- Feature 1 -->
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <i data-lucide="bar-chart-3" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Dashboard Analitis Real-Time</h3>
+                                <p class="feature-desc">Visualisasi metrik performa penjualan, pesanan aktif, total omzet, dan status operasional secara grafis dan real-time.</p>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2 -->
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Manajemen Pesanan &amp; Invoice</h3>
+                                <p class="feature-desc">Otomasi faktur digital, konversi pesanan ke PDF, serta fitur unik tautan invoice publik yang dapat dibagikan langsung ke pelanggan.</p>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3 -->
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <i data-lucide="truck" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Pelacakan Driver &amp; Pengiriman</h3>
+                                <p class="feature-desc">Manajemen armada pengiriman gas, pencatatan status secara dinamis, dan sistem konfirmasi kedatangan oleh driver.</p>
+                            </div>
+                        </div>
+
+                        <!-- Feature 4 -->
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <i data-lucide="brain-circuit" style="width: 16px; height: 16px; color: #22d3ee;"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title" style="color: #22d3ee; display: flex; align-items: center; gap: 4px;">
+                                    Prediksi Stok Tabung Pelanggan
+                                </h3>
+                                <p class="feature-desc">Fitur cerdas yang menganalisis interval pembelian historis untuk memprediksi tanggal habisnya pasokan gas LPG pelanggan secara proaktif.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 5. Technology Stack -->
+                <div class="banner-tech">
+                    <h3 class="banner-tech-title">Teknologi Pendukung</h3>
+                    <div class="tech-badges-list">
+                        <div class="tech-badge">
+                            <span class="tech-dot" style="background-color: #ff2d20;"></span>
+                            Laravel (PHP 8.x)
+                        </div>
+                        <div class="tech-badge">
+                            <span class="tech-dot" style="background-color: #00f;"></span>
+                            MySQL Relational DB
+                        </div>
+                        <div class="tech-badge">
+                            <span class="tech-dot" style="background-color: #38bdf8;"></span>
+                            Tailwind CSS 3
+                        </div>
+                        <div class="tech-badge">
+                            <span class="tech-dot" style="background-color: #f7df1e;"></span>
+                            Vite &amp; JS Vanilla
+                        </div>
+                        <div class="tech-badge">
+                            <span class="tech-dot" style="background-color: #6366f1;"></span>
+                            Lucide Vector Graphics
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Footer (Author & Advisors) -->
+                <div class="banner-footer">
+                    <div class="author-box">
+                        <div class="footer-sec-title">Mahasiswa</div>
+                        <div class="footer-name" id="author-name">KIRJO</div>
+                        <div class="footer-subtext">NIM: <span id="author-nim">1234567890</span></div>
+                    </div>
+                    <div class="advisor-box">
+                        <div class="footer-sec-title">Dosen Pembimbing</div>
+                        <div class="footer-name" style="font-size:0.75rem;" id="adv1-name">Dr. Budi Santoso, M.T.</div>
+                        <div class="footer-name" style="font-size:0.75rem; margin-top:-2px;" id="adv2-name">Siti Rahma, M.Kom.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Fit preview scale to screen size
+        function adjustPreviewScale() {
+            const container = document.getElementById('scale-container');
+            const previewArea = document.querySelector('.preview-area');
+            
+            // Available space leaving some margin
+            const margin = 60;
+            const availableHeight = previewArea.clientHeight - margin;
+            const availableWidth = previewArea.clientWidth - margin;
+            
+            // Core banner dimensions
+            const bannerWidth = 600;
+            const bannerHeight = 1600;
+            
+            // Calculate scale ratio
+            const scaleHeight = availableHeight / (bannerHeight + 16); // +16 for border
+            const scaleWidth = availableWidth / (bannerWidth + 16);
+            
+            // Choose the smaller scale to fit both width and height
+            const finalScale = Math.min(scaleHeight, scaleWidth, 1); // limit to max 1.0
+            
+            container.style.transform = `scale(${finalScale})`;
+        }
+
+        // Run scale adjustments
+        window.addEventListener('resize', adjustPreviewScale);
+        window.addEventListener('load', adjustPreviewScale);
+        // Quick delay to ensure fonts/images loads and renders
+        setTimeout(adjustPreviewScale, 500);
+
+        // Bind text inputs to live elements
+        function bindText(elementId, val) {
+            document.getElementById(elementId).innerText = val;
+            // Also update scale in case text wraps significantly
+            adjustPreviewScale();
+        }
+
+        function bindCaseStudy(val) {
+            document.getElementById('banner-case-text').innerText = val;
+            // Update browser mock URL address as well for detail matching
+            const formatted = val.toLowerCase().replace(/[^a-z0-9]/g, '');
+            document.getElementById('browser-address-bar').innerText = `http://${formatted || 'nagasaktijaya'}-erp.com/dashboard`;
+        }
+
+        // Change presets
+        function setTheme(themeName, btnElement) {
+            // Remove active classes
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // Reset body themes
+            document.body.className = '';
+            document.body.classList.add(`theme-${themeName}`);
+        }
+
+        // Local logo uploader
+        function uploadLogo(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    
+                    // Update preview thumbnail in sidebar
+                    const previewThumb = document.getElementById('logo-preview-img');
+                    previewThumb.src = dataUrl;
+                    previewThumb.style.display = 'block';
+
+                    // Update banner logo image
+                    const bannerLogoImg = document.getElementById('banner-logo-img');
+                    bannerLogoImg.src = dataUrl;
+                    bannerLogoImg.style.display = 'block';
+
+                    // Hide default icon placeholder
+                    document.getElementById('banner-logo-placeholder').style.display = 'none';
+
+                    document.getElementById('logo-status-text').innerText = "Logo kustom berhasil diunggah.";
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Print function
+        function printBanner() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

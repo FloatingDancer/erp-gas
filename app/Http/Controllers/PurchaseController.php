@@ -118,13 +118,19 @@ class PurchaseController extends Controller
         return view('purchases.print', compact('purchase'));
     }
 
-    public function printPublic($id)
+    public function invoice(Purchase $purchase)
+    {
+        $purchase->load(['supplier', 'product']);
+        return view('purchases.invoice', compact('purchase'));
+    }
+
+    public function invoicePublic($id)
     {
         try {
             $purchase = Purchase::with(['supplier', 'product'])->findOrFail($id);
-            return view('purchases.print', compact('purchase'));
+            return view('purchases.invoice', compact('purchase'));
         } catch (\Throwable $e) {
-            return response("Error: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)
+            return response("Error: " . $e->getMessage(), 500)
                 ->header('Content-Type', 'text/plain');
         }
     }

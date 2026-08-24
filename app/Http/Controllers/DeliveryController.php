@@ -130,14 +130,64 @@ class DeliveryController extends Controller
 
     public function confirmArrival(Delivery $delivery)
     {
-        $delivery->update(['status' => 'Delivered']);
+        $delivery->update([
+            'status'    => 'Delivered',
+            'latitude'  => null,
+            'longitude' => null,
+        ]);
         
+        if ($delivery->driver) {
+            $delivery->driver->update([
+                'latitude'  => null,
+                'longitude' => null,
+            ]);
+        }
+
         if ($delivery->order) {
             $delivery->order->update(['status' => 'Completed']);
         }
 
-        ActivityLog::log('Update', 'Mengonfirmasi pengiriman #' . $delivery->id . ' telah sampai di tempat pelanggan.');
+        $delivery->load(['order.customer', 'order.product', 'driver']);
+        $customer = $delivery->order->customer ?? null;
+        $custName = $customer->customer_name ?? 'Pelanggan';
 
-        return redirect()->back()->with('success', 'Pengiriman berhasil dikonfirmasi sampai!');
+        if ($customer && $customer->phone) {
+            $phone = preg_replace('/[^0-9]/', '', $customer->phone);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            }
+            $prodName = $delivery->order->product->name ?? 'Gas Elpiji';
+            $driverName = $delivery->driver->name ?? $delivery->driver_name ?? 'Driver Kami';
+            
+            $waMsg = "Halo *{$custName}*,\n\nDriver kami (*{$driverName}*) telah mengonfirmasi bahwa pesanan tabung gas Anda telah *SAMPAI & DITERIMA* dengan baik di alamat Anda.\n\n"
+                   . "*Detail Pengiriman:*\n"
+                   . "- No. DO: #DO-" . str_pad($delivery->id, 5, '0', STR_PAD_LEFT) . "\n"
+                   . "- Produk: {$prodName} ({$delivery->order->quantity} Tabung)\n"
+                   . "- Waktu Sampai: " . now()->format('d M Y H:i') . " WIB\n\n"
+                   . "Terima kasih telah berbelanja di *TK. NAGA SAKTI JAYA*!";
+                   
+            $waUrl = "https://api.whatsapp.com/send?phone=" . $phone . "&text=" . rawurlencode($waMsg);
+            session()->flash('wa_url', $waUrl);
+        }
+
+        ActivityLog::log('Update', 'Mengonfirmasi pengiriman #' . $delivery->id . ' telah sampai di tempat pelanggan: ' . $custName);
+
+        return redirect()->back()->with('success', 'Pengiriman berhasil dikonfirmasi sampai di lokasi pelanggan!');
+    }
+
+    public function printDO(Delivery $delivery)
+    {
+        $delivery->load(['order.customer', 'order.product', 'driver']);
+        return view('deliveries.print-do', compact('delivery'));
+    }
+
+    public function printDOPublic($id)
+    {
+        try {
+            $delivery = Delivery::with(['order.customer', 'order.product', 'driver'])->findOrFail($id);
+            return view('deliveries.print-do', compact('delivery'));
+        } catch (\Throwable $e) {
+            return response("Error: " . $e->getMessage(), 500)->header('Content-Type', 'text/plain');
+        }
     }
 }

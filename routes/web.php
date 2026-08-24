@@ -14,6 +14,8 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\ProductReturnController;
+use App\Http\Controllers\PredictiveAnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,9 @@ if (config('app.demo')) {
 
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
 Route::get('/share/purchases/{id}', [PurchaseController::class, 'printPublic'])->name('purchases.print-public');
+Route::get('/share/purchase-invoices/{id}', [PurchaseController::class, 'invoicePublic'])->name('purchases.invoice-public');
+Route::get('/share/delivery-orders/{id}', [DeliveryController::class, 'printDOPublic'])->name('deliveries.print-do-public');
+Route::get('/share/returns/{id}', [ProductReturnController::class, 'printPublic'])->name('returns.print-public');
 
 /*
 |--------------------------------------------------------------------------
@@ -102,14 +107,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('deliveries', DeliveryController::class);
+    Route::get('/deliveries/{delivery}/print-do', [DeliveryController::class, 'printDO'])->name('deliveries.print-do');
     Route::get('/live-orders', [DeliveryController::class, 'liveOrders'])->name('deliveries.live-orders');
     Route::resource('payments', PaymentController::class);
     Route::resource('invoices', InvoiceController::class);
     Route::resource('drivers', DriverController::class);
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+    
+    // Returns / Retur Barang & Damage Product
+    Route::resource('returns', ProductReturnController::class);
+    Route::post('/returns/{return}/approve', [ProductReturnController::class, 'approve'])->name('returns.approve');
+    Route::get('/returns/{return}/print', [ProductReturnController::class, 'print'])->name('returns.print');
+
     Route::get('/reports/export-csv', [DashboardController::class, 'exportCSV'])->name('reports.export-csv');
     Route::get('/reports/laba-rugi', [FinancialReportController::class, 'index'])->name('reports.laba-rugi');
     Route::get('/reports/laba-rugi/print', [FinancialReportController::class, 'print'])->name('reports.laba-rugi.print');
+    Route::get('/analytics/predictive', [PredictiveAnalyticsController::class, 'index'])->name('analytics.predictive');
     Route::post('/deliveries/{delivery}/confirm-arrival', [DeliveryController::class, 'confirmArrival'])->name('deliveries.confirm-arrival');
 
     // Suppliers & Purchases
@@ -117,6 +130,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('purchases', PurchaseController::class);
     Route::post('/purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');
     Route::get('/purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('purchases.print');
+    Route::get('/purchases/{purchase}/invoice', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
 
     // Live Tracking
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');

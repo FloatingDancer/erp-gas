@@ -652,6 +652,8 @@
             ['path' => 'purchases',  'label' => 'Purchasing', 'icon' => 'shopping-bag'],
             ['path' => 'reports/laba-rugi', 'label' => 'Profit & Loss', 'icon' => 'trending-up'],
             ['path' => 'deliveries', 'label' => 'Deliveries', 'icon' => 'truck'],
+            ['path' => 'returns',    'label' => 'Returns',    'icon' => 'rotate-ccw'],
+            ['path' => 'analytics/predictive', 'label' => 'Predictive Analytics', 'icon' => 'line-chart'],
             ['path' => 'drivers',    'label' => 'Drivers',    'icon' => 'users-round'],
         ];
         if (auth()->user()->role === 'manager') {
