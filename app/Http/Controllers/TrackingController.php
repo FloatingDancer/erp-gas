@@ -102,25 +102,30 @@ class TrackingController extends Controller
         ]);
 
         $user = auth()->user();
-        if (!$user || !$user->driver_id) {
-            return response()->json(['status' => 'error', 'message' => 'User bukan merupakan driver.'], 403);
+        $driverId = $user->driver_id ?? null;
+
+        if (!$driverId && $user) {
+            $driver = Driver::where('name', $user->name)->first() ?? Driver::first();
+            $driverId = $driver ? $driver->id : null;
         }
 
-        Driver::where('id', $user->driver_id)->update([
-            'latitude'  => $request->latitude,
-            'longitude' => $request->longitude,
-        ]);
-
-        // Cari jika driver ini memiliki pengiriman yang berstatus 'On Delivery'
-        $activeDelivery = Delivery::where('driver_id', $user->driver_id)
-            ->where('status', 'On Delivery')
-            ->first();
-
-        if ($activeDelivery) {
-            $activeDelivery->update([
+        if ($driverId) {
+            Driver::where('id', $driverId)->update([
                 'latitude'  => $request->latitude,
                 'longitude' => $request->longitude,
             ]);
+
+            // Cari jika driver ini memiliki pengiriman yang berstatus 'On Delivery'
+            $activeDelivery = Delivery::where('driver_id', $driverId)
+                ->where('status', 'On Delivery')
+                ->first();
+
+            if ($activeDelivery) {
+                $activeDelivery->update([
+                    'latitude'  => $request->latitude,
+                    'longitude' => $request->longitude,
+                ]);
+            }
         }
 
         return response()->json(['status' => 'success', 'message' => 'Lokasi driver berhasil diperbarui secara global.']);
