@@ -98,7 +98,7 @@
                     <option value="" disabled selected>-- Pilih Produk --</option>
                     @foreach($products as $p)
                         <option value="{{ $p->id }}" data-price="{{ $p->price }}" {{ (old('product_id', $selectedOrder->product_id ?? ($selectedDelivery->order->product_id ?? '')) == $p->id) ? 'selected' : '' }}>
-                            {{ $p->name }} (Stok: {{ $p->stock }} | Rusak: {{ $p->damaged_stock ?? 0 }})
+                            {{ $p->name }} (Rp {{ number_format($p->price, 0, ',', '.') }} | Stok: {{ $p->stock }} | Rusak: {{ $p->damaged_stock ?? 0 }})
                         </option>
                     @endforeach
                 </select>
@@ -165,6 +165,19 @@
 
 <script>
 $(document).ready(function() {
+    function calculateRefund() {
+        const selectedOption = $('#productSelect').find('option:selected');
+        const price = parseFloat(selectedOption.data('price')) || 0;
+        const qty = parseInt($('input[name="quantity"]').val()) || 0;
+        const returnType = $('select[name="return_type"]').val();
+
+        if (returnType === 'Refund' || returnType === 'Credit') {
+            $('input[name="refund_amount"]').val(price * qty);
+        } else if (returnType === 'Exchange') {
+            $('input[name="refund_amount"]').val(0);
+        }
+    }
+
     $('#orderSelect').change(function() {
         const opt = $(this).find('option:selected');
         const custId = opt.data('customer');
@@ -174,6 +187,7 @@ $(document).ready(function() {
         if (custId) $('#customerSelect').val(custId);
         if (prodId) $('#productSelect').val(prodId);
         if (qty) $('input[name="quantity"]').val(qty);
+        calculateRefund();
     });
 
     $('#deliverySelect').change(function() {
@@ -183,7 +197,16 @@ $(document).ready(function() {
         
         if (custId) $('#customerSelect').val(custId);
         if (prodId) $('#productSelect').val(prodId);
+        calculateRefund();
     });
+
+    $('#productSelect').on('change', calculateRefund);
+    $('input[name="quantity"]').on('input change keyup', calculateRefund);
+    $('select[name="return_type"]').on('change', calculateRefund);
+
+    if ($('#productSelect').val()) {
+        calculateRefund();
+    }
 });
 </script>
 @endsection
