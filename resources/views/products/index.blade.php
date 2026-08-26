@@ -139,6 +139,72 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
   });
 </script>
 @endif
+
+@php
+    $lowStockItems = $products->filter(fn($p) => $p->stock <= 10);
+@endphp
+
+@if($lowStockItems->isNotEmpty())
+@php
+    $firstItem = $lowStockItems->first();
+    $waSummaryMsg = "⚠️ *PERINGATAN STOK MENIPIS (LOW STOCK ALERT)*\n"
+                  . "*TK. NAGA SAKTI JAYA*\n\n"
+                  . "Terdeteksi " . $lowStockItems->count() . " jenis produk gas dengan stok kritis (≤ 10 Tabung):\n";
+    foreach($lowStockItems as $it) {
+        $waSummaryMsg .= "- *{$it->name}*: {$it->stock} Tabung Siap Jual" . (($it->damaged_stock ?? 0) > 0 ? " (Rusak: {$it->damaged_stock})" : "") . "\n";
+    }
+    $waSummaryMsg .= "- *Batas Minimum:* 10 Tabung\n"
+                  . "- *Waktu Laporan:* " . now()->format('d M Y H:i') . " WIB\n\n"
+                  . "Mohon segera buat Purchase Order (PO) untuk pengisian kembali pasokan gas.";
+    $waAutoUrl = "https://api.whatsapp.com/send?text=" . rawurlencode($waSummaryMsg);
+    
+    $htmlList = "";
+    foreach($lowStockItems as $it) {
+        $htmlList .= "<div style='display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #fed7aa;font-size:13px;'><span><strong>{$it->name}</strong> ({$it->category})</span><span style='color:#dc2626;font-weight:700;'>{$it->stock} Tabung</span></div>";
+    }
+@endphp
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tampilkan pop-up peringatan stok otomatis
+    setTimeout(function() {
+        Swal.fire({
+            title: '⚠️ Peringatan Stok Menipis!',
+            html: `
+                <div style="text-align:left;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:14px 16px;margin-top:8px;">
+                    <div style="font-size:12.5px;font-weight:700;color:#9a3412;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">
+                        🚨 Terdeteksi {{ $lowStockItems->count() }} Produk di Bawah Batas Minimum (≤ 10 Tabung):
+                    </div>
+                    <div>
+                        {!! $htmlList !!}
+                    </div>
+                </div>
+                <p style="font-size:12.5px;color:#64748b;margin:14px 0 0;line-height:1.5;">
+                    Segera kirimkan peringatan ke <strong>Supplier / Owner via WhatsApp</strong> atau langsung buat <strong>Purchase Order (PO)</strong> untuk menjaga ketersediaan pasokan.
+                </p>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#2563eb',
+            denyButtonColor: '#94a3b8',
+            confirmButtonText: '📲 Kirim Alert via WhatsApp',
+            cancelButtonText: '🛒 Buat Purchase Order (PO)',
+            denyButtonText: 'Tutup',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open('{!! $waAutoUrl !!}', '_blank');
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = "{{ route('purchases.create') }}?product_id={{ $firstItem->id }}";
+            }
+        });
+    }, 400);
+});
+</script>
+@endif
+
 <script>
 function confirmDelete(id) {
   Swal.fire({
