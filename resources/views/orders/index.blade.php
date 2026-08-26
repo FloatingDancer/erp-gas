@@ -86,6 +86,9 @@ table.modern-table tbody td{padding:13px 16px;font-size:13.5px;color:#374151;ver
             </td>
             <td>
               <div style="display:flex;gap:6px;">
+                <a href="{{ route('orders.print-so', $order->id) }}" target="_blank" style="display:inline-flex;align-items:center;background:#e0f2fe;color:#0369a1;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;" title="Cetak Surat Pesanan Penjualan (Sales Order)">
+                  <i data-lucide="file-text" style="width:12px;height:12px;margin-right:2px;"></i> SO
+                </a>
                 <a href="{{ route('returns.create', ['order_id' => $order->id]) }}" style="display:inline-flex;align-items:center;background:#fef9c3;color:#854d0e;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;" title="Retur Produk dari Order ini">
                   <i data-lucide="rotate-ccw" style="width:12px;height:12px;margin-right:2px;"></i> Retur
                 </a>

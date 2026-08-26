@@ -43,6 +43,7 @@ Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->n
 Route::get('/share/purchases/{id}', [PurchaseController::class, 'printPublic'])->name('purchases.print-public');
 Route::get('/share/purchase-invoices/{id}', [PurchaseController::class, 'invoicePublic'])->name('purchases.invoice-public');
 Route::get('/share/delivery-orders/{id}', [DeliveryController::class, 'printDOPublic'])->name('deliveries.print-do-public');
+Route::get('/share/sales-orders/{id}', [OrderController::class, 'printSOPublic'])->name('orders.print-so-public');
 Route::get('/share/returns/{id}', [ProductReturnController::class, 'printPublic'])->name('returns.print-public');
 
 /*
@@ -106,6 +107,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('products', ProductController::class);
     Route::resource('orders', OrderController::class);
+    Route::get('/orders/{order}/print-so', [OrderController::class, 'printSO'])->name('orders.print-so');
     Route::resource('deliveries', DeliveryController::class);
     Route::get('/deliveries/{delivery}/print-do', [DeliveryController::class, 'printDO'])->name('deliveries.print-do');
     Route::get('/live-orders', [DeliveryController::class, 'liveOrders'])->name('deliveries.live-orders');

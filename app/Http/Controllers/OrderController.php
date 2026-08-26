@@ -141,4 +141,16 @@ class OrderController extends Controller
         return redirect()->route('orders.index')
             ->with('success', 'Order berhasil dihapus!');
     }
+
+    public function printSO(Order $order)
+    {
+        $order->load(['customer', 'product']);
+        return view('orders.print-so', compact('order'));
+    }
+
+    public function printSOPublic(Order $order)
+    {
+        $order->load(['customer', 'product']);
+        return view('orders.print-so', compact('order'));
+    }
 }
