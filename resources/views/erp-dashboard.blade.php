@@ -207,8 +207,11 @@
     <div class="col-12 col-md-5">
         <div class="chart-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <h5 style="margin: 0;"><i data-lucide="trending-up" style="width:16px;height:16px;vertical-align:middle;margin-top:-3px;margin-right:4px;color:#2563eb;"></i> Peramalan Permintaan Gas (Next Month)</h5>
+                    <button type="button" onclick="openAlgoModal()" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;cursor:pointer;transition:transform 0.15s;" title="Penjelasan Detail Algoritma & Simbol Formula">
+                        <i data-lucide="alert-circle" style="width:16px;height:16px;"></i>
+                    </button>
                 </div>
                 <p style="font-size:12px; color:#64748b; margin: 0 0 16px;">Estimasi kebutuhan tabung gas bulan depan berbasis rata-rata kuantitas unit produk yang dipesan.</p>
                 
@@ -736,7 +739,147 @@
             fullSpan.style.display = 'none';
             shortSpan.style.display = 'inline';
             btn.innerText = 'See More';
+        }
+    }
+
+    function openAlgoModal() {
+        document.getElementById('algoModalDashboard').style.display = 'flex';
+    }
+
+    function closeAlgoModal(e) {
+        if (!e || e.target === document.getElementById('algoModalDashboard') || e.target.tagName === 'BUTTON') {
+            document.getElementById('algoModalDashboard').style.display = 'none';
+        }
+    }
 </script>
+
+{{-- MODAL PENJELASAN ALGORITMA & SIMBOL FORMULA (DASHBOARD) --}}
+<style>
+.algo-modal-backdrop { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px; }
+.algo-modal-box { background:white; border-radius:18px; max-width:760px; width:100%; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); animation: modalIn 0.2s ease-out; }
+@keyframes modalIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+.algo-modal-header { padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
+.algo-modal-body { padding:20px 24px; overflow-y:auto; }
+</style>
+
+<div id="algoModalDashboard" class="algo-modal-backdrop" style="display:none;" onclick="closeAlgoModal(event)">
+    <div class="algo-modal-box" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div class="algo-modal-header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">
+                    <i data-lucide="alert-circle" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0;font-size:16.5px;font-weight:800;color:#0f172a;">Rincian & Panduan Algoritma Peramalan (Demand Forecasting)</h3>
+                    <p style="margin:2px 0 0;font-size:12.5px;color:#64748b;">Penjelasan rumus matematika, simbol variabel, dan cara evaluasi akurasi</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeAlgoModal()" style="border:none;background:#f1f5f9;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;color:#64748b;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <!-- Body -->
+        <div class="algo-modal-body">
+            
+            <!-- Konsep Qty vs Order -->
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin-bottom:18px;">
+                <h4 style="margin:0 0 6px;font-size:13.5px;font-weight:700;color:#1e40af;">
+                    <i data-lucide="help-circle" style="width:15px;height:15px;vertical-align:middle;margin-right:2px;"></i> Mengapa Peramalan Berbasis Kuantitas Tabung (Qty), Bukan Jumlah Transaksi?
+                </h4>
+                <p style="margin:0;font-size:12.5px;color:#1e3a8a;line-height:1.6;">
+                    Satu kali transaksi pemesanan dapat berisi <strong>1 tabung</strong> atau <strong>100 tabung</strong>. Oleh karena itu, peramalan berbasis <strong>Kuantitas Unit Tabung Riil ($Qty$)</strong> yang terjual memberikan estimasi kebutuhan stok gudang yang jauh lebih akurat dan mencegah terjadinya kehabisan stok (*stockout*).
+                </p>
+            </div>
+
+            <!-- 1. SMA -->
+            <div style="border:1.5px solid #dbeafe;border-radius:12px;padding:16px;margin-bottom:18px;background:#fbfdff;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <h4 style="margin:0;font-size:14px;font-weight:800;color:#1e40af;">1. Simple Moving Average (SMA - 3 Bulan)</h4>
+                    <span style="background:#dbeafe;color:#1e40af;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;">Rata-rata Bergerak</span>
+                </div>
+                <p style="font-size:12.5px;color:#475569;margin-bottom:10px;">
+                    Menghitung nilai ramalan permintaan periode berikutnya dengan mengambil rata-rata aritmatika dari 3 bulan penjualan terakhir.
+                </p>
+                
+                <div style="background:#0f172a;color:#38bdf8;padding:12px 16px;border-radius:8px;font-family:'Courier New', monospace;font-size:13.5px;margin-bottom:12px;">
+                    Formula: F(t+1) = [ Q(t) + Q(t-1) + Q(t-2) ] / 3
+                </div>
+
+                <h5 style="font-size:12px;font-weight:700;text-transform:uppercase;color:#64748b;margin:0 0 6px;">Keterangan Simbol Formula:</h5>
+                <ul style="margin:0;padding-left:18px;font-size:12.5px;color:#334155;line-height:1.6;">
+                    <li><strong>F(t+1)</strong> : Nilai ramalan (*Forecast*) kuantitas permintaan untuk bulan berikutnya.</li>
+                    <li><strong>Q(t)</strong> : Kuantitas aktual tabung gas yang dipesan pada bulan berjalan (bulan saat ini).</li>
+                    <li><strong>Q(t-1)</strong> : Kuantitas aktual tabung gas yang dipesan pada 1 bulan yang lalu.</li>
+                    <li><strong>Q(t-2)</strong> : Kuantitas aktual tabung gas yang dipesan pada 2 bulan yang lalu.</li>
+                    <li><strong>3</strong> : Jumlah periode waktu ($n = 3$ bulan) yang dirata-ratakan.</li>
+                </ul>
+            </div>
+
+            <!-- 2. SES -->
+            <div style="border:1.5px solid #d1fae5;border-radius:12px;padding:16px;margin-bottom:18px;background:#fbfefc;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <h4 style="margin:0;font-size:14px;font-weight:800;color:#065f46;">2. Single Exponential Smoothing (SES)</h4>
+                    <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;">Pemulusan Eksponensial</span>
+                </div>
+                <p style="font-size:12.5px;color:#475569;margin-bottom:10px;">
+                    Memberikan pembobotan eksponensial lebih tinggi pada data transaksi terbaru dan pembobotan yang menurun bertahap pada data historis masa lalu.
+                </p>
+
+                <div style="background:#0f172a;color:#4ade80;padding:12px 16px;border-radius:8px;font-family:'Courier New', monospace;font-size:13.5px;margin-bottom:12px;">
+                    Formula: F(t+1) = α · Q(t) + (1 - α) · F(t)
+                </div>
+
+                <h5 style="font-size:12px;font-weight:700;text-transform:uppercase;color:#64748b;margin:0 0 6px;">Keterangan Simbol Formula:</h5>
+                <ul style="margin:0;padding-left:18px;font-size:12.5px;color:#334155;line-height:1.6;">
+                    <li><strong>F(t+1)</strong> : Nilai ramalan permintaan untuk periode berikutnya.</li>
+                    <li><strong>α (Alpha)</strong> : Konstanta pemulusan (*smoothing constant*, rentang $0 < α \le 1$). Sistem menguji bobot <strong>α = 0.3</strong> (lebih stabil) dan <strong>α = 0.5</strong> (lebih responsif terhadap perubahan tren).</li>
+                    <li><strong>Q(t)</strong> : Kuantitas tabung gas riil/aktual yang terjual pada periode berjalan.</li>
+                    <li><strong>F(t)</strong> : Nilai hasil peramalan pada periode berjalan saat ini.</li>
+                    <li><strong>(1 - α)</strong> : Bobot sisa yang diberikan kepada tren peramalan sebelumnya.</li>
+                </ul>
+            </div>
+
+            <!-- 3. Error Metrics -->
+            <div style="border:1.5px solid #fed7aa;border-radius:12px;padding:16px;margin-bottom:18px;background:#fffdfa;">
+                <h4 style="margin:0 0 8px;font-size:14px;font-weight:800;color:#9a3412;">3. Evaluasi Akurasi & Pemilihan Model Terbaik (Best Model)</h4>
+                
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;margin-bottom:12px;">
+                    <div style="background:white;border:1px solid #fed7aa;border-radius:8px;padding:12px;">
+                        <div style="font-weight:700;font-size:12px;color:#9a3412;">MAD (Mean Absolute Deviation)</div>
+                        <div style="font-family:'Courier New',monospace;font-size:12px;margin:4px 0;background:#fef3c7;padding:4px 8px;border-radius:4px;">MAD = Σ |Q(t) - F(t)| / N</div>
+                        <p style="font-size:11.5px;color:#64748b;margin:0;">Mengukur rata-rata besaran selisih absolut antara permintaan riil dengan hasil ramalan (dalam unit tabung).</p>
+                    </div>
+                    <div style="background:white;border:1px solid #fed7aa;border-radius:8px;padding:12px;">
+                        <div style="font-weight:700;font-size:12px;color:#9a3412;">MAPE (Mean Absolute % Error)</div>
+                        <div style="font-family:'Courier New',monospace;font-size:12px;margin:4px 0;background:#fef3c7;padding:4px 8px;border-radius:4px;">MAPE = (Σ |(Q-F)/Q| / N) × 100%</div>
+                        <p style="font-size:11.5px;color:#64748b;margin:0;">Persentase rata-rata kesalahan prediksi. Model dengan <strong>MAPE terkecil</strong> otomatis dinobatkan sebagai <strong>Best Model</strong>.</p>
+                    </div>
+                </div>
+
+                <div style="font-size:12px;background:#fff7ed;padding:8px 12px;border-radius:6px;color:#c2410c;">
+                    <strong>Standar Akurasi MAPE:</strong> &lt;10% (*Sangat Akurat*) | 10%–20% (*Akurasi Baik*) | 20%–50% (*Cukup/Wajar*).
+                </div>
+            </div>
+
+            <!-- 4. PO Restock Formula -->
+            <div style="border:1.5px solid #e9d5ff;border-radius:12px;padding:16px;background:#fdfcfe;">
+                <h4 style="margin:0 0 6px;font-size:14px;font-weight:800;color:#6b21a8;">4. Rumus Rekomendasi Pengadaan Stok (Purchase Order - PO)</h4>
+                <div style="background:#0f172a;color:#c084fc;padding:10px 14px;border-radius:8px;font-family:'Courier New', monospace;font-size:12.5px;margin-bottom:8px;">
+                    Rekomendasi PO = MAX(0, [ Prediksi Permintaan + Safety Stock ] - Stok Gudang Saat Ini)
+                </div>
+                <p style="font-size:12px;color:#64748b;margin:0;">
+                    Di mana <strong>Safety Stock</strong> disetel sebesar <strong>20%</strong> dari hasil prediksi untuk mengantisipasi lonjakan konsumsi gas tak terduga oleh pelanggan.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="padding:14px 24px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;">
+            <button type="button" onclick="closeAlgoModal()" style="background:#2563eb;color:white;border:none;padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Tutup Panduan</button>
+        </div>
+    </div>
+</div>
 
 @if(session('success'))
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
