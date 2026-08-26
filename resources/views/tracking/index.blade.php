@@ -30,7 +30,11 @@
         <h1 class="page-title"><i data-lucide="map-pin" style="width:22px;height:22px;vertical-align:middle;margin-top:-4px;margin-right:4px;"></i> Live Driver Tracking</h1>
         <p class="page-subtitle">Pantau pergerakan pengiriman driver secara real-time</p>
     </div>
-    <div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;">
+            <span style="width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px rgba(16,185,129,0.3);"></span>
+            Sync: <strong id="last-sync-time" style="color:#0f172a;">Menghubungkan...</strong>
+        </span>
         <span class="badge-live"><span style="width:6px;height:6px;background:#ef4444;border-radius:50%;display:inline-block;"></span> LIVE MONITORING</span>
     </div>
 </div>
@@ -131,6 +135,12 @@
         fetch('/api/driver-coordinates')
             .then(res => res.json())
             .then(data => {
+                const syncEl = document.getElementById('last-sync-time');
+                if (syncEl) {
+                    const now = new Date();
+                    syncEl.innerText = now.toTimeString().split(' ')[0] + ' WIB';
+                }
+
                 document.getElementById('active-count').innerText = data.length;
                 const container = document.getElementById('driver-list-container');
                 
@@ -154,10 +164,10 @@
                 }
                 
                 let listHtml = '';
-                let currentIds = data.map(d => d.id);
+                let currentIds = data.map(d => String(d.id));
                 
                 for (let id in markers) {
-                    if (!currentIds.includes(parseInt(id))) {
+                    if (!currentIds.includes(String(id))) {
                         map.removeLayer(markers[id]);
                         if (routes[id]) map.removeLayer(routes[id]);
                         if (customerMarkers[id]) map.removeLayer(customerMarkers[id]);
@@ -168,9 +178,10 @@
                 }
                 
                 data.forEach(d => {
-                    const isActive = selectedDriverId === d.id ? 'active' : '';
+                    const strId = String(d.id);
+                    const isActive = selectedDriverId === strId ? 'active' : '';
                     listHtml += `
-                        <div class="driver-item ${isActive}" onclick="selectDriver('${d.id}', ${d.latitude}, ${d.longitude})">
+                        <div class="driver-item ${isActive}" id="item-${strId}" onclick="selectDriver('${strId}', ${d.latitude}, ${d.longitude})">
                             <div class="driver-name">${d.driver_name}</div>
                             <div class="driver-meta">
                                 <span><i data-lucide="shopping-bag" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> Order #${d.order_id} - ${d.customer_name}</span>
@@ -180,19 +191,18 @@
                         </div>
                     `;
                     
-                    // Default to storeLatLng if no coordinates yet (so marker is shown at the warehouse start point)
                     const lat = d.latitude ? parseFloat(d.latitude) : storeLatLng[0];
                     const lng = d.longitude ? parseFloat(d.longitude) : storeLatLng[1];
                     const latLng = [lat, lng];
                     
-                    if (markers[d.id]) {
-                        markers[d.id].setLatLng(latLng);
+                    if (markers[strId]) {
+                        markers[strId].setLatLng(latLng);
                     } else {
                         const popupText = d.is_active_delivery 
                             ? `<strong>Driver: ${d.driver_name}</strong><br>Nopol: ${d.vehicle}<br>Order: #${d.order_id} ke ${d.customer_name}`
                             : `<strong>Driver: ${d.driver_name} (Standby)</strong><br>Nopol: ${d.vehicle}`;
 
-                        markers[d.id] = L.marker(latLng, {icon: driverIcon})
+                        markers[strId] = L.marker(latLng, {icon: driverIcon})
                             .addTo(map)
                             .bindPopup(popupText);
                     }
@@ -207,28 +217,27 @@
                             customerLatLng = [customerLat, customerLng];
                         }
 
-                        if (customerMarkers[d.id]) {
-                            customerMarkers[d.id].setLatLng(customerLatLng);
+                        if (customerMarkers[strId]) {
+                            customerMarkers[strId].setLatLng(customerLatLng);
                         } else {
-                            customerMarkers[d.id] = L.marker(customerLatLng, {icon: customerIcon})
+                            customerMarkers[strId] = L.marker(customerLatLng, {icon: customerIcon})
                                 .addTo(map)
                                 .bindPopup(`<strong>Pelanggan: ${d.customer_name}</strong><br>${d.address}`);
                         }
 
-                        if (routes[d.id]) {
-                            routes[d.id].setLatLngs([latLng, customerLatLng]);
+                        if (routes[strId]) {
+                            routes[strId].setLatLngs([latLng, customerLatLng]);
                         } else {
-                            routes[d.id] = L.polyline([latLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(map);
+                            routes[strId] = L.polyline([latLng, customerLatLng], {color: '#3b82f6', dashArray: '5, 5'}).addTo(map);
                         }
                     } else {
-                        // Remove markers/routes if they exist for a standby driver
-                        if (customerMarkers[d.id]) {
-                            map.removeLayer(customerMarkers[d.id]);
-                            delete customerMarkers[d.id];
+                        if (customerMarkers[strId]) {
+                            map.removeLayer(customerMarkers[strId]);
+                            delete customerMarkers[strId];
                         }
-                        if (routes[d.id]) {
-                            map.removeLayer(routes[d.id]);
-                            delete routes[d.id];
+                        if (routes[strId]) {
+                            map.removeLayer(routes[strId]);
+                            delete routes[strId];
                         }
                     }
                 });
@@ -244,10 +253,11 @@
     }
 
     function selectDriver(id, lat, lng) {
-        selectedDriverId = id;
+        selectedDriverId = String(id);
         
         document.querySelectorAll('.driver-item').forEach(el => el.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        const el = document.getElementById('item-' + id);
+        if (el) el.classList.add('active');
         
         const finalLat = lat ? parseFloat(lat) : storeLatLng[0];
         const finalLng = lng ? parseFloat(lng) : storeLatLng[1];
@@ -257,6 +267,6 @@
     }
 
     updateDriverLocations();
-    setInterval(updateDriverLocations, 5000);
+    setInterval(updateDriverLocations, 3000);
 </script>
 @endsection
