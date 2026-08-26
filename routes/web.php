@@ -122,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/export-csv', [DashboardController::class, 'exportCSV'])->name('reports.export-csv');
     Route::get('/reports/laba-rugi', [FinancialReportController::class, 'index'])->name('reports.laba-rugi');
     Route::get('/reports/laba-rugi/print', [FinancialReportController::class, 'print'])->name('reports.laba-rugi.print');
+    Route::get('/reports/laba-rugi/export-csv', [FinancialReportController::class, 'exportCSV'])->name('reports.laba-rugi.export-csv');
     Route::get('/analytics/predictive', [PredictiveAnalyticsController::class, 'index'])->name('analytics.predictive');
     Route::post('/deliveries/{delivery}/confirm-arrival', [DeliveryController::class, 'confirmArrival'])->name('deliveries.confirm-arrival');
 

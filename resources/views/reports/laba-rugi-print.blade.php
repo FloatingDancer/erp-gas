@@ -40,8 +40,9 @@
         }
         .title-section h3 {
             margin: 0 0 4px 0;
-            font-size: 15px;
+            font-size: 16px;
             color: #1e293b;
+            text-transform: uppercase;
         }
         .title-section p {
             margin: 0;
@@ -72,20 +73,19 @@
             font-weight: 700;
         }
         .section-header-row td {
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #000;
             border-bottom: 1px solid #e2e8f0;
             font-size: 12px;
             color: #0f172a;
         }
-        .total-row {
+        .subtotal-row td {
             font-weight: 700;
-        }
-        .total-row td {
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
+            border-top: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+            background: #fafafa;
         }
         .net-profit-row {
-            font-weight: 700;
+            font-weight: 800;
             font-size: 14px;
         }
         .net-profit-row td {
@@ -140,22 +140,22 @@
         </div>
 
         <div class="title-section">
-            <h3>PROFIT & LOSS REPORT</h3>
+            <h3>LAPORAN LABA RUGI (INCOME STATEMENT)</h3>
             <p>Untuk Periode: {{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }} {{ $year }}</p>
         </div>
 
         <table class="financial-table">
             <thead>
                 <tr>
-                    <th>Keterangan / Deskripsi Produk</th>
+                    <th>Keterangan / Pos Keuangan</th>
                     <th style="text-align: center; width: 120px;">Volume (Qty)</th>
-                    <th style="text-align: right; width: 200px;">Jumlah Rupiah</th>
+                    <th style="text-align: right; width: 200px;">Jumlah (Rp)</th>
                 </tr>
             </thead>
             <tbody>
                 {{-- 1. REVENUES --}}
                 <tr class="section-header-row">
-                    <td colspan="3">PENDAPATAN USAHA (REVENUES)</td>
+                    <td colspan="3">I. PENDAPATAN USAHA (REVENUE)</td>
                 </tr>
                 @forelse($revenueDetails as $prodName => $det)
                     <tr>
@@ -165,52 +165,82 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" style="padding-left: 24px; color: #64748b; font-style: italic;">Tidak ada transaksi pendapatan penjualan</td>
+                        <td colspan="3" style="padding-left: 24px; color: #64748b; font-style: italic;">Tidak ada transaksi penjualan</td>
                     </tr>
                 @endforelse
-                <tr class="total-row" style="color: #15803d;">
-                    <td style="padding-left: 24px;">TOTAL PENDAPATAN</td>
-                    <td></td>
-                    <td style="text-align: right;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
+                <tr>
+                    <td style="padding-left: 24px; font-weight: 600;">Total Penjualan Kotor (Gross Sales)</td>
+                    <td style="text-align: center; font-weight: 600;">{{ $totalUnitsSold }} tabung</td>
+                    <td style="text-align: right; font-weight: 600;">Rp {{ number_format($totalGrossRevenue, 0, ',', '.') }}</td>
+                </tr>
+                @if($totalRefundAmount > 0)
+                <tr>
+                    <td style="padding-left: 24px; color: #b91c1c;">Dikurangi: Retur Penjualan & Refund</td>
+                    <td style="text-align: center; color: #b91c1c;">{{ $totalUnitsReturned }} tabung</td>
+                    <td style="text-align: right; color: #b91c1c;">(Rp {{ number_format($totalRefundAmount, 0, ',', '.') }})</td>
+                </tr>
+                @endif
+                <tr class="subtotal-row" style="color: #15803d;">
+                    <td style="padding-left: 24px;">TOTAL PENJUALAN BERSIH (NET SALES)</td>
+                    <td style="text-align: center;">{{ $totalUnitsSold - $totalUnitsReturned }} tabung</td>
+                    <td style="text-align: right;">Rp {{ number_format($totalNetRevenue, 0, ',', '.') }}</td>
                 </tr>
 
-                {{-- Empty Spacer Row --}}
-                <tr><td colspan="3" style="height: 12px; border: none;"></td></tr>
+                {{-- Spacer --}}
+                <tr><td colspan="3" style="height: 10px; border: none;"></td></tr>
 
-                {{-- 2. EXPENSES --}}
+                {{-- 2. COGS & GROSS PROFIT --}}
                 <tr class="section-header-row">
-                    <td colspan="3">Beban Usaha / Pengadaan Stok (EXPENSES)</td>
+                    <td colspan="3">II. BEBAN POKOK PENJUALAN (HPP / COGS)</td>
+                </tr>
+                <tr>
+                    <td style="padding-left: 24px;">Harga Pokok Penjualan (Modal Barang Terjual)</td>
+                    <td style="text-align: center;">{{ $totalUnitsSold }} tabung</td>
+                    <td style="text-align: right;">(Rp {{ number_format($totalCOGS, 0, ',', '.') }})</td>
+                </tr>
+                <tr class="subtotal-row" style="color: #1d4ed8;">
+                    <td style="padding-left: 24px;">LABA KOTOR PENJUALAN (GROSS PROFIT)</td>
+                    <td style="text-align: center;">Margin: {{ $grossProfitMargin }}%</td>
+                    <td style="text-align: right;">Rp {{ number_format($grossProfit, 0, ',', '.') }}</td>
+                </tr>
+
+                {{-- Spacer --}}
+                <tr><td colspan="3" style="height: 10px; border: none;"></td></tr>
+
+                {{-- 3. EXPENSES --}}
+                <tr class="section-header-row">
+                    <td colspan="3">III. PENGELUARAN PENGADAAN STOK (INVENTORY PURCHASES)</td>
                 </tr>
                 @forelse($expenseDetails as $prodName => $det)
                     <tr>
-                        <td style="padding-left: 24px;">Pembelian {{ $prodName }}</td>
+                        <td style="padding-left: 24px;">Pembelian Pasokan {{ $prodName }}</td>
                         <td style="text-align: center;">{{ $det['qty'] }} tabung</td>
                         <td style="text-align: right;">Rp {{ number_format($det['amount'], 0, ',', '.') }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" style="padding-left: 24px; color: #64748b; font-style: italic;">Tidak ada transaksi pengadaan barang</td>
+                        <td colspan="3" style="padding-left: 24px; color: #64748b; font-style: italic;">Tidak ada pengadaan stok</td>
                     </tr>
                 @endforelse
-                <tr class="total-row" style="color: #b91c1c;">
-                    <td style="padding-left: 24px;">TOTAL PENGELUARAN</td>
-                    <td></td>
-                    <td style="text-align: right;">Rp {{ number_format($totalExpense, 0, ',', '.') }}</td>
+                <tr class="subtotal-row" style="color: #b91c1c;">
+                    <td style="padding-left: 24px;">TOTAL PENGELUARAN PENGADAAN</td>
+                    <td style="text-align: center;">{{ $totalUnitsPurchased }} tabung</td>
+                    <td style="text-align: right;">(Rp {{ number_format($totalExpense, 0, ',', '.') }})</td>
                 </tr>
 
-                {{-- Empty Spacer Row --}}
-                <tr><td colspan="3" style="height: 24px; border: none;"></td></tr>
+                {{-- Spacer --}}
+                <tr><td colspan="3" style="height: 16px; border: none;"></td></tr>
 
-                {{-- 3. NET PROFIT --}}
+                {{-- 4. NET CASH FLOW --}}
                 @php
                     $isProfit = $netProfit >= 0;
-                    $profitLabel = $isProfit ? 'LABA BERSIH (NET PROFIT)' : 'RUGI BERSIH (NET LOSS)';
+                    $profitLabel = $isProfit ? 'HASIL AKHIR: ARUS KAS BERSIH (SURPLUS)' : 'HASIL AKHIR: ARUS KAS BERSIH (DEFISIT / RESTOCK)';
                     $profitColor = $isProfit ? '#15803d' : '#b91c1c';
                 @endphp
                 <tr class="net-profit-row" style="color: {{ $profitColor }}; background-color: #f8fafc;">
                     <td>{{ $profitLabel }}</td>
                     <td></td>
-                    <td style="text-align: right; border-bottom: 2px double {{ $profitColor }};">Rp {{ number_format($netProfit, 0, ',', '.') }}</td>
+                    <td style="text-align: right;">Rp {{ number_format($netProfit, 0, ',', '.') }}</td>
                 </tr>
             </tbody>
         </table>
