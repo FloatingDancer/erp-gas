@@ -12,12 +12,46 @@ use App\Models\Delivery;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ProductReturnController extends Controller
 {
+    private function ensureSchema()
+    {
+        try {
+            if (!Schema::hasColumn('product_returns', 'supplier_id')) {
+                Schema::table('product_returns', function ($table) {
+                    $table->string('return_category')->default('Customer')->nullable();
+                    $table->unsignedBigInteger('supplier_id')->nullable();
+                    $table->unsignedBigInteger('purchase_id')->nullable();
+                });
+            }
+        } catch (\Throwable $e) {
+            try {
+                DB::statement("ALTER TABLE `product_returns` ADD `return_category` VARCHAR(50) DEFAULT 'Customer' NULL");
+            } catch (\Throwable $ex) {}
+            try {
+                DB::statement("ALTER TABLE `product_returns` ADD `supplier_id` BIGINT UNSIGNED NULL");
+            } catch (\Throwable $ex) {}
+            try {
+                DB::statement("ALTER TABLE `product_returns` ADD `purchase_id` BIGINT UNSIGNED NULL");
+            } catch (\Throwable $ex) {}
+        }
+    }
+
     public function index()
     {
-        $returns = ProductReturn::with(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery'])
+        $this->ensureSchema();
+
+        $relations = ['customer', 'product', 'order', 'delivery'];
+        if (Schema::hasColumn('product_returns', 'supplier_id')) {
+            $relations[] = 'supplier';
+        }
+        if (Schema::hasColumn('product_returns', 'purchase_id')) {
+            $relations[] = 'purchase';
+        }
+
+        $returns = ProductReturn::with($relations)
             ->latest()
             ->get();
 
@@ -30,11 +64,7 @@ class ProductReturnController extends Controller
 
     public function create(Request $request)
     {
-        try {
-            if (!\Illuminate\Support\Facades\Schema::hasColumn('product_returns', 'supplier_id')) {
-                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            }
-        } catch (\Throwable $e) {}
+        $this->ensureSchema();
 
         $customers = Customer::orderBy('customer_name')->get();
         $suppliers = Supplier::orderBy('name')->get();
@@ -57,6 +87,8 @@ class ProductReturnController extends Controller
 
     public function store(Request $request)
     {
+        $this->ensureSchema();
+
         $request->validate([
             'return_category' => 'required|in:Customer,Supplier',
             'customer_id'     => 'nullable|required_if:return_category,Customer|exists:customers,id',
@@ -78,14 +110,11 @@ class ProductReturnController extends Controller
         $returnNumber = $prefix . date('Ymd') . '-' . str_pad((ProductReturn::count() + 1), 4, '0', STR_PAD_LEFT);
 
         DB::transaction(function () use ($request, $returnNumber) {
-            $productReturn = ProductReturn::create([
+            $data = [
                 'return_number'   => $returnNumber,
-                'return_category' => $request->return_category,
                 'customer_id'     => $request->return_category === 'Customer' ? $request->customer_id : null,
-                'supplier_id'     => $request->return_category === 'Supplier' ? $request->supplier_id : null,
                 'product_id'      => $request->product_id,
                 'order_id'        => $request->order_id,
-                'purchase_id'     => $request->purchase_id,
                 'delivery_id'     => $request->delivery_id,
                 'quantity'        => $request->quantity,
                 'condition'       => $request->condition,
@@ -94,13 +123,25 @@ class ProductReturnController extends Controller
                 'reason'          => $request->reason,
                 'status'          => $request->status,
                 'return_date'     => $request->return_date,
-            ]);
+            ];
+
+            if (Schema::hasColumn('product_returns', 'return_category')) {
+                $data['return_category'] = $request->return_category;
+            }
+            if (Schema::hasColumn('product_returns', 'supplier_id')) {
+                $data['supplier_id'] = $request->return_category === 'Supplier' ? $request->supplier_id : null;
+            }
+            if (Schema::hasColumn('product_returns', 'purchase_id')) {
+                $data['purchase_id'] = $request->purchase_id;
+            }
+
+            $productReturn = ProductReturn::create($data);
 
             $product = Product::find($request->product_id);
 
             // Jika status disetujui (Approved), otomatis sesuaikan inventaris
             if ($productReturn->status === 'Approved' && $product) {
-                if ($productReturn->return_category === 'Supplier') {
+                if (($productReturn->return_category ?? 'Customer') === 'Supplier') {
                     // Retur ke Supplier: keluarkan tabung rusak dari stok karantina gudang
                     $product->decrement('damaged_stock', min($productReturn->quantity, $product->damaged_stock));
                     
@@ -122,7 +163,7 @@ class ProductReturnController extends Controller
                 }
                 ActivityLog::log('Create', $logDesc);
             } else {
-                ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Kategori: {$productReturn->return_category}, Status: {$productReturn->status})");
+                ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Status: {$productReturn->status})");
             }
         });
 
@@ -140,7 +181,7 @@ class ProductReturnController extends Controller
             $product = $return->product;
 
             if ($product) {
-                if ($return->return_category === 'Supplier') {
+                if (($return->return_category ?? 'Customer') === 'Supplier') {
                     $product->decrement('damaged_stock', min($return->quantity, $product->damaged_stock));
                     if ($return->return_type === 'Exchange') {
                         $product->increment('stock', $return->quantity);
@@ -179,7 +220,7 @@ class ProductReturnController extends Controller
         DB::transaction(function () use ($return) {
             // Jika retur sudah Approved dan dihapus, kembalikan stok
             if ($return->status === 'Approved' && $return->product) {
-                if ($return->return_category === 'Supplier') {
+                if (($return->return_category ?? 'Customer') === 'Supplier') {
                     $return->product->increment('damaged_stock', $return->quantity);
                     if ($return->return_type === 'Exchange') {
                         $return->product->decrement('stock', min($return->quantity, $return->product->stock));
@@ -203,14 +244,30 @@ class ProductReturnController extends Controller
 
     public function print(ProductReturn $return)
     {
-        $return->load(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery.driver']);
+        $this->ensureSchema();
+        $relations = ['customer', 'product', 'order', 'delivery.driver'];
+        if (Schema::hasColumn('product_returns', 'supplier_id')) {
+            $relations[] = 'supplier';
+        }
+        if (Schema::hasColumn('product_returns', 'purchase_id')) {
+            $relations[] = 'purchase';
+        }
+        $return->load($relations);
         return view('returns.print', compact('return'));
     }
 
     public function printPublic($id)
     {
         try {
-            $return = ProductReturn::with(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery.driver'])->findOrFail($id);
+            $this->ensureSchema();
+            $relations = ['customer', 'product', 'order', 'delivery.driver'];
+            if (Schema::hasColumn('product_returns', 'supplier_id')) {
+                $relations[] = 'supplier';
+            }
+            if (Schema::hasColumn('product_returns', 'purchase_id')) {
+                $relations[] = 'purchase';
+            }
+            $return = ProductReturn::with($relations)->findOrFail($id);
             return view('returns.print', compact('return'));
         } catch (\Throwable $e) {
             return response("Error: " . $e->getMessage(), 500)->header('Content-Type', 'text/plain');

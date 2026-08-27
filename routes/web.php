@@ -39,6 +39,16 @@ if (config('app.demo')) {
     });
 }
 
+Route::get('/run-migration', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return 'Migration completed!<br><br>Console Output:<br><pre>' . htmlspecialchars($output) . '</pre>';
+    } catch (\Throwable $e) {
+        return 'Error migrating database: ' . $e->getMessage();
+    }
+});
+
 Route::get('/share/invoices/{id}', [InvoiceController::class, 'printPublic'])->name('invoices.print-public');
 Route::get('/share/purchases/{id}', [PurchaseController::class, 'printPublic'])->name('purchases.print-public');
 Route::get('/share/purchase-invoices/{id}', [PurchaseController::class, 'invoicePublic'])->name('purchases.invoice-public');
