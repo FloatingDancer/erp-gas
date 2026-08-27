@@ -30,6 +30,12 @@ class ProductReturnController extends Controller
 
     public function create(Request $request)
     {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('product_returns', 'supplier_id')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+        } catch (\Throwable $e) {}
+
         $customers = Customer::orderBy('customer_name')->get();
         $suppliers = Supplier::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
