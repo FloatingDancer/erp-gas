@@ -114,12 +114,30 @@ class OrderController extends Controller
             'status'       => $request->status,
         ]);
 
-        // Otomatis sinkronisasi nominal Invoice
+        // Otomatis sinkronisasi nominal & status Invoice
         $invoice = Invoice::where('order_id', $order->id)->first();
         if ($invoice) {
+            $isPaid = in_array($request->status, ['Paid', 'Completed']);
+            $newInvoiceStatus = $isPaid ? 'Paid' : 'Unpaid';
+            
             $invoice->update([
-                'total_amount' => $total
+                'total_amount' => $total,
+                'status'       => $newInvoiceStatus,
             ]);
+
+            // Jika status menjadi Paid dan belum ada Payment, otomatis catat Payment
+            if ($isPaid) {
+                $payment = \App\Models\Payment::where('invoice_id', $invoice->id)->first();
+                if (!$payment) {
+                    \App\Models\Payment::create([
+                        'invoice_id' => $invoice->id,
+                        'amount'     => $total,
+                        'method'     => 'Cash',
+                    ]);
+                } else {
+                    $payment->update(['amount' => $total]);
+                }
+            }
         }
 
         ActivityLog::log('Update', 'Memperbarui order #' . $order->id . ' status: ' . $order->status);

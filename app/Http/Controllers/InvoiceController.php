@@ -70,6 +70,24 @@ class InvoiceController extends Controller
             'status'       => $request->status,
         ]);
 
+        // Sinkronisasi status Order
+        if ($invoice->order) {
+            $newOrderStatus = $request->status === 'Paid' ? 'Paid' : 'Pending';
+            $invoice->order->update(['status' => $newOrderStatus]);
+        }
+
+        // Jika Invoice diubah menjadi Paid, pastikan record Payment tercatat
+        if ($request->status === 'Paid') {
+            $payment = \App\Models\Payment::where('invoice_id', $invoice->id)->first();
+            if (!$payment) {
+                \App\Models\Payment::create([
+                    'invoice_id' => $invoice->id,
+                    'amount'     => $invoice->total_amount,
+                    'method'     => 'Cash',
+                ]);
+            }
+        }
+
         ActivityLog::log('Update', 'Memperbarui invoice #' . $invoice->id . ' status: ' . $invoice->status);
 
         return redirect()->route('invoices.index')

@@ -36,10 +36,13 @@ class PaymentController extends Controller
             'method'     => $request->method,
         ]);
 
-        // Otomatis ubah status Invoice menjadi Paid
+        // Otomatis ubah status Invoice menjadi Paid & sinkronkan Order menjadi Paid
         $invoice = Invoice::find($request->invoice_id);
         if ($invoice) {
             $invoice->update(['status' => 'Paid']);
+            if ($invoice->order) {
+                $invoice->order->update(['status' => 'Paid']);
+            }
         }
 
         ActivityLog::log('Create', 'Mencatat pembayaran baru untuk Invoice #' . $payment->invoice_id . ' sebesar Rp ' . number_format($payment->amount, 0, ',', '.') . ' via ' . $payment->method);
@@ -80,7 +83,20 @@ class PaymentController extends Controller
     public function destroy(Payment $payment)
     {
         $id = $payment->id;
+        $invoiceId = $payment->invoice_id;
         $payment->delete();
+
+        // Cek apakah masih ada payment lain untuk invoice ini
+        $remainingPayments = Payment::where('invoice_id', $invoiceId)->count();
+        if ($remainingPayments === 0) {
+            $invoice = Invoice::find($invoiceId);
+            if ($invoice) {
+                $invoice->update(['status' => 'Unpaid']);
+                if ($invoice->order) {
+                    $invoice->order->update(['status' => 'Pending']);
+                }
+            }
+        }
 
         ActivityLog::log('Delete', 'Menghapus pembayaran #' . $id);
 
