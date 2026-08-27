@@ -41,19 +41,27 @@ class ProductReturnController extends Controller
 
     public function index()
     {
-        $this->ensureSchema();
+        try {
+            $this->ensureSchema();
+        } catch (\Throwable $e) {}
+
+        try {
+            $hasSupplier = Schema::hasColumn('product_returns', 'supplier_id');
+        } catch (\Throwable $e) {
+            $hasSupplier = false;
+        }
 
         $relations = ['customer', 'product', 'order', 'delivery'];
-        if (Schema::hasColumn('product_returns', 'supplier_id')) {
+        if ($hasSupplier) {
             $relations[] = 'supplier';
-        }
-        if (Schema::hasColumn('product_returns', 'purchase_id')) {
             $relations[] = 'purchase';
         }
 
-        $returns = ProductReturn::with($relations)
-            ->latest()
-            ->get();
+        try {
+            $returns = ProductReturn::with($relations)->latest()->get();
+        } catch (\Throwable $e) {
+            $returns = ProductReturn::latest()->get();
+        }
 
         $totalGood = $returns->where('condition', 'Good')->where('status', 'Approved')->sum('quantity');
         $totalDamaged = $returns->where('condition', 'Damaged')->where('status', 'Approved')->sum('quantity');
