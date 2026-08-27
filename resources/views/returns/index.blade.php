@@ -93,8 +93,8 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
             <thead>
                 <tr>
                     <th>No. Retur</th>
-                    <th>Pelanggan</th>
-                    <th>Ref Order / Delivery</th>
+                    <th>Pihak Terkait</th>
+                    <th>Ref Transaksi</th>
                     <th>Produk</th>
                     <th>Jumlah</th>
                     <th>Kondisi Barang</th>
@@ -108,20 +108,34 @@ table.modern-table tbody td { padding:13px 16px; font-size:13.5px; color:#374151
                 <tr>
                     <td>
                         <span style="font-weight:700;color:#0f172a;">{{ $r->return_number }}</span>
-                        <div style="font-size:11px;color:#64748b;">{{ \Carbon\Carbon::parse($r->return_date)->format('d M Y') }}</div>
+                        <div style="margin-top:2px;">
+                            @if(($r->return_category ?? 'Customer') === 'Supplier')
+                                <span class="badge-pill" style="background:#f3e8ff;color:#7e22ce;font-size:10px;padding:2px 7px;font-weight:700;">🏭 Ke Supplier</span>
+                            @else
+                                <span class="badge-pill" style="background:#eff6ff;color:#1d4ed8;font-size:10px;padding:2px 7px;font-weight:700;">👥 Dari Pelanggan</span>
+                            @endif
+                        </div>
+                        <div style="font-size:11px;color:#64748b;margin-top:2px;">{{ \Carbon\Carbon::parse($r->return_date)->format('d M Y') }}</div>
                     </td>
                     <td>
-                        <span style="font-weight:600;color:#0f172a;">{{ $r->customer->customer_name ?? '-' }}</span>
-                        <div style="font-size:11.5px;color:#64748b;">{{ $r->customer->phone ?? '-' }}</div>
+                        @if(($r->return_category ?? 'Customer') === 'Supplier')
+                            <span style="font-weight:700;color:#6b21a8;"><i data-lucide="factory" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> {{ $r->supplier->name ?? 'Supplier' }}</span>
+                            <div style="font-size:11.5px;color:#64748b;">{{ $r->supplier->phone ?? '-' }}</div>
+                        @else
+                            <span style="font-weight:600;color:#0f172a;"><i data-lucide="user" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> {{ $r->customer->customer_name ?? '-' }}</span>
+                            <div style="font-size:11.5px;color:#64748b;">{{ $r->customer->phone ?? '-' }}</div>
+                        @endif
                     </td>
                     <td>
-                        @if($r->order_id)
+                        @if($r->purchase_id)
+                            <span style="font-weight:700;color:#7e22ce;">PO #{{ $r->purchase_id }}</span>
+                        @elseif($r->order_id)
                             <span style="font-weight:600;color:#2563eb;">Order #{{ $r->order_id }}</span>
                         @endif
                         @if($r->delivery_id)
                             <div style="font-size:11.5px;color:#64748b;">Pengiriman #{{ $r->delivery_id }}</div>
                         @endif
-                        @if(!$r->order_id && !$r->delivery_id)
+                        @if(!$r->order_id && !$r->delivery_id && !$r->purchase_id)
                             <span style="color:#94a3b8;font-size:12px;">Direct Return</span>
                         @endif
                     </td>

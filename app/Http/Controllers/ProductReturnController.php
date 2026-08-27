@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductReturn;
 use App\Models\Customer;
+use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Purchase;
 use App\Models\Delivery;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
@@ -15,7 +17,7 @@ class ProductReturnController extends Controller
 {
     public function index()
     {
-        $returns = ProductReturn::with(['customer', 'product', 'order', 'delivery'])
+        $returns = ProductReturn::with(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery'])
             ->latest()
             ->get();
 
@@ -29,68 +31,92 @@ class ProductReturnController extends Controller
     public function create(Request $request)
     {
         $customers = Customer::orderBy('customer_name')->get();
+        $suppliers = Supplier::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
         
         $selectedOrderId = $request->get('order_id');
         $selectedDeliveryId = $request->get('delivery_id');
+        $selectedPurchaseId = $request->get('purchase_id');
         
         $selectedOrder = $selectedOrderId ? Order::with(['customer', 'product', 'delivery'])->find($selectedOrderId) : null;
         $selectedDelivery = $selectedDeliveryId ? Delivery::with(['order.customer', 'order.product'])->find($selectedDeliveryId) : null;
+        $selectedPurchase = $selectedPurchaseId ? Purchase::with(['supplier', 'product'])->find($selectedPurchaseId) : null;
 
         $orders = Order::with(['customer', 'product'])->latest()->take(50)->get();
         $deliveries = Delivery::with(['order.customer', 'order.product'])->latest()->take(50)->get();
+        $purchases = Purchase::with(['supplier', 'product'])->latest()->take(50)->get();
 
-        return view('returns.create', compact('customers', 'products', 'orders', 'deliveries', 'selectedOrder', 'selectedDelivery'));
+        return view('returns.create', compact('customers', 'suppliers', 'products', 'orders', 'purchases', 'deliveries', 'selectedOrder', 'selectedDelivery', 'selectedPurchase'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'customer_id'   => 'required|exists:customers,id',
-            'product_id'    => 'required|exists:products,id',
-            'order_id'      => 'nullable|exists:orders,id',
-            'delivery_id'   => 'nullable|exists:deliveries,id',
-            'quantity'      => 'required|integer|min:1',
-            'condition'     => 'required|in:Good,Damaged',
-            'return_type'   => 'required|in:Exchange,Refund,Credit',
-            'refund_amount' => 'nullable|numeric|min:0',
-            'reason'        => 'nullable|string',
-            'status'        => 'required|in:Pending,Approved,Rejected',
-            'return_date'   => 'required|date',
+            'return_category' => 'required|in:Customer,Supplier',
+            'customer_id'     => 'nullable|required_if:return_category,Customer|exists:customers,id',
+            'supplier_id'     => 'nullable|required_if:return_category,Supplier|exists:suppliers,id',
+            'product_id'      => 'required|exists:products,id',
+            'order_id'        => 'nullable|exists:orders,id',
+            'purchase_id'     => 'nullable|exists:purchases,id',
+            'delivery_id'     => 'nullable|exists:deliveries,id',
+            'quantity'        => 'required|integer|min:1',
+            'condition'       => 'required|in:Good,Damaged',
+            'return_type'     => 'required|in:Exchange,Refund,Credit',
+            'refund_amount'   => 'nullable|numeric|min:0',
+            'reason'          => 'nullable|string',
+            'status'          => 'required|in:Pending,Approved,Rejected',
+            'return_date'     => 'required|date',
         ]);
 
-        $returnNumber = 'RET-' . date('Ymd') . '-' . str_pad((ProductReturn::count() + 1), 4, '0', STR_PAD_LEFT);
+        $prefix = $request->return_category === 'Supplier' ? 'RETSUP-' : 'RET-';
+        $returnNumber = $prefix . date('Ymd') . '-' . str_pad((ProductReturn::count() + 1), 4, '0', STR_PAD_LEFT);
 
         DB::transaction(function () use ($request, $returnNumber) {
             $productReturn = ProductReturn::create([
-                'return_number' => $returnNumber,
-                'customer_id'   => $request->customer_id,
-                'product_id'    => $request->product_id,
-                'order_id'      => $request->order_id,
-                'delivery_id'   => $request->delivery_id,
-                'quantity'      => $request->quantity,
-                'condition'     => $request->condition,
-                'return_type'   => $request->return_type,
-                'refund_amount' => $request->refund_amount ?? 0,
-                'reason'        => $request->reason,
-                'status'        => $request->status,
-                'return_date'   => $request->return_date,
+                'return_number'   => $returnNumber,
+                'return_category' => $request->return_category,
+                'customer_id'     => $request->return_category === 'Customer' ? $request->customer_id : null,
+                'supplier_id'     => $request->return_category === 'Supplier' ? $request->supplier_id : null,
+                'product_id'      => $request->product_id,
+                'order_id'        => $request->order_id,
+                'purchase_id'     => $request->purchase_id,
+                'delivery_id'     => $request->delivery_id,
+                'quantity'        => $request->quantity,
+                'condition'       => $request->condition,
+                'return_type'     => $request->return_type,
+                'refund_amount'   => $request->refund_amount ?? 0,
+                'reason'          => $request->reason,
+                'status'          => $request->status,
+                'return_date'     => $request->return_date,
             ]);
 
             $product = Product::find($request->product_id);
 
             // Jika status disetujui (Approved), otomatis sesuaikan inventaris
             if ($productReturn->status === 'Approved' && $product) {
-                if ($productReturn->condition === 'Good') {
-                    $product->increment('stock', $productReturn->quantity);
-                    $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Bagus dikembalikan ke Stok Siap Jual ({$product->name}).";
+                if ($productReturn->return_category === 'Supplier') {
+                    // Retur ke Supplier: keluarkan tabung rusak dari stok karantina gudang
+                    $product->decrement('damaged_stock', min($productReturn->quantity, $product->damaged_stock));
+                    
+                    // Jika ditukar tabung baru oleh supplier, tambah ke stok siap jual
+                    if ($productReturn->return_type === 'Exchange') {
+                        $product->increment('stock', $productReturn->quantity);
+                    }
+                    
+                    $logDesc = "Retur ke Supplier #{$returnNumber} disetujui. {$productReturn->quantity} tabung rusak dikembalikan ke Supplier ({$product->name}).";
                 } else {
-                    $product->increment('damaged_stock', $productReturn->quantity);
-                    $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak ({$product->name}).";
+                    // Retur dari Pelanggan
+                    if ($productReturn->condition === 'Good') {
+                        $product->increment('stock', $productReturn->quantity);
+                        $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Bagus dikembalikan ke Stok Siap Jual ({$product->name}).";
+                    } else {
+                        $product->increment('damaged_stock', $productReturn->quantity);
+                        $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak ({$product->name}).";
+                    }
                 }
                 ActivityLog::log('Create', $logDesc);
             } else {
-                ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Status: {$productReturn->status})");
+                ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Kategori: {$productReturn->return_category}, Status: {$productReturn->status})");
             }
         });
 
@@ -108,12 +134,20 @@ class ProductReturnController extends Controller
             $product = $return->product;
 
             if ($product) {
-                if ($return->condition === 'Good') {
-                    $product->increment('stock', $return->quantity);
-                    $logDesc = "Menyetujui Retur #{$return->return_number}. {$return->quantity} tabung kondisi Bagus dimasukkan kembali ke Stok Siap Jual.";
+                if ($return->return_category === 'Supplier') {
+                    $product->decrement('damaged_stock', min($return->quantity, $product->damaged_stock));
+                    if ($return->return_type === 'Exchange') {
+                        $product->increment('stock', $return->quantity);
+                    }
+                    $logDesc = "Menyetujui Retur ke Supplier #{$return->return_number}. {$return->quantity} tabung rusak dikembalikan ke Supplier.";
                 } else {
-                    $product->increment('damaged_stock', $return->quantity);
-                    $logDesc = "Menyetujui Retur #{$return->return_number}. {$return->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak.";
+                    if ($return->condition === 'Good') {
+                        $product->increment('stock', $return->quantity);
+                        $logDesc = "Menyetujui Retur #{$return->return_number}. {$return->quantity} tabung kondisi Bagus dimasukkan kembali ke Stok Siap Jual.";
+                    } else {
+                        $product->increment('damaged_stock', $return->quantity);
+                        $logDesc = "Menyetujui Retur #{$return->return_number}. {$return->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak.";
+                    }
                 }
                 ActivityLog::log('Update', $logDesc);
             }
@@ -122,15 +156,34 @@ class ProductReturnController extends Controller
         return redirect()->route('returns.index')->with('success', 'Retur barang berhasil disetujui dan stok inventaris telah otomatis diperbarui!');
     }
 
+    public function reject(Request $request, ProductReturn $return)
+    {
+        if ($return->status === 'Approved') {
+            return redirect()->back()->with('error', 'Retur yang sudah disetujui tidak dapat ditolak.');
+        }
+
+        $return->update(['status' => 'Rejected']);
+        ActivityLog::log('Update', "Menolak permohonan retur #{$return->return_number}");
+
+        return redirect()->route('returns.index')->with('success', 'Permohonan retur barang telah ditolak.');
+    }
+
     public function destroy(ProductReturn $return)
     {
         DB::transaction(function () use ($return) {
             // Jika retur sudah Approved dan dihapus, kembalikan stok
             if ($return->status === 'Approved' && $return->product) {
-                if ($return->condition === 'Good') {
-                    $return->product->decrement('stock', min($return->quantity, $return->product->stock));
+                if ($return->return_category === 'Supplier') {
+                    $return->product->increment('damaged_stock', $return->quantity);
+                    if ($return->return_type === 'Exchange') {
+                        $return->product->decrement('stock', min($return->quantity, $return->product->stock));
+                    }
                 } else {
-                    $return->product->decrement('damaged_stock', min($return->quantity, $return->product->damaged_stock));
+                    if ($return->condition === 'Good') {
+                        $return->product->decrement('stock', min($return->quantity, $return->product->stock));
+                    } else {
+                        $return->product->decrement('damaged_stock', min($return->quantity, $return->product->damaged_stock));
+                    }
                 }
             }
 
@@ -144,14 +197,14 @@ class ProductReturnController extends Controller
 
     public function print(ProductReturn $return)
     {
-        $return->load(['customer', 'product', 'order', 'delivery.driver']);
+        $return->load(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery.driver']);
         return view('returns.print', compact('return'));
     }
 
     public function printPublic($id)
     {
         try {
-            $return = ProductReturn::with(['customer', 'product', 'order', 'delivery.driver'])->findOrFail($id);
+            $return = ProductReturn::with(['customer', 'supplier', 'product', 'order', 'purchase', 'delivery.driver'])->findOrFail($id);
             return view('returns.print', compact('return'));
         } catch (\Throwable $e) {
             return response("Error: " . $e->getMessage(), 500)->header('Content-Type', 'text/plain');

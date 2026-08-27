@@ -140,16 +140,30 @@
 
         <div class="details-container">
             <div class="billing-info">
-                <h4>Data Pelanggan:</h4>
-                <strong>{{ $return->customer->customer_name ?? 'Pelanggan' }}</strong><br>
-                Telepon: {{ $return->customer->phone ?? '-' }}<br>
-                Alamat: {{ $return->customer->address ?? '-' }}
+                @if(($return->return_category ?? 'Customer') === 'Supplier')
+                    <h4>Data Supplier (Pihak Tujuan Retur):</h4>
+                    <strong>{{ $return->supplier->name ?? 'Supplier' }}</strong><br>
+                    Telepon: {{ $return->supplier->phone ?? '-' }}<br>
+                    Alamat: {{ $return->supplier->address ?? '-' }}
+                @else
+                    <h4>Data Pelanggan:</h4>
+                    <strong>{{ $return->customer->customer_name ?? 'Pelanggan' }}</strong><br>
+                    Telepon: {{ $return->customer->phone ?? '-' }}<br>
+                    Alamat: {{ $return->customer->address ?? '-' }}
+                @endif
             </div>
             <div class="meta-info">
                 <h4>Detail Dokumen Retur:</h4>
+                Kategori Retur: <strong>{{ ($return->return_category ?? 'Customer') === 'Supplier' ? 'Retur ke Supplier (Purchase Return)' : 'Retur dari Pelanggan (Sales Return)' }}</strong><br>
                 Tanggal Retur: {{ \Carbon\Carbon::parse($return->return_date)->format('d M Y') }}<br>
-                Ref Order: {{ $return->order_id ? 'Order #' . $return->order_id : '-' }}<br>
-                Ref Delivery: {{ $return->delivery_id ? 'Pengiriman #' . $return->delivery_id : '-' }}<br>
+                @if($return->purchase_id)
+                    Ref Pembelian: PO #{{ $return->purchase_id }}<br>
+                @elseif($return->order_id)
+                    Ref Order: Order #{{ $return->order_id }}<br>
+                @endif
+                @if($return->delivery_id)
+                    Ref Delivery: Pengiriman #{{ $return->delivery_id }}<br>
+                @endif
                 Status Retur: 
                 <span style="font-weight: 700; color: {{ $return->status === 'Approved' ? '#15803d' : '#c2410c' }}">
                     {{ $return->status === 'Approved' ? 'DISETUJUI (Approved)' : 'PENDING' }}
@@ -178,20 +192,22 @@
                     <td style="text-align: center; font-weight:700;">{{ $return->quantity }} tabung</td>
                     <td style="text-align: center;">
                         <span style="font-weight:600; color: {{ $return->condition === 'Good' ? '#15803d' : '#b91c1c' }};">
-                            {{ $return->condition === 'Good' ? 'Bagus / Layak' : 'Rusak / Cacat / Bocor' }}
+                            {{ $return->condition === 'Good' ? 'Bagus / Utuh' : 'Rusak / Cacat / Bocor' }}
                         </span>
                     </td>
                     <td>
-                        @if($return->return_type === 'Exchange')
-                            Ganti Barang Baru (Exchange)
-                        @elseif($return->return_type === 'Refund')
-                            Pengembalian Dana (Refund)
-                        @else
-                            Potong Nota / Piutang (Credit)
-                        @endif
+                        <strong>
+                            @if($return->return_type === 'Exchange')
+                                Ganti Barang Baru (Exchange)
+                            @elseif($return->return_type === 'Refund')
+                                Pengembalian Dana (Refund)
+                            @else
+                                Potong Nota / Tagihan (Credit)
+                            @endif
+                        </strong>
                     </td>
-                    <td style="text-align: right; font-weight:600;">
-                        Rp {{ number_format($return->refund_amount, 0, ',', '.') }}
+                    <td style="text-align: right; font-weight:700; color:#0f172a;">
+                        Rp {{ number_format($return->refund_amount ?? 0, 0, ',', '.') }}
                     </td>
                 </tr>
             </tbody>
@@ -200,28 +216,34 @@
         <div class="totals">
             <div class="totals-box">
                 <div class="totals-row">
-                    <span>Total Tabung Diretur</span>
-                    <span style="font-weight:700;">{{ $return->quantity }} Tabung</span>
+                    <span style="color:#64748b;">Jumlah Unit Retur:</span>
+                    <strong>{{ $return->quantity }} Tabung</strong>
                 </div>
                 <div class="totals-row grand-total">
-                    <span>Total Dana Dikembalikan</span>
-                    <span>Rp {{ number_format($return->refund_amount, 0, ',', '.') }}</span>
+                    <span>Total Klaim / Refund:</span>
+                    <span style="color:#2563eb;">Rp {{ number_format($return->refund_amount ?? 0, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
 
         <div class="footer">
             <div class="signature-block">
-                <p>Pelanggan / Pemohon,</p>
-                <div class="signature-line">{{ $return->customer->customer_name ?? 'Pelanggan' }}</div>
+                <p style="margin-bottom: 0;">{{ ($return->return_category ?? 'Customer') === 'Supplier' ? 'Pihak Supplier,' : 'Pelanggan / Penerima,' }}</p>
+                <div class="signature-line">
+                    ( {{ ($return->return_category ?? 'Customer') === 'Supplier' ? ($return->supplier->name ?? 'Supplier') : ($return->customer->customer_name ?? 'Pelanggan') }} )
+                </div>
             </div>
             <div class="signature-block">
-                <p>Petugas Gudang / Pemeriksa,</p>
-                <div class="signature-line">{{ config('app.demo') ? 'PT XYZ' : 'TK. Naga Sakti Jaya' }}</div>
+                <p style="margin-bottom: 0;">Bagian Gudang / Kasir,</p>
+                <div class="signature-line">
+                    ( {{ auth()->user()->name ?? 'Petugas Toko' }} )
+                </div>
             </div>
             <div class="signature-block">
-                <p>Menyetujui (Manager),</p>
-                <div class="signature-line">{{ auth()->user()->name ?? 'Manager Toko' }}</div>
+                <p style="margin-bottom: 0;">Manager / Pemilik,</p>
+                <div class="signature-line">
+                    ( ........................................... )
+                </div>
             </div>
         </div>
     </div>
