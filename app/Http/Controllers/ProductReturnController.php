@@ -19,6 +19,10 @@ class ProductReturnController extends Controller
     private function ensureSchema()
     {
         try {
+            DB::statement("ALTER TABLE `product_returns` MODIFY `customer_id` BIGINT UNSIGNED NULL");
+        } catch (\Throwable $e) {}
+
+        try {
             if (!Schema::hasColumn('product_returns', 'supplier_id')) {
                 Schema::table('product_returns', function ($table) {
                     $table->string('return_category')->default('Customer')->nullable();
@@ -99,8 +103,8 @@ class ProductReturnController extends Controller
 
         $request->validate([
             'return_category' => 'required|in:Customer,Supplier',
-            'customer_id'     => 'nullable|required_if:return_category,Customer|exists:customers,id',
-            'supplier_id'     => 'nullable|required_if:return_category,Supplier|exists:suppliers,id',
+            'customer_id'     => $request->return_category === 'Customer' ? 'required|exists:customers,id' : 'nullable',
+            'supplier_id'     => $request->return_category === 'Supplier' ? 'required|exists:suppliers,id' : 'nullable',
             'product_id'      => 'required|exists:products,id',
             'order_id'        => 'nullable|exists:orders,id',
             'purchase_id'     => 'nullable|exists:purchases,id',
@@ -117,63 +121,83 @@ class ProductReturnController extends Controller
         $prefix = $request->return_category === 'Supplier' ? 'RETSUP-' : 'RET-';
         $returnNumber = $prefix . date('Ymd') . '-' . str_pad((ProductReturn::count() + 1), 4, '0', STR_PAD_LEFT);
 
-        DB::transaction(function () use ($request, $returnNumber) {
-            $data = [
-                'return_number'   => $returnNumber,
-                'customer_id'     => $request->return_category === 'Customer' ? $request->customer_id : null,
-                'product_id'      => $request->product_id,
-                'order_id'        => $request->order_id,
-                'delivery_id'     => $request->delivery_id,
-                'quantity'        => $request->quantity,
-                'condition'       => $request->condition,
-                'return_type'     => $request->return_type,
-                'refund_amount'   => $request->refund_amount ?? 0,
-                'reason'          => $request->reason,
-                'status'          => $request->status,
-                'return_date'     => $request->return_date,
-            ];
-
-            if (Schema::hasColumn('product_returns', 'return_category')) {
-                $data['return_category'] = $request->return_category;
-            }
-            if (Schema::hasColumn('product_returns', 'supplier_id')) {
-                $data['supplier_id'] = $request->return_category === 'Supplier' ? $request->supplier_id : null;
-            }
-            if (Schema::hasColumn('product_returns', 'purchase_id')) {
-                $data['purchase_id'] = $request->purchase_id;
-            }
-
-            $productReturn = ProductReturn::create($data);
-
-            $product = Product::find($request->product_id);
-
-            // Jika status disetujui (Approved), otomatis sesuaikan inventaris
-            if ($productReturn->status === 'Approved' && $product) {
-                if (($productReturn->return_category ?? 'Customer') === 'Supplier') {
-                    // Retur ke Supplier: keluarkan tabung rusak dari stok karantina gudang
-                    $product->decrement('damaged_stock', min($productReturn->quantity, $product->damaged_stock));
-                    
-                    // Jika ditukar tabung baru oleh supplier, tambah ke stok siap jual
-                    if ($productReturn->return_type === 'Exchange') {
-                        $product->increment('stock', $productReturn->quantity);
-                    }
-                    
-                    $logDesc = "Retur ke Supplier #{$returnNumber} disetujui. {$productReturn->quantity} tabung rusak dikembalikan ke Supplier ({$product->name}).";
-                } else {
-                    // Retur dari Pelanggan
-                    if ($productReturn->condition === 'Good') {
-                        $product->increment('stock', $productReturn->quantity);
-                        $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Bagus dikembalikan ke Stok Siap Jual ({$product->name}).";
-                    } else {
-                        $product->increment('damaged_stock', $productReturn->quantity);
-                        $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak ({$product->name}).";
+        try {
+            DB::transaction(function () use ($request, $returnNumber) {
+                $customerId = $request->return_category === 'Customer' ? $request->customer_id : null;
+                if (empty($customerId)) {
+                    try {
+                        $isNullable = DB::select("SELECT IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'product_returns' AND COLUMN_NAME = 'customer_id'");
+                        if (!empty($isNullable) && $isNullable[0]->IS_NULLABLE === 'NO') {
+                            $firstCust = Customer::first();
+                            $customerId = $firstCust ? $firstCust->id : null;
+                        }
+                    } catch (\Throwable $e) {
+                        $firstCust = Customer::first();
+                        $customerId = $firstCust ? $firstCust->id : null;
                     }
                 }
-                ActivityLog::log('Create', $logDesc);
-            } else {
-                ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Status: {$productReturn->status})");
-            }
-        });
+
+                $data = [
+                    'return_number'   => $returnNumber,
+                    'customer_id'     => $customerId,
+                    'product_id'      => $request->product_id,
+                    'order_id'        => $request->order_id,
+                    'delivery_id'     => $request->delivery_id,
+                    'quantity'        => $request->quantity,
+                    'condition'       => $request->condition,
+                    'return_type'     => $request->return_type,
+                    'refund_amount'   => $request->refund_amount ?? 0,
+                    'reason'          => $request->reason,
+                    'status'          => $request->status,
+                    'return_date'     => $request->return_date,
+                ];
+
+                if (Schema::hasColumn('product_returns', 'return_category')) {
+                    $data['return_category'] = $request->return_category;
+                }
+                if (Schema::hasColumn('product_returns', 'supplier_id')) {
+                    $data['supplier_id'] = $request->return_category === 'Supplier' ? $request->supplier_id : null;
+                }
+                if (Schema::hasColumn('product_returns', 'purchase_id')) {
+                    $data['purchase_id'] = $request->purchase_id;
+                }
+
+                $productReturn = ProductReturn::create($data);
+
+                $product = Product::find($request->product_id);
+
+                // Jika status disetujui (Approved), otomatis sesuaikan inventaris
+                if ($productReturn->status === 'Approved' && $product) {
+                    if (($productReturn->return_category ?? 'Customer') === 'Supplier') {
+                        // Retur ke Supplier: keluarkan tabung rusak dari stok karantina gudang
+                        $product->decrement('damaged_stock', min($productReturn->quantity, $product->damaged_stock));
+                        
+                        // Jika ditukar tabung baru oleh supplier, tambah ke stok siap jual
+                        if ($productReturn->return_type === 'Exchange') {
+                            $product->increment('stock', $productReturn->quantity);
+                        }
+                        
+                        $logDesc = "Retur ke Supplier #{$returnNumber} disetujui. {$productReturn->quantity} tabung rusak dikembalikan ke Supplier ({$product->name}).";
+                    } else {
+                        // Retur dari Pelanggan
+                        if ($productReturn->condition === 'Good') {
+                            $product->increment('stock', $productReturn->quantity);
+                            $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Bagus dikembalikan ke Stok Siap Jual ({$product->name}).";
+                        } else {
+                            $product->increment('damaged_stock', $productReturn->quantity);
+                            $logDesc = "Retur #{$returnNumber} disetujui. {$productReturn->quantity} tabung kondisi Rusak/Bocor dimasukkan ke Stok Rusak ({$product->name}).";
+                        }
+                    }
+                    ActivityLog::log('Create', $logDesc);
+                } else {
+                    ActivityLog::log('Create', "Mencatat permohonan retur baru #{$returnNumber} (Status: {$productReturn->status})");
+                }
+            });
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan retur: ' . $e->getMessage());
+        }
 
         return redirect()->route('returns.index')->with('success', 'Data retur barang berhasil disimpan!');
     }

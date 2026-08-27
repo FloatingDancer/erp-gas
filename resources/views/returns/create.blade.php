@@ -315,6 +315,18 @@ $(document).ready(function() {
         calculateRefund();
     });
 
+    // Form submit protection
+    $('#returnForm').on('submit', function(e) {
+        const cat = $('#returnCategoryInput').val();
+        if (cat === 'Supplier') {
+            $('#customerSelect').prop('disabled', true);
+            $('#supplierSelect').prop('disabled', false);
+        } else {
+            $('#supplierSelect').prop('disabled', true);
+            $('#customerSelect').prop('disabled', false);
+        }
+    });
+
     calculateRefund();
 });
 </script>
